@@ -14,8 +14,8 @@ export default function WhatsappPage() {
       <div className="mx-auto w-full max-w-content p-page">
         <EmptyState
           icon={MessageCircle}
-          title="Nomor WhatsApp belum terhubung"
-          description="Hubungkan nomor warung lebih dulu. Setelah tersambung, orderan pelanggan masuk ke KedeAwak tanpa perlu dicatat manual."
+          title="Halaman ini belum berfungsi"
+          description="Status kanal WhatsApp dan pesan pelanggan belum ditampilkan di sini. Data warung yang sudah tercatat bisa dibuka dari halaman Dasbor, Stok, dan Laporan."
         />
       </div>
     </>

@@ -426,7 +426,7 @@ Rincian enkripsi, sesuai `src/lib/crypto/field-encryption.ts`:
 | -------------- | ------------- | -------------------------------------------------------------------------------------------------------------- |
 | Unit           | Vitest        | Sepuluh tool, perhitungan laporan, rata rata bergerak, context lock, format rupiah dan tanggal, aturan teks UI |
 | Integrasi      | Vitest        | Kanal webhook sampai tersimpan sebagai order dan pembayaran, orkestrasi sampai tool terpanggil                 |
-| Ujung ke ujung | Playwright    | Sepuluh langkah kriteria sukses demo di `docs/SCOPE.md` bagian 7                                               |
+| Ujung ke ujung | Playwright    | Tata letak kerangka aplikasi, lalu aliran potongan vertikal Dasbor, Laporan, dan Stok                          |
 | Aturan UI      | Skrip sendiri | Larangan emoji dan tanda hubung pada semua teks yang dilihat pengguna                                          |
 
 Letak berkas dan perintahnya:
@@ -451,6 +451,20 @@ urutan pergerakan stok, dan total laporannya sama pada setiap kali dijalankan.
 menghasilkan tipe rute dan tipe `LayoutProps` ke dalam `.next`. Tanpa langkah
 itu, pemeriksaan tipe gagal pada salinan repo yang baru.
 
+Setiap kartu data pada permukaan aplikasi dibungkus tiga lapis. Kartu bagian
+menyediakan permukaan dan judulnya, batas `Suspense` menyediakan kerangka muat,
+dan pembatas galat dari `catchError` menjaga kegagalan tetap di dalam kartu itu
+saja, sehingga satu bagian yang gagal tidak menjatuhkan seluruh halaman. Halaman
+dan komponen membaca data lewat `withCurrentBusiness` pada
+`src/lib/data/server.ts`, yang menyediakan handle basis data tanpa membuat
+`src/components/` menyentuh `src/lib/db/`. Karena Cache Components mengaktifkan
+`cacheComponents`, pembacaan data bersifat dinamis tanpa `force-dynamic`, dan
+nilai waktu dibaca sesudah `await connection()` supaya batas harinya tetap
+Waktu Indonesia Barat. Hasilnya setiap halaman yang membaca data dirender
+sebagai Partial Prerender: kerangka halaman statis, isi kartu mengalir
+menyusul. Uji peramban `e2e/vertical.spec.ts` memeriksa seluruh alur ini pada
+dua lebar layar, 393 dan 1280 piksel.
+
 ## 10. Keputusan yang sudah ditetapkan
 
 Semua keputusan berikut sudah dikonfirmasi user atau sudah diverifikasi
@@ -464,7 +478,7 @@ langsung dari dokumentasi resmi. Tanggal: 17 Oktober 2026.
 | A4    | Basis data demo                                       | PGlite, PostgreSQL di dalam proses                                                                                                                              | User menyetujui setelah dipastikan mendukung CRUD penuh                                                                                                                                                                                                                                                                                                                                                          |
 | A5    | Pengambilan konteks bisnis                            | Query SQL terstruktur, tanpa pgvector                                                                                                                           | DeepSeek tidak menyediakan endpoint embedding, sehingga kolom vektor tidak dapat diisi data nyata. Data warung juga berupa data terstruktur, sehingga query lebih tepat daripada kemiripan vektor. PGlite tetap dipakai sesuai K7                                                                                                                                                                                |
 | A6    | Identitas git dan autentikasi push                    | Nama `ZeaLIsHere`, email noreply GitHub, kredensial Windows Credential Manager                                                                                  | Push sudah terverifikasi berhasil                                                                                                                                                                                                                                                                                                                                                                                |
-| A7    | Akses skill desain                                    | Belum diputuskan, akan dipakai saat fase 1                                                                                                                      | Data skill dibaca lewat Node selama Python belum terpasang                                                                                                                                                                                                                                                                                                                                                       |
+| A7    | Akses skill desain                                    | Dipakai sebagian; data skill dibaca langsung dari berkasnya, tanpa `scripts/search.py` karena Python belum terpasang                                            | Token dan aturan desain disusun dari `DESIGN.md` serta bacaan berkas data skill                                                                                                                                                                                                                                                                                                                                  |
 | A8    | Penyedia kanal WhatsApp                               | **Fonnte.** Paket gratis, tanpa n8n sebagai perantara                                                                                                           | Nomor user sudah terhubung ke Fonnte dan chat teks berjalan, sehingga demo punya kanal WhatsApp nyata tanpa menunggu verifikasi bisnis Meta. Batasan lampiran dan voice note sudah dipastikan dari dokumentasi resmi dan dicatat di bagian 11. Ditinjau ulang bila keadaan berubah                                                                                                                               |
 | A9    | Versi dan opsi bawaan Next.js                         | Next.js 16.4.2, React 19.3.0, Tailwind 4, `cacheComponents` aktif, `partialPrefetching` aktif                                                                   | Keluaran `create-next-app`. Lihat catatan di bawah tabel                                                                                                                                                                                                                                                                                                                                                         |
 | A10   | Penulisan otomatis blok aturan Next.js ke `AGENTS.md` | Dimatikan, memakai `agentRules: false` pada `next.config.ts`                                                                                                    | `AGENTS.md` dikelola tim. Panduan Next.js 16 dibaca dari `node_modules/next/dist/docs/`                                                                                                                                                                                                                                                                                                                          |

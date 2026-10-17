@@ -11,8 +11,8 @@ export default function PengaturanPage() {
       <div className="mx-auto w-full max-w-content p-page">
         <EmptyState
           icon={Settings}
-          title="Belum ada data pelanggan tersimpan"
-          description="Enkripsi nama dan nomor telepon pelanggan, serta permintaan penghapusan data pelanggan, berada di halaman ini."
+          title="Halaman ini belum berfungsi"
+          description="Keterangan koneksi nomor dan privasi data pelanggan belum ditampilkan di sini. Data warung yang sudah tercatat bisa dibuka dari halaman Dasbor, Stok, dan Laporan."
         />
       </div>
     </>

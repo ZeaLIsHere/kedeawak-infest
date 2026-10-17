@@ -37,11 +37,11 @@ diperbarui 17 Oktober 2026.
 | 2    | Basis data dan lapisan data         | 8       | 8     |
 | 3    | Tool layer                          | 0       | 12    |
 | 4    | Lapisan AI dan context lock         | 0       | 10    |
-| 5    | Permukaan aplikasi                  | 0       | 32    |
+| 5    | Permukaan aplikasi                  | 10      | 32    |
 | 6    | Pematangan dan bukti                | 0       | 7     |
-|      | Jumlah                              | 28      | 89    |
+|      | Jumlah                              | 38      | 89    |
 
-Fokus berikutnya: T5.1.
+Fokus berikutnya: T5.27.
 
 Pelacak kedua adalah riwayat git. Setiap commit memuat baris `Refs:` yang
 menunjuk ID tugas, sehingga `git log` dapat dipakai untuk menelusuri kapan
@@ -57,6 +57,18 @@ menyusul sesudahnya, dan tidak ada tugas pada kedua fase itu yang dibatalkan.
 Rincian rancangan potongan itu ada di
 `docs/plans/2026-10-17-potongan-vertikal-1.md`. Sisa tugas Fase 5 dikerjakan
 setelah Fase 3 dan Fase 4, sesuai urutan aslinya.
+
+Potongan pertama itu selesai pada 17 Oktober 2026. S1 Dasbor, S4 Laporan
+Keuangan, dan S5 Stok sudah berjalan dari data demo sampai layar, dan tiga
+permukaan lain yang belum dibangun tampil dengan keterangan terus terang bahwa
+halamannya belum berfungsi. Dua catatan untuk pekerjaan berikutnya. Pertama,
+data demo sudah memuat satu aksi menunggu persetujuan, dan aksi itu belum
+terlihat di mana pun sampai S6 dibangun, padahal alur alert stok menuju draft
+orderan pembelian lalu disetujui adalah butir penerimaan 8 dan 9 pada
+`docs/SCOPE.md` bagian 7. Karena itu S6 Persetujuan, yaitu T5.27 sampai T5.30,
+disarankan dikerjakan berikutnya. Kedua, `DEEPSEEK_API_KEY` dan `FONNTE_TOKEN`
+pada `.env.local` masih kosong, sehingga Fase 3 dan Fase 4 belum dapat diuji
+sampai pemilik proyek mengisinya.
 
 ---
 
@@ -195,10 +207,10 @@ Tujuan: enam permukaan berfungsi penuh, sesuai `docs/SCOPE.md` bagian 2.
 
 | ID   | Tugas                                                | Status |
 | ---- | ---------------------------------------------------- | ------ |
-| T5.1 | Ringkasan penjualan, pengeluaran, dan laba hari ini  | `[ ]`  |
-| T5.2 | Jumlah order dan produk terlaris                     | `[ ]`  |
-| T5.3 | Ringkasan alert stok terbaru                         | `[ ]`  |
-| T5.4 | Keadaan memuat, kosong, dan gagal untuk setiap kartu | `[ ]`  |
+| T5.1 | Ringkasan penjualan, pengeluaran, dan laba hari ini  | `[x]`  |
+| T5.2 | Jumlah order dan produk terlaris                     | `[x]`  |
+| T5.3 | Ringkasan alert stok terbaru                         | `[x]`  |
+| T5.4 | Keadaan memuat, kosong, dan gagal untuk setiap kartu | `[x]`  |
 
 ### S2 Percakapan dengan Agen AI
 
@@ -231,20 +243,25 @@ menghubungkan, batasan lampiran, dan akibatnya pada rancangan ada di
 
 | ID    | Tugas                                      | Status |
 | ----- | ------------------------------------------ | ------ |
-| T5.18 | Laporan harian                             | `[ ]`  |
-| T5.19 | Laporan mingguan                           | `[ ]`  |
-| T5.20 | Rincian transaksi per periode              | `[ ]`  |
-| T5.21 | Pemisahan penjualan, pengeluaran, dan laba | `[ ]`  |
+| T5.18 | Laporan harian                             | `[x]`  |
+| T5.19 | Laporan mingguan                           | `[x]`  |
+| T5.20 | Rincian transaksi per periode              | `[x]`  |
+| T5.21 | Pemisahan penjualan, pengeluaran, dan laba | `[x]`  |
 
 ### S5 Stok dan Produk
 
 | ID    | Tugas                                 | Status |
 | ----- | ------------------------------------- | ------ |
-| T5.22 | Daftar produk dengan harga dan stok   | `[ ]`  |
+| T5.22 | Daftar produk dengan harga dan stok   | `[x]`  |
 | T5.23 | Pengaturan ambang minimum per produk  | `[ ]`  |
-| T5.24 | Daftar alert stok menipis             | `[ ]`  |
+| T5.24 | Daftar alert stok menipis             | `[x]`  |
 | T5.25 | Penyesuaian stok manual dengan alasan | `[ ]`  |
 | T5.26 | Prediksi stok dan rekomendasi restok  | `[ ]`  |
+
+Catatan: T5.23, T5.25, dan T5.26 belum dikerjakan karena mengubah data dan
+memerlukan formulir serta lapisan aksi yang belum ada. Ketiganya menunggu
+potongan berikutnya. Daftar produk pada T5.22 sudah menampilkan ambang minimum
+tiap produk, hanya belum dapat diubah dari halaman ini.
 
 ### S6 Persetujuan
 

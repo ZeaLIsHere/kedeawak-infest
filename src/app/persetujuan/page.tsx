@@ -14,8 +14,8 @@ export default function PersetujuanPage() {
       <div className="mx-auto w-full max-w-content p-page">
         <EmptyState
           icon={ClipboardCheck}
-          title="Tidak ada yang menunggu persetujuan"
-          description="Aksi yang mengubah data warung akan berhenti di sini dan menunggu persetujuan Anda lebih dulu."
+          title="Halaman ini belum berfungsi"
+          description="Antrean persetujuan belum ditampilkan di sini. Data warung yang sudah tercatat bisa dibuka dari halaman Dasbor, Stok, dan Laporan."
         />
       </div>
     </>

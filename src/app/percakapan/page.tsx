@@ -14,8 +14,8 @@ export default function PercakapanPage() {
       <div className="mx-auto w-full max-w-content p-page">
         <EmptyState
           icon={Bot}
-          title="Belum ada percakapan"
-          description="Mulai dengan mengetik pertanyaan seperti penjualan hari ini berapa, atau sebutkan barang yang baru laku."
+          title="Halaman ini belum berfungsi"
+          description="Percakapan dengan agen AI belum ditampilkan di sini. Data warung yang sudah tercatat bisa dibuka dari halaman Dasbor, Stok, dan Laporan."
         />
       </div>
     </>

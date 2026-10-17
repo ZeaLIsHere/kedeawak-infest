@@ -23,6 +23,38 @@ const visibleText = (page: Page, text: string) =>
 /** Jumlah produk pada data demo, sesuai `DEMO_PRODUCTS` di `src/lib/db/seed.ts`. */
 const JUMLAH_PRODUK_DEMO = 20;
 
+/*
+ * Permukaan yang belum dibuka pada potongan vertikal ini. Setiap halaman
+ * menyatakan keadaannya apa adanya dan tidak menyediakan tindakan apa pun,
+ * sesuai keputusan pemilik proyek.
+ */
+const HALAMAN_BELUM_BERFUNGSI: readonly {
+  readonly path: string;
+  readonly heading: string;
+  readonly keterangan: string;
+}[] = [
+  {
+    path: "/percakapan",
+    heading: "Percakapan dengan Agen AI",
+    keterangan: "Percakapan dengan agen AI belum ditampilkan",
+  },
+  {
+    path: "/whatsapp",
+    heading: "Integrasi WhatsApp",
+    keterangan: "Status kanal WhatsApp dan pesan pelanggan belum ditampilkan",
+  },
+  {
+    path: "/persetujuan",
+    heading: "Persetujuan",
+    keterangan: "Antrean persetujuan belum ditampilkan",
+  },
+  {
+    path: "/pengaturan",
+    heading: "Pengaturan",
+    keterangan: "Keterangan koneksi nomor dan privasi data pelanggan belum ditampilkan",
+  },
+];
+
 /** Semua nilai rupiah yang sedang tampil. */
 const visibleRupiah = (page: Page) =>
   page.getByText(/^Rp[\d.]+$/u).filter({ visible: true });
@@ -173,4 +205,38 @@ test.describe("Laporan Keuangan", () => {
     ).toBeVisible();
     await expectNoHorizontalScroll(page);
   });
+});
+
+test.describe("berpindah dari Dasbor", () => {
+  test("membuka Laporan lewat navigasi", async ({ page }) => {
+    await page.goto("/");
+    await page.getByRole("link", { name: "Laporan", exact: true }).click();
+
+    await expect(page).toHaveURL(/\/laporan$/u);
+    await expect(page.getByRole("heading", { name: "Ringkasan periode" })).toBeVisible();
+    await expect(visibleText(page, "Jumlah transaksi").first()).toBeVisible();
+  });
+});
+
+test.describe("permukaan yang belum berfungsi", () => {
+  for (const halaman of HALAMAN_BELUM_BERFUNGSI) {
+    test(`${halaman.path} menyatakan belum berfungsi tanpa tindakan`, async ({
+      page,
+    }) => {
+      await page.goto(halaman.path);
+
+      await expect(page.getByRole("heading", { level: 1 })).toHaveText(halaman.heading);
+      await expect(
+        visibleText(page, "Halaman ini belum berfungsi").first(),
+      ).toBeVisible();
+      await expect(page.getByText(halaman.keterangan).first()).toBeVisible();
+
+      /*
+       * Tidak boleh ada tombol atau tautan di dalam isi halaman, karena belum
+       * ada yang bisa dijalankan. Tautan navigasi berada di luar `main`.
+       */
+      await expect(page.locator("main").getByRole("button")).toHaveCount(0);
+      await expect(page.locator("main a")).toHaveCount(0);
+    });
+  }
 });

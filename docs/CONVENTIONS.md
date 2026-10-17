@@ -157,6 +157,12 @@ Perintah: `npm run lint:ui`.
    `src/components/ui/` atau folder bersama yang sesuai.
 5. Komponen tingkat halaman tidak boleh dipindahkan ke folder bersama hanya
    karena satu bagian kecil dipakai ulang.
+6. Dua folder bersama dipakai dengan pembagian berikut. `src/components/ui/`
+   memuat komponen dasar dari shadcn/ui beserta variannya. `src/components/shell/`
+   memuat kerangka aplikasi dan komponen bersama antarpermukaan, misalnya
+   `SectionCard`, `StateBlock`, `EmptyState`, `MetricBlock`, `Skeleton`,
+   `CardError`, dan `LowStockBadge`. Komponen yang hanya dipakai satu permukaan
+   tetap tinggal di folder permukaan itu, misalnya `src/components/dashboard/`.
 
 ## 6. Penamaan
 
