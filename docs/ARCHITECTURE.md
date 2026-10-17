@@ -164,6 +164,14 @@ Aturan skema:
 3. Penghapusan data pelanggan dilakukan sebagai penghapusan baris sungguhan,
    sesuai butir privasi proposal, bukan penandaan lunak.
 4. Setiap perubahan stok wajib meninggalkan baris di `stock_movements`.
+5. Tabel `conversations` dan `messages` tetap ada karena dibutuhkan untuk
+   menerima pesan pelanggan, membentuk orderan, dan menyusun balasan otomatis.
+   Keduanya **tidak dirender sebagai tampilan obrolan** di antarmuka. Yang
+   ditampilkan ke pemilik adalah orderan, bukti pembayaran, dan pesan asal
+   sebagai dasar orderan. Keputusan ini tercatat di `docs/SCOPE.md` bagian 3.1.
+6. `businesses` memuat keadaan koneksi kanal WhatsApp, yaitu status koneksi,
+   nomor bisnis, dan waktu koneksi. Nilai rahasia penyedia tidak disimpan di
+   baris ini, lihat bagian 8.
 
 ## 5. Antarmuka penyedia AI
 
@@ -302,6 +310,11 @@ Ini yang dimaksud human in the loop pada proposal, dan wajib.
    dilakukan di server.
 3. Variabel lingkungan hanya dari `.env.local`, yang tidak pernah masuk git.
 4. Setiap query data wajib menyertakan `business_id`.
+5. Kredensial penyedia kanal WhatsApp hanya dibaca dari variabel lingkungan.
+   Nomor bisnis dan waktu koneksi boleh disimpan di basis data, tetapi token
+   akses tidak pernah disimpan di baris basis data maupun di repo.
+6. Pesan masuk dari webhook wajib divalidasi terhadap skema sebelum dipakai,
+   karena bentuk payload penyedia berbeda beda dan isinya berasal dari luar.
 
 ## 9. Pengujian
 
@@ -326,6 +339,34 @@ langsung dari dokumentasi resmi. Tanggal: 17 Oktober 2026.
 | A5 | Pencarian vektor | Ekstensi pgvector untuk PGlite | PGlite menyediakan paket `@electric-sql/pglite-pgvector` |
 | A6 | Identitas git dan autentikasi push | Nama `ZeaLIsHere`, email noreply GitHub, kredensial Windows Credential Manager | Push sudah terverifikasi berhasil |
 | A7 | Akses skill desain | Belum diputuskan, akan dipakai saat fase 1 | Data skill dibaca lewat Node selama Python belum terpasang |
+| A8 | Penyedia kanal WhatsApp | **Belum diputuskan.** Meta Cloud API, Fonnte, atau n8n sebagai perantara | User menunda keputusan. Rincian pertimbangan ada di bagian 11 |
+
+### 11. Penyedia kanal WhatsApp yang belum diputuskan
+
+Permukaan S3 memuat aksi Hubungkan ke WhatsApp beserta tata caranya. Isi tata
+cara itu bergantung pada penyedia yang dipilih, sehingga bagian ini sengaja
+dibelum difinalkan.
+
+Tiga jalur yang dipertimbangkan beserta akibatnya pada kode:
+
+| Jalur | Tata cara yang ditulis | Akibat pada kode |
+| --- | --- | --- |
+| Meta WhatsApp Business Cloud API langsung | Daftar aplikasi Meta, verifikasi bisnis, daftarkan nomor, ambil Phone Number ID dan token akses, atur alamat webhook dan token verifikasi | Bentuk payload webhook mengikuti Cloud API. Perlu penanganan verifikasi webhook dan tanda tangan permintaan |
+| Penyedia perantara seperti Fonnte | Daftar akun penyedia, hubungkan nomor, ambil token perangkat, atur alamat webhook | Bentuk payload mengikuti penyedia. Perlu lapisan penerjemah payload agar inti aplikasi tetap bebas dari penyedia |
+| n8n sebagai perantara alur | Pasang n8n, susun alur penerimaan pesan, arahkan ke webhook aplikasi | n8n bukan penyedia WhatsApp, sehingga tetap butuh salah satu dari dua jalur di atas. Nilainya adalah perantara alur dan antrean |
+
+Yang tidak berubah dari pilihan mana pun:
+
+1. Permukaan S3 tetap memuat status koneksi, aksi menghubungkan, dan aksi
+   memutuskan, sesuai butir opt in pada proposal.
+2. Bentuk data pesan masuk yang disimpan tetap sama, yaitu percakapan, pesan,
+   orderan, dan bukti pembayaran.
+3. Seluruh pemrosesan pesan masuk lewat satu titik, yaitu fungsi yang sama
+   dengan parameter penyedia, supaya penggantian penyedia tidak menyentuh
+   logika bisnis.
+
+Keputusan ini wajib diambil sebelum tugas T5.11 dikerjakan.
+
 
 ### Kemampuan PGlite yang sudah dipastikan
 

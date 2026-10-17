@@ -28,7 +28,7 @@ Enam permukaan. Semuanya mengacu ke bagian mockup dan fitur utama proposal.
 | --- | --- | --- | --- |
 | S1 | Dasbor | Statistik penjualan, pengeluaran, laba, jumlah order, produk terlaris, alert stok terbaru | MASUK |
 | S2 | Percakapan dengan Agen AI | Obrolan dengan AI untuk mencatat transaksi lewat teks, voice note, dan foto struk, termasuk konfirmasi dan persetujuan aksi | MASUK |
-| S3 | Integrasi WhatsApp | Daftar chat pelanggan, detail percakapan, orderan yang masuk, bukti pembayaran, status verifikasi | SIMULASI |
+| S3 | Integrasi WhatsApp | Status koneksi nomor, aksi Hubungkan ke WhatsApp beserta tata caranya, orderan yang masuk, bukti pembayaran, status verifikasi | SIMULASI |
 | S4 | Laporan Keuangan | Laporan harian dan mingguan: penjualan, pengeluaran, laba, rincian transaksi, ekspor | MASUK |
 | S5 | Stok dan Produk | Daftar produk, harga, stok, ambang minimum, alert stok menipis, penyesuaian stok | MASUK |
 | S6 | Persetujuan | Antrean aksi yang menunggu persetujuan pemilik, contohnya draft PO ke supplier, dengan aksi setujui atau tolak | MASUK |
@@ -40,20 +40,34 @@ Enam fitur dari bagian "Fitur Utama" proposal.
 ### 3.1 Integrasi WhatsApp ke Aplikasi — SIMULASI
 
 Pesan pelanggan, orderan, dan bukti pembayaran tersambung dan tercatat di
-aplikasi.
+aplikasi, dan pemilik menghubungkan nomornya sendiri dari dalam aplikasi.
 
-- **Yang dikerjakan:** kanal masuk yang menerima payload pesan WhatsApp,
-  memprosesnya, dan menyimpannya sebagai percakapan, orderan, dan bukti
+- **Yang dikerjakan, bagian koneksi:** permukaan S3 memuat status koneksi
+  nomor, aksi Hubungkan ke WhatsApp beserta tata caranya sampai nomor
+  berstatus terhubung, dan aksi memutuskan koneksi. Nomor hanya diproses
+  setelah pemilik menghubungkannya sendiri, sesuai butir opt in pada proposal.
+- **Yang dikerjakan, bagian pesan:** kanal masuk yang menerima payload pesan
+  WhatsApp, memprosesnya, lalu menyimpannya sebagai orderan dan bukti
   pembayaran yang tampil di permukaan S3 dan S1.
-- **Yang disimulasikan:** pengiriman sebenarnya lewat WhatsApp Business Cloud
-  API milik Meta. Kanal masuk dibuat sebagai endpoint webhook dengan bentuk
-  payload yang sama seperti WhatsApp Cloud API, plus satu panel di aplikasi
-  untuk mengirim pesan tiruan sebagai pelanggan, supaya alur bisa
-  didemonstrasikan tanpa akun Meta.
-- **Alasan:** nomor WhatsApp Business, verifikasi bisnis Meta, dan biaya
+- **Yang tidak ditampilkan:** riwayat percakapan pelanggan dalam bentuk
+  tampilan obrolan. Keputusan user: detail percakapan tidak masuk ke
+  permukaan S3. Pesan pelanggan tetap diterima dan disimpan karena
+  dibutuhkan untuk membentuk orderan dan menyusun balasan, tetapi yang
+  ditampilkan ke pemilik adalah hasilnya, yaitu orderan, bukti pembayaran,
+  beserta pesan asal yang menjadi dasar orderan tersebut.
+- **Yang disimulasikan:** pengiriman dan penerimaan sebenarnya lewat penyedia
+  kanal WhatsApp. Kanal masuk dibuat sebagai endpoint webhook, ditambah satu
+  panel di aplikasi untuk mengirim pesan tiruan sebagai pelanggan, supaya
+  alur dapat didemonstrasikan tanpa kredensial penyedia.
+- **Alasan:** pendaftaran penyedia kanal, verifikasi bisnis, dan biaya
   percakapan berada di luar web dan di luar jangkauan tempo lomba.
-- **Batas:** tidak ada kode yang menyentuh Graph API Meta. Tidak ada
-  penyimpanan token Meta. Tidak ada verifikasi nomor.
+- **Batas:** tidak ada pengiriman pesan ke nomor pelanggan yang sesungguhnya.
+  Tidak ada token penyedia yang disimpan di dalam repo.
+- **Menunggu keputusan:** penyedia kanal yang dipakai, yaitu Meta Cloud API,
+  Fonnte, atau n8n sebagai perantara. Isi tata cara pada tombol Hubungkan ke
+  WhatsApp bergantung pada pilihan ini. Rincian ada di
+  `docs/ARCHITECTURE.md` bagian 11 dan keputusan K9 pada `PLAN.md`.
+
 
 ### 3.2 Ekstraksi Data Multimodal — MASUK
 
@@ -86,12 +100,15 @@ AI menjawab pertanyaan berulang seperti harga, ketersediaan, dan jam buka.
 
 - **Yang dikerjakan:** basis pengetahuan warung berisi harga, ketersediaan
   stok, dan jam buka. Saat pesan pelanggan masuk ke kanal S3, AI menyusun
-  balasan dan balasan itu tercatat di percakapan.
+  balasan.
 - **Yang disimulasikan:** pengiriman balasan ke WhatsApp asli. Balasan
-  ditampilkan di permukaan S3.
+  disimpan dan ditampilkan sebagai bagian dari konteks pesan pelanggan pada
+  orderan di permukaan S3, bukan sebagai tampilan obrolan. Ini mengikuti
+  keputusan pada bagian 3.1.
 - **Catatan proposal:** fitur ini masuk daftar Extended, tetapi juga muncul
   sebagai fitur utama. Keputusan: dikerjakan dengan status SIMULASI, karena
   seluruh mekanismenya dapat diperagakan di dalam web.
+
 
 ### 3.5 Permintaan Laporan Keuangan — MASUK
 
@@ -127,7 +144,7 @@ Sepuluh tool dari proposal. Ini daftar kerja yang harus ada dan berfungsi.
 | `create_expense(description, amount)` | MASUK | Menulis transaksi pengeluaran |
 | `create_debt(customer, amount)` | MASUK | Menulis hutang pelanggan |
 | `create_purchase_order(supplier, items)` | MASUK | Membuat draft PO ke antrean persetujuan |
-| `send_whatsapp(phone, message)` | SIMULASI | Menulis ke percakapan di S3, tidak benar benar mengirim |
+| `send_whatsapp(phone, message)` | SIMULASI | Menulis balasan pada konteks pesan pelanggan, tidak benar benar mengirim |
 | `verify_payment(image_url, expected_amount)` | MASUK | Mencocokkan bukti transfer dengan nominal yang diharapkan |
 | `get_report(period)` | MASUK | Menghitung ringkasan harian dan mingguan |
 | `forecast_stock(product_id)` | MASUK | Rata rata bergerak dengan safety stock, seperti di proposal |
@@ -138,12 +155,12 @@ pemanggilan tercatat di jejak audit agar dapat diperiksa saat demo.
 
 ## 5. Keamanan dan privasi yang dikerjakan
 
-Empat butir dari bagian privasi proposal. Ketiganya tampil di web.
+Empat butir dari bagian privasi proposal. Keempatnya tampil di web.
 
 | Butir proposal | Status | Wujud di aplikasi |
 | --- | --- | --- |
 | Hanya memproses pesan ke nomor bisnis warung | MASUK | Setiap entitas data terikat ke `business_id`. Tidak ada query lintas warung |
-| Pemilik menghubungkan nomor secara opt in | MASUK | Halaman pengaturan berisi status koneksi nomor dan aksi menghubungkan atau memutuskan |
+| Pemilik menghubungkan nomor secara opt in | MASUK | Permukaan S3 berisi status koneksi nomor, tata cara, aksi Hubungkan ke WhatsApp, dan aksi memutuskan koneksi |
 | Data pelanggan disimpan terenkripsi | MASUK | Kolom nama dan nomor telepon pelanggan dienkripsi saat disimpan |
 | Pemilik dapat menghapus data pelanggan | MASUK | Aksi hapus data pelanggan di S3, dengan konfirmasi |
 
@@ -204,20 +221,25 @@ Kalau salah satu di atas terasa perlu, tanyakan dulu. Jangan langsung dibuat.
 Demo dianggap berhasil bila seluruh rangkaian ini berjalan tanpa langkah
 manual di luar aplikasi:
 
-1. Ada pesan pelanggan masuk ke kanal WhatsApp, lengkap dengan satu orderan
+1. Pemilik membuka permukaan S3, menjalankan aksi Hubungkan ke WhatsApp, dan
+   nomor berubah berstatus terhubung.
+2. Ada pesan pelanggan masuk ke kanal WhatsApp, lengkap dengan satu orderan
    dan satu bukti transfer.
-2. Orderan dan bukti transfer itu otomatis muncul di dasbor dan di integrasi
-   WhatsApp dengan status verifikasi yang benar.
-3. Pemilik mengirim voice note atau foto struk di percakapan agen AI, dan
+3. Orderan dan bukti transfer itu otomatis muncul di dasbor dan di permukaan
+   S3 dengan status verifikasi yang benar.
+4. Pada orderan tersebut terlihat pesan asal pelanggan serta balasan otomatis
+   agen. Tidak ada tampilan obrolan, sesuai keputusan bagian 3.1.
+5. Pemilik mengirim voice note atau foto struk di percakapan agen AI, dan
    tercatat sebagai transaksi keuangan yang benar.
-4. Foto struk dengan confidence rendah memicu permintaan konfirmasi.
-5. Pemilik mengetik permintaan laporan, dan ringkasan penjualan beserta laba
+6. Foto struk dengan confidence rendah memicu permintaan konfirmasi.
+7. Pemilik mengetik permintaan laporan, dan ringkasan penjualan beserta laba
    langsung tersaji.
-6. Stok sebuah produk turun di bawah ambang minimum, alert muncul.
-7. Dari alert itu, AI membuat draft PO. Draft masuk antrean persetujuan.
+8. Stok sebuah produk turun di bawah ambang minimum, alert muncul.
+9. Dari alert itu, AI membuat draft PO. Draft masuk antrean persetujuan.
    Pemilik menyetujui, stok diperbarui.
-8. Selama draft PO menunggu persetujuan, pesan berikutnya tidak dianggap
-   transaksi baru.
+10. Selama draft PO menunggu persetujuan, pesan berikutnya tidak dianggap
+    transaksi baru.
 
 Semua langkah di atas adalah pengujian penerimaan yang harus lulus sebelum
 proyek dinyatakan selesai.
+

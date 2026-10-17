@@ -37,6 +37,7 @@ menghambat. Lihat bagian "Keputusan yang menunggu konfirmasi" di bawah.
 | K6 | Konfirmasi daftar fitur di `docs/SCOPE.md` | Ditanyakan | **Dikonfirmasi user.** Enam permukaan sesuai `docs/SCOPE.md` |
 | K7 | Pemakaian PGlite untuk demo, bukan Postgres terpisah | Ditanyakan | **Ditetapkan.** PGlite, setelah dipastikan mendukung CRUD penuh, transaksi, dan pgvector |
 | K8 | Transkripsi voice note | Diusulkan | **Ditetapkan.** Web Speech API peramban, karena DeepSeek tidak punya endpoint audio dan proposal menyebut Google STT |
+| K9 | Penyedia kanal WhatsApp: Meta Cloud API, Fonnte, atau n8n sebagai perantara | Ditanyakan | **Terbuka.** User belum memutuskan. Dibutuhkan sebelum tata cara Hubungkan ke WhatsApp ditulis. Lihat `docs/ARCHITECTURE.md` bagian 11 |
 
 ---
 
@@ -117,7 +118,7 @@ Tujuan: sepuluh tool proposal ada, berfungsi, dan teruji.
 | T3.4 | `create_expense` | Menulis pengeluaran | `[ ]` |
 | T3.5 | `create_debt` | Menulis hutang pelanggan | `[ ]` |
 | T3.6 | `create_purchase_order` | Membuat draft PO, bukan langsung menulis, masuk antrean persetujuan | `[ ]` |
-| T3.7 | `send_whatsapp` | Menulis balasan ke percakapan, tidak mengirim ke luar | `[ ]` |
+| T3.7 | `send_whatsapp` | Menulis balasan pada konteks pesan pelanggan, tidak mengirim ke luar | `[ ]` |
 | T3.8 | `verify_payment` | Mencocokkan bukti transfer dengan nominal harapan | `[ ]` |
 | T3.9 | `get_report` | Ringkasan harian dan mingguan | `[ ]` |
 | T3.10 | `forecast_stock` | Rata rata bergerak dengan safety stock | `[ ]` |
@@ -179,13 +180,17 @@ Tujuan: enam permukaan berfungsi penuh, sesuai `docs/SCOPE.md` bagian 2.
 
 | ID | Tugas | Status |
 | --- | --- | --- |
-| T5.11 | Daftar percakapan pelanggan | `[ ]` |
-| T5.12 | Detail percakapan dan riwayat pesan | `[ ]` |
+| T5.11 | Status koneksi nomor WhatsApp | `[ ]` |
+| T5.12 | Tata cara dan aksi Hubungkan ke WhatsApp sampai berstatus terhubung, beserta aksi memutuskan koneksi | `[ ]` |
 | T5.13 | Orderan yang masuk dari kanal WhatsApp | `[ ]` |
 | T5.14 | Bukti pembayaran dan status verifikasi | `[ ]` |
 | T5.15 | Panel pengirim pesan tiruan sebagai pelanggan | `[ ]` |
-| T5.16 | Balasan otomatis agen tercatat di percakapan | `[ ]` |
+| T5.16 | Balasan otomatis agen tercatat pada konteks orderan | `[ ]` |
 | T5.17 | Penghapusan data pelanggan dari antarmuka | `[ ]` |
+
+Catatan: tugas T5.11 dan T5.12 terhambat keputusan K9, yaitu pemilihan
+penyedia kanal WhatsApp. Tugas lain di S3 tidak terhambat.
+
 
 ### S4 Laporan Keuangan
 
@@ -219,7 +224,7 @@ Tujuan: enam permukaan berfungsi penuh, sesuai `docs/SCOPE.md` bagian 2.
 
 | ID | Tugas | Status |
 | --- | --- | --- |
-| T5.31 | Status koneksi nomor dan aksi menghubungkan atau memutuskan | `[ ]` |
+| T5.31 | Keterangan opt in dan persetujuan pemilik atas pemrosesan pesan | `[ ]` |
 | T5.32 | Keterangan privasi data sesuai butir proposal | `[ ]` |
 
 Kriteria selesai fase 5: keenam permukaan dan halaman pengaturan dapat dipakai
@@ -250,7 +255,7 @@ bagian 7 lulus otomatis, dan semua dokumen sesuai kenyataan.
 
 | Janji proposal | Tugas yang membuktikannya |
 | --- | --- |
-| Integrasi WhatsApp ke aplikasi | T5.11 sampai T5.16 |
+| Integrasi WhatsApp ke aplikasi | T5.11 sampai T5.17 |
 | Ekstraksi data multimodal | T4.2, T4.3, T4.9, T5.6, T5.7, T5.8 |
 | Alert stok menipis | T2.6, T5.23, T5.24 |
 | Respons otomatis ke pelanggan | T3.7, T4.5, T4.6, T5.16 |
@@ -258,7 +263,7 @@ bagian 7 lulus otomatis, dan semua dokumen sesuai kenyataan.
 | Agentic action | T3.6, T4.7, T5.27 sampai T5.30 |
 | Human in the loop | T3.6, T4.7, T5.29 |
 | Sepuluh tool | T3.1 sampai T3.12 |
-| Tiga butir privasi | T2.4, T5.17, T5.31, T5.32 |
+| Tiga butir privasi | T2.4, T5.11, T5.12, T5.17, T5.31, T5.32 |
 | Dashboard clean, minimalis, rata | T1.3, T1.4, T6.3 |
 | Aturan user: tanpa emoji dan tanpa tanda hubung | T1.6, T6.3 |
 
