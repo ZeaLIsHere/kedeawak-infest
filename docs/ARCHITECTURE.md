@@ -127,6 +127,7 @@ src/
     ui-copy/
       rules.ts                    Aturan teks UI, dipakai bersama pengujian
   scripts/
+    db-migrate.ts                 Penerap migrasi lewat driver yang aktif
     lint-ui-copy.ts               Pemeriksa larangan emoji dan tanda hubung
 
 e2e/
@@ -207,6 +208,14 @@ Aturan skema:
 10. Nilai enum memakai bahasa Indonesia, mengikuti penyebutan pada tabel di
     atas. Nama tabel dan kolom tetap memakai bahasa Inggris, sesuai
     `docs/CONVENTIONS.md` bagian 7.
+
+Migrasi dibuat oleh `npm run db:generate`, yang memakai drizzle-kit untuk
+membaca skema dan menulis berkas SQL ke folder `drizzle/`. Folder itu masuk
+repo, karena merupakan hasil kerja tim, bukan perkakas. Penerapan migrasi
+memakai `npm run db:migrate`, yang memakai penerap milik Drizzle ORM, bukan
+perintah `drizzle-kit migrate`. Alasannya, perintah itu hanya dapat menyambung
+ke Postgres lewat jaringan, sedangkan demo memakai PGlite yang berjalan di
+dalam proses. Dengan cara ini migrasi yang sama diterapkan pada kedua driver.
 
 ## 5. Antarmuka penyedia AI
 
@@ -395,6 +404,7 @@ langsung dari dokumentasi resmi. Tanggal: 17 Oktober 2026.
 | A15   | Perapian format dan pemeriksaan tipe                  | Prettier dengan `eslint-config-prettier`, lebar baris 90, akhir baris LF. Perintah `npm run format`, `npm run format:check`, dan `npm run typecheck`            | Menghentikan perdebatan gaya dan menjaga kode terbaca. `AGENTS.md` dan `docs/PRODUCT.md` dikecualikan karena isinya tidak diubah tanpa persetujuan user. Berkas `src/components/ui/` yang dihasilkan CLI shadcn/ui ikut dirapikan, jadi hasil `shadcn add` berikutnya perlu dirapikan ulang                                                                                                                      |
 | A16   | Alat pengujian                                        | Vitest 5 untuk unit dan integrasi pada `src/**/*.test.ts`, Playwright 1.64 untuk alur peramban pada `e2e/*.spec.ts`. Dua proyek tata letak: 393 dan 1280 piksel | Sudah ditetapkan pada rencana dan `docs/ARCHITECTURE.md` bagian 9. Node 24 menjalankan TypeScript langsung, sehingga Vitest tidak perlu pustaka tambahan. `@types/node` dinaikkan dari 20 ke 24 karena Vitest 5 menuntutnya, sekaligus sejalan dengan Node 24 di mesin pengembangan. `vitest.config.mts` memakai akhiran `.mts` karena `package.json` tidak menetapkan `type`                                    |
 | A17   | Bentuk skema basis data                               | uuid sebagai kunci utama, `business_id` di setiap tabel, nilai enum bahasa Indonesia, kolom uang bilangan bulat                                                 | Diputuskan saat T2.1 karena tidak diatur di dokumen mana pun. Rinciannya menjadi aturan skema pada bagian 4. Tidak ada kolom vektor, sesuai keputusan A5                                                                                                                                                                                                                                                         |
+| A18   | Penerapan migrasi                                     | Penerap milik Drizzle ORM, bukan drizzle-kit migrate                                                                                                            | Perintah drizzle-kit migrate hanya dapat menyambung ke Postgres lewat jaringan, sedangkan demo memakai PGlite di dalam proses. Berkas migrasi tetap dibuat drizzle-kit lewat npm run db:generate, dan folder drizzle/ masuk repo                                                                                                                                                                                 |
 
 Catatan A9: `cacheComponents` aktif berarti halaman yang membaca data saat
 berjalan wajib dibungkus `Suspense` atau memakai arahan `"use cache"`.

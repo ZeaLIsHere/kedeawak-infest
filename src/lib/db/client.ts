@@ -31,11 +31,26 @@ export type DriverName = "pglite" | "postgres";
 /** Tipe basis data yang diterima lapisan akses data. */
 export type Database = PgliteDatabase<typeof schema> | NodePgDatabase<typeof schema>;
 
-/** Satu pegangan basis data beserta cara menutupnya. */
-export type DatabaseHandle = {
-  driver: DriverName;
-  db: Database;
-  client: PGlite | Pool;
+/*
+ * Pegangan basis data dibedakan menurut driver, bukan disatukan, supaya tipe
+ * basis data menyempit sendiri saat driver diperiksa. Tanpa pembedaan ini,
+ * setiap pemakaian di luar lapisan akses data harus memaksa tipe.
+ */
+export type DatabaseHandle = PgliteHandle | PostgresHandle;
+
+/** Pegangan untuk driver PGlite, yaitu mode demo tanpa server basis data. */
+export type PgliteHandle = {
+  driver: "pglite";
+  db: PgliteDatabase<typeof schema>;
+  client: PGlite;
+  close: () => Promise<void>;
+};
+
+/** Pegangan untuk driver Postgres biasa, yaitu mode produksi. */
+export type PostgresHandle = {
+  driver: "postgres";
+  db: NodePgDatabase<typeof schema>;
+  client: Pool;
   close: () => Promise<void>;
 };
 
