@@ -166,11 +166,16 @@ Perintah: `npm run lint:ui`.
 | Fungsi dan variabel | camelCase            | `formatRupiah`                |
 | Konstanta           | SCREAMING_SNAKE_CASE | `LOW_STOCK_THRESHOLD_DEFAULT` |
 | Tipe dan antarmuka  | PascalCase           | `TransactionInput`            |
-| Berkas komponen     | PascalCase           | `StockAlertList.tsx`          |
+| Berkas komponen     | kebab-case           | `stock-alert-list.tsx`        |
 | Berkas lain         | kebab-case           | `stock-alerts.ts`             |
 | Tabel basis data    | snake_case, jamak    | `stock_alerts`                |
 | Kolom basis data    | snake_case           | `minimum_stock`               |
 | Route API           | kebab-case           | `/api/agent/receipt`          |
+
+Nama komponen di dalam berkas tetap PascalCase, misalnya `StockAlertList`.
+Hanya nama berkasnya memakai kebab-case, karena sebelas berkas komponen yang
+sudah ada memakainya, termasuk komponen bawaan `shadcn/ui`. Satu folder tidak
+boleh memuat dua gaya penamaan berkas.
 
 ## 7. Gaya CSS
 

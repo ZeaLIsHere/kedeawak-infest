@@ -41,11 +41,22 @@ diperbarui 17 Oktober 2026.
 | 6    | Pematangan dan bukti                | 0       | 7     |
 |      | Jumlah                              | 28      | 89    |
 
-Fokus berikutnya: T3.1.
+Fokus berikutnya: T5.1.
 
 Pelacak kedua adalah riwayat git. Setiap commit memuat baris `Refs:` yang
 menunjuk ID tugas, sehingga `git log` dapat dipakai untuk menelusuri kapan
 sebuah tugas dikerjakan dan apa buktinya. Lihat `docs/WORKFLOW.md` bagian 5.
+
+### Urutan kerja yang berlaku sekarang
+
+Atas persetujuan pemilik proyek, satu potongan vertikal dari Fase 5 dikerjakan
+lebih dulu, yaitu permukaan S1 Dasbor, S4 Laporan Keuangan, dan S5 Stok, supaya
+ada satu alur yang berfungsi penuh dan dapat didemokan sebelum lapisan yang
+lain selesai. Fase 3 (tool layer) dan Fase 4 (lapisan AI dan context lock)
+menyusul sesudahnya, dan tidak ada tugas pada kedua fase itu yang dibatalkan.
+Rincian rancangan potongan itu ada di
+`docs/plans/2026-10-17-potongan-vertikal-1.md`. Sisa tugas Fase 5 dikerjakan
+setelah Fase 3 dan Fase 4, sesuai urutan aslinya.
 
 ---
 
