@@ -19,23 +19,24 @@ Rencana kerja induk KedeAwak. Ini satu satunya daftar pekerjaan yang dikerjakan.
 berikutnya sebelum tugas yang menghambat selesai. Setiap tugas selesai langsung
 di commit dan di push, sesuai `docs/WORKFLOW.md`.
 
-**Blocker saat ini:** tidak ada. Fase 0 selesai. Keputusan K3, K4, K5, dan K7
-belum dijawab, tetapi baru dibutuhkan pada fase 1 dan fase 4. Lihat bagian
-"Keputusan yang menunggu konfirmasi" di bawah.
+**Blocker saat ini:** tidak ada. Fase 0 selesai. Keputusan K1 sampai K4 dan K6
+sampai K8 sudah ditetapkan. Hanya K5 yang masih terbuka, dan itu tidak
+menghambat. Lihat bagian "Keputusan yang menunggu konfirmasi" di bawah.
 
 ---
 
-## Keputusan yang menunggu konfirmasi
+## Keputusan
 
 | ID | Pertanyaan | Rekomendasi saya | Status |
 | --- | --- | --- | --- |
 | K1 | Nama dan email untuk identitas git | Perlu dari user | Selesai. Nama `ZeaLIsHere`, email memakai alamat noreply GitHub `180758619+ZeaLIsHere@users.noreply.github.com`. Ganti bila ingin memakai email lain |
 | K2 | Cara autentikasi push ke GitHub | Perlu dari user | Selesai. Kredensial `ZeaLIsHere` sudah tersimpan di Windows Credential Manager, push terverifikasi berhasil |
-| K3 | Penyedia model bahasa untuk demo | Google Gemini, ada tingkat gratis dan mendukung gambar serta suara | Belum dijawab. Tidak menghambat, baru dipakai di fase 4 |
-| K4 | Apakah kunci API sudah tersedia | Bila belum, pengganti lokal aktif dan ditampilkan terus terang | Belum dijawab. Tidak menghambat |
-| K5 | Pemasangan Python untuk data skill desain | Boleh dipasang, atau data dibaca dengan Node | Belum dijawab. Tidak menghambat, baru terasa saat fase 1 |
-| K6 | Konfirmasi daftar fitur di `docs/SCOPE.md` | Sudah saya susun berdasarkan proposal | **Dikonfirmasi user.** Enam permukaan sesuai `docs/SCOPE.md` |
-| K7 | Pemakaian PGlite untuk demo, bukan Postgres terpisah | PGlite, supaya demo tidak butuh jaringan | Belum dijawab. Tidak menghambat |
+| K3 | Penyedia model bahasa untuk demo | Ditanyakan | **Ditetapkan.** DeepSeek, model `deepseek-flash`, karena token sudah tersedia dari user |
+| K4 | Apakah kunci API sudah tersedia | Ditanyakan | **Ditetapkan.** Token DeepSeek tersedia. Disimpan di `.env.local` sebagai `DEEPSEEK_API_KEY` |
+| K5 | Pemasangan Python untuk data skill desain | Ditanyakan | Belum dijawab. Tidak menghambat, data CSV dibaca lewat Node sampai diputuskan |
+| K6 | Konfirmasi daftar fitur di `docs/SCOPE.md` | Ditanyakan | **Dikonfirmasi user.** Enam permukaan sesuai `docs/SCOPE.md` |
+| K7 | Pemakaian PGlite untuk demo, bukan Postgres terpisah | Ditanyakan | **Ditetapkan.** PGlite, setelah dipastikan mendukung CRUD penuh, transaksi, dan pgvector |
+| K8 | Transkripsi voice note | Diusulkan | **Ditetapkan.** Web Speech API peramban, karena DeepSeek tidak punya endpoint audio dan proposal menyebut Google STT |
 
 ---
 
@@ -135,10 +136,10 @@ Tujuan: percakapan bahasa alami menjadi aksi yang tercatat, dengan pengaman.
 | ID | Tugas | Hasil | Status |
 | --- | --- | --- | --- |
 | T4.1 | Antarmuka penyedia model bahasa | Satu kontrak, implementasi nyata dan pengganti lokal | `[ ]` |
-| T4.2 | Antarmuka speech to text | Voice note menjadi teks | `[ ]` |
-| T4.3 | Antarmuka pembacaan struk | Foto struk menjadi data terstruktur | `[ ]` |
+| T4.2 | Antarmuka speech to text lewat Web Speech API peramban | Voice note menjadi teks, dengan fallback isian manual | `[ ]` |
+| T4.3 | Antarmuka pembacaan struk lewat `deepseek-flash` | Foto struk menjadi data terstruktur, memakai skema keluaran ketat | `[ ]` |
 | T4.4 | Pengganti lokal yang deterministik | Berjalan tanpa kunci API, tidak mengarang hasil | `[ ]` |
-| T4.5 | Orkestrator: pemahaman maksud dan pemilihan tool | Pesan masuk dipetakan ke pemanggilan tool | `[ ]` |
+| T4.5 | Orkestrator: pemahaman maksud dan pemilihan tool | Pesan masuk dipetakan ke pemanggilan tool, argumen divalidasi dengan skema | `[ ]` |
 | T4.6 | RAG konteks bisnis dengan pgvector | Jawaban memakai data warung yang nyata | `[ ]` |
 | T4.7 | Context lock saat menunggu persetujuan | Pesan lanjutan tidak dianggap transaksi baru | `[ ]` |
 | T4.8 | Pembatas pemakaian harian | Kuota harian tercatat dan ditegakkan | `[ ]` |

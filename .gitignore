@@ -41,3 +41,12 @@ Thumbs.db
 *.tsbuildinfo
 .vercel
 .turbo
+
+# basis data lokal PGlite
+.pglite/
+*.db
+*.db-journal
+
+# berkas sementara hasil unggahan pengguna dan media demo
+/uploads/
+/public/uploads/

@@ -32,9 +32,9 @@ Basis: bagian "Mekanisme Teknologi" dan "Desain Sistem" pada proposal.
 | ORM | Drizzle | Skema bertipe, migrasi ringan, mendukung PGlite dan Postgres |
 | Pencarian vektor | pgvector | Sesuai proposal, untuk RAG konteks bisnis |
 | Sesi dan context lock | Tabel di PostgreSQL lewat satu antarmuka | Menggantikan Redis saat demo, tanpa mengubah pemanggil |
-| Model bahasa | Penyedia yang dapat ditukar, lewat satu antarmuka | Sesuai proposal yang menyebut LLM sebagai komponen yang bisa diganti |
-| Speech to text | Penyedia yang dapat ditukar | Sesuai proposal, Whisper atau Google STT |
-| Ekstraksi struk | Model vision, dengan fallback tiga lapis | Sesuai proposal |
+| Model bahasa | DeepSeek, model `deepseek-flash`, endpoint kompatibel OpenAI | Token sudah tersedia dari user. Mendukung pemanggilan fungsi dan keluaran JSON, dua hal yang dibutuhkan tool layer |
+| Speech to text | Web Speech API peramban, yang di Chrome dilayani Google | Sesuai proposal yang menyebut Google STT. Tidak menambah kunci API, tidak menambah titik gagal |
+| Ekstraksi struk | Model vision, yaitu `deepseek-flash` | Satu penyedia menangani teks sekaligus gambar. Fallback tiga lapis sesuai proposal tetap berlaku |
 | Uji | Vitest untuk unit, Playwright untuk alur browser | Menutup kriteria demo di `docs/SCOPE.md` bagian 7 |
 
 Catatan penyimpangan dari proposal, disengaja dan dicatat:
@@ -44,6 +44,11 @@ Catatan penyimpangan dari proposal, disengaja dan dicatat:
    yaitu sesi, context lock, dan pembatas kuota harian, tetap ada.
 2. Proposal tidak menyebut framework frontend. Next.js dipilih karena satu
    basis kode menangani antarmuka, webhook, dan pemanggilan model bahasa.
+3. Proposal menyebut Whisper atau Google STT untuk voice note. Yang dipakai
+   adalah Web Speech API peramban, yang di Chrome memang dilayani Google STT.
+   Alasannya, DeepSeek tidak menyediakan endpoint transkripsi audio, sehingga
+   menambah penyedia lain berarti menambah kunci API dan satu titik gagal lagi
+   saat demo. Rincian ada di bagian 5.
 
 ## 3. Struktur direktori
 
@@ -186,6 +191,82 @@ Aturan pemilihan penyedia:
 5. Kasus uji tidak pernah bergantung pada penyedia nyata. Pengganti lokal
    yang deterministik dipakai di pengujian.
 
+### 5.1 DeepSeek sebagai penyedia model bahasa
+
+Fakta berikut sudah diverifikasi dari dokumentasi resmi DeepSeek, bukan
+perkiraan. Tanggal pemeriksaan: 17 Oktober 2026.
+
+| Hal | Nilai |
+| --- | --- |
+| Alamat dasar, format OpenAI | `https://api.deepseek.com` |
+| Alamat dasar, format Anthropic | `https://api.deepseek.com/anthropic` |
+| Model untuk percakapan | `deepseek-flash` |
+| Model penalaran | `deepseek-v4-pro` |
+| Panjang konteks | 1 juta token |
+| Pemanggilan fungsi | Didukung kedua model |
+| Keluaran JSON | Didukung kedua model |
+| Gambar | Hanya `deepseek-flash` |
+| Format gambar | JPEG, PNG, GIF, WebP |
+| Batas satu gambar | 32 MB untuk base64 atau alamat luar, 64 MB lewat Files API |
+| Endpoint transkripsi audio | **Tidak ada** |
+
+Konsekuensi yang wajib dipatuhi saat implementasi:
+
+1. **Gambar hanya dikirim di pesan `user`.** Gambar pada pesan `system` atau
+   `assistant` ditolak dengan galat `400`.
+2. **Pembacaan struk wajib memakai `deepseek-flash`.** `deepseek-v4-pro`
+   tidak menerima gambar.
+3. **Mode berpikir dan pemaksaan tool tidak dapat digabung.** Pilihan
+   `tool_choice` bernilai `required` atau menunjuk tool tertentu ditolak
+   dengan galat `400` bila mode berpikir aktif. Untuk tool yang wajib
+   dipanggil, matikan mode berpikir lebih dulu.
+4. **Keluaran JSON wajib diminta lewat instruksi.** Menyalakan
+   `response_format` bernilai `json_object` saja tidak cukup. Instruksi
+   pembangkit JSON harus ditulis di pesan `system` atau `user`.
+5. **Argumen tool wajib divalidasi.** Dokumentasi DeepSeek menyatakan model
+   tidak selalu menghasilkan JSON yang sah dan dapat mengarang parameter yang
+   tidak ada di skema. Semua argumen divalidasi dengan skema sebelum
+   dijalankan.
+6. **Analisis struk memakai skema ketat.** Mode `strict` pada pemanggilan
+   fungsi boleh dipakai untuk memaksa keluaran sesuai skema, sehingga
+   pembacaan nilai dan tanggal konsisten.
+
+Kunci disimpan di `DEEPSEEK_API_KEY`. Nama variabel lain ada di
+`.env.example`.
+
+### 5.2 Voice note
+
+DeepSeek tidak menyediakan transkripsi audio. Yang dipakai adalah Web Speech
+API peramban:
+
+1. Peramban merekam suara dan mengubahnya menjadi teks secara langsung pada
+   perangkat atau lewat layanan yang dipakai peramban tersebut. Chrome
+   memakai layanan Google, yang sejalan dengan penyebutan Google STT pada
+   proposal.
+2. Bahasa diatur ke Indonesia.
+3. Bila peramban tidak mendukung, atau transkripsi gagal, permukaan S2
+   menampilkan pemberitahuan dan menyediakan kolom isian teks. Pemilik tetap
+   dapat mencatat transaksi.
+4. Tidak ada berkas audio yang dikirim ke penyedia model bahasa.
+
+Keterbatasan ini dicatat di `README` supaya tidak mengejutkan saat demo.
+
+### 5.3 Pembacaan struk dan fallback tiga lapis
+
+Sesuai proposal, tiga lapis dipertahankan:
+
+1. **Primer.** `deepseek-flash` membaca foto struk dan mengembalikan nominal,
+   tanggal, dan keterangan lewat skema keluaran yang ketat.
+2. **Sekunder.** Bila nilai keyakinan hasil bacaan di bawah 70 persen, agen
+   meminta konfirmasi, contohnya "Saya baca total Rp150.000, benar?".
+3. **Tersier.** Bila foto tidak terbaca, agen meminta pemilik mendikte lewat
+   suara atau mengetik manual.
+
+Nilai keyakinan diperoleh dari jawaban model secara terstruktur, bukan dari
+logprob, karena logprob tidak tersedia untuk keluaran fungsi. Model diminta
+mengisi nilai keyakinan antara 0 dan 1 beserta alasan singkatnya.
+
+
 ## 6. Orkestrasi dan context lock
 
 1. Setiap pesan masuk, baik dari kanal WhatsApp maupun dari percakapan di
@@ -231,15 +312,36 @@ Ini yang dimaksud human in the loop pada proposal, dan wajib.
 | Ujung ke ujung | Playwright | Delapan langkah kriteria sukses demo di `docs/SCOPE.md` bagian 7 |
 | Aturan UI | Skrip sendiri | Larangan emoji dan tanda hubung pada semua teks yang dilihat pengguna |
 
-## 10. Keputusan yang masih menunggu konfirmasi user
+## 10. Keputusan yang sudah ditetapkan
 
-Daftar ini harus dijawab sebelum pekerjaan fase 2 dimulai. Sementara menunggu,
-implementasi memakai pilihan yang ditandai rekomendasi.
+Semua keputusan berikut sudah dikonfirmasi user atau sudah diverifikasi
+langsung dari dokumentasi resmi. Tanggal: 17 Oktober 2026.
 
-| Nomor | Pertanyaan | Rekomendasi |
-| --- | --- | --- |
-| A1 | Penyedia model bahasa mana yang dipakai untuk demo | Google Gemini, karena ada tingkat gratis dan mendukung vision sekaligus audio |
-| A2 | Apakah kunci API sudah tersedia saat demo | Bila belum, pengganti lokal aktif dan itu ditampilkan terus terang |
-| A3 | Basis data demo: PGlite di dalam proses, atau Postgres sungguhan | PGlite, supaya demo tidak bergantung jaringan |
-| A4 | Perlu Python untuk skill desain | Boleh dipasang, atau data CSV dibaca dengan Node |
-| A5 | Identitas git dan cara autentikasi push | Perlu diisi, karena belum ada nama, email, dan kredensial tersimpan |
+| Nomor | Hal | Keputusan | Dasar |
+| --- | --- | --- | --- |
+| A1 | Penyedia model bahasa | DeepSeek, model `deepseek-flash` | User memiliki token DeepSeek |
+| A2 | Pembacaan foto struk | `deepseek-flash`, yang menerima gambar | Dokumentasi DeepSeek bagian Vision |
+| A3 | Transkripsi voice note | Web Speech API peramban | DeepSeek tidak punya endpoint audio, lihat bagian 5.2 |
+| A4 | Basis data demo | PGlite, PostgreSQL di dalam proses | User menyetujui setelah dipastikan mendukung CRUD penuh |
+| A5 | Pencarian vektor | Ekstensi pgvector untuk PGlite | PGlite menyediakan paket `@electric-sql/pglite-pgvector` |
+| A6 | Identitas git dan autentikasi push | Nama `ZeaLIsHere`, email noreply GitHub, kredensial Windows Credential Manager | Push sudah terverifikasi berhasil |
+| A7 | Akses skill desain | Belum diputuskan, akan dipakai saat fase 1 | Data skill dibaca lewat Node selama Python belum terpasang |
+
+### Kemampuan PGlite yang sudah dipastikan
+
+PGlite adalah PostgreSQL asli yang dikompilasi ke WebAssembly dan berjalan di
+dalam proses Node. Yang tersedia dan akan dipakai:
+
+| Kemampuan | Keterangan |
+| --- | --- |
+| Baca dan tulis | Method `query` dengan parameter, method `exec` untuk banyak pernyataan |
+| Transaksi | Method `transaction` dengan commit otomatis dan rollback otomatis bila gagal |
+| Query bertemplate | Method `sql` dengan pengikatan parameter otomatis |
+| Impor dan ekspor | Device virtual `/dev/blob` lewat perintah `COPY` |
+| Ekstensi | Objek `extensions` saat inisialisasi, termasuk `pgvector` |
+| Penyimpanan | `file://` ke disk, `memory://` sementara, atau `idb://` di peramban |
+
+Konsekuensi: seluruh operasi basis data yang dibutuhkan aplikasi ini, termasuk
+CRUD, transaksi, dan pencarian vektor, dapat berjalan tanpa server basis data.
+Berkas basis data disimpan di direktori yang masuk `.gitignore`.
+
