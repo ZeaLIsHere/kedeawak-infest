@@ -1,11 +1,11 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { listApprovals, readPurchaseOrderId } from "../data/approvals";
+import { decideApproval, listApprovals, readPurchaseOrderId } from "../data/approvals";
 import { findBusiness } from "../data/business";
 import { listCustomers, readCustomerName, readCustomerPhone } from "../data/customers";
 import { listOrders } from "../data/orders";
-import { listProducts } from "../data/products";
-import { findPurchaseOrder } from "../data/purchase-orders";
+import { findProduct, listProducts } from "../data/products";
+import { findPurchaseOrder, findPurchaseOrderWithItems } from "../data/purchase-orders";
 import { listStockAlerts, listStockMovements } from "../data/stock";
 import { listTransactions } from "../data/transactions";
 import { businesses } from "./schema";
@@ -123,6 +123,47 @@ describe("data demo", () => {
       expect(customer.phoneNumberHash).toHaveLength(64);
       expect(readCustomerPhone(customer)).toMatch(/^(\+?62|0)\d{8,}$/u);
     }
+  });
+
+  it("memberlakukan aksi menunggu sehingga alertnya menutup dan stoknya bertambah", async () => {
+    const pending = (await listApprovals(test.db, seeded.businessId, "menunggu"))[0];
+    const withItems = await findPurchaseOrderWithItems(
+      test.db,
+      seeded.businessId,
+      readPurchaseOrderId(pending?.payload ?? null) ?? "",
+    );
+    const item = withItems?.items[0];
+    const before =
+      item === undefined
+        ? undefined
+        : await findProduct(test.db, seeded.businessId, item.productId);
+
+    expect(before).toBeDefined();
+    expect(await listStockAlerts(test.db, seeded.businessId, "aktif")).toHaveLength(2);
+
+    const decided = await decideApproval(
+      test.db,
+      seeded.businessId,
+      pending?.id ?? "",
+      "disetujui",
+    );
+
+    expect(decided?.status).toBe("disetujui");
+
+    const after = await findProduct(test.db, seeded.businessId, item?.productId ?? "");
+    const alerts = await listStockAlerts(test.db, seeded.businessId, "aktif");
+    const movements = await listStockMovements(
+      test.db,
+      seeded.businessId,
+      item?.productId,
+    );
+
+    expect(after?.stock).toBe((before?.stock ?? 0) + (item?.quantity ?? 0));
+    expect(after?.stock).toBeGreaterThanOrEqual(after?.minimumStock ?? 0);
+    expect(alerts).toHaveLength(1);
+    expect(alerts.map((alert) => alert.productId)).not.toContain(item?.productId);
+    expect(movements[0]?.reason).toBe("Pesanan pembelian dari Pasar Induk");
+    expect(movements[0]?.quantityChange).toBe(24);
   });
 
   it("mengganti seluruh data lama saat dijalankan ulang", async () => {

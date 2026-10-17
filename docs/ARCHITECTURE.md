@@ -433,6 +433,16 @@ Letak berkas dan perintahnya:
 | `npm run test:watch` | Vitest dalam mode pantau                                                                          |
 | `npm run test:e2e`   | Playwright, berkas `e2e/*.spec.ts`, dua cabang tata letak diuji terpisah pada 393 dan 1280 piksel |
 
+Lapisan data diuji dari tiga sisi. Setiap modul di `src/lib/data/` punya berkas
+uji di sebelahnya. `src/lib/data/isolation.test.ts` mengisi dua warung dengan
+bentuk data yang sama, lalu memeriksa bahwa setiap pembaca hanya mengembalikan
+baris warungnya sendiri, sehingga kebocoran antar warung tertangkap pada seluruh
+modul sekaligus. `src/lib/data/ownership.test.ts` memastikan pemeriksaan rujukan
+menerima kunci warung sendiri dan menolak kunci warung lain, kunci yang tidak
+ada, maupun kunci yang salah bentuk. Data demo diuji pada
+`src/lib/db/seed.test.ts` dengan waktu yang ditetapkan, sehingga jumlah catatan,
+urutan pergerakan stok, dan total laporannya sama pada setiap kali dijalankan.
+
 `npm run typecheck` menjalankan `next typegen` lebih dulu, karena Next.js
 menghasilkan tipe rute dan tipe `LayoutProps` ke dalam `.next`. Tanpa langkah
 itu, pemeriksaan tipe gagal pada salinan repo yang baru.
