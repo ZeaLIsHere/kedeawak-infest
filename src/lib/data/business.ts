@@ -2,6 +2,7 @@ import { asc, eq } from "drizzle-orm";
 
 import type { Database } from "../db/client";
 import { businesses, type Business } from "../db/schema";
+import { isUuid } from "./ids";
 
 /** Keadaan koneksi nomor WhatsApp, diambil dari skema. */
 export type ChannelStatus = Business["channelStatus"];
@@ -45,6 +46,10 @@ export async function findBusiness(
   db: Database,
   businessId: string,
 ): Promise<Business | undefined> {
+  if (!isUuid(businessId)) {
+    return undefined;
+  }
+
   const [business] = await db
     .select()
     .from(businesses)

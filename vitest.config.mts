@@ -20,6 +20,7 @@ export default defineConfig({
      */
     include: ["src/**/*.test.ts", "src/**/*.test.tsx"],
     environment: "node",
+    setupFiles: ["vitest.setup.ts"],
     /*
      * PGlite adalah PostgreSQL di dalam proses, dan penyiapannya memakan waktu
      * yang berbeda beda. Batas bawaan lima detik terbukti terlampaui saat

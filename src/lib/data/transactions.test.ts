@@ -5,6 +5,7 @@ import {
   createTestDatabase,
   type TestDatabase,
 } from "../db/testing";
+import { createCustomer } from "./customers";
 import { createTransaction, findTransaction, listTransactions } from "./transactions";
 
 let test: TestDatabase;
@@ -128,5 +129,22 @@ describe("data transaksi", () => {
 
     expect(Number.isInteger(transaction.amount)).toBe(true);
     expect(transaction.amount).toBe(27500);
+  });
+
+  it("menolak hutang yang menunjuk pelanggan warung lain", async () => {
+    const otherCustomer = await createCustomer(test.db, otherBusinessId, {
+      name: "Pelanggan Tetangga",
+      phoneNumber: "081211112222",
+    });
+
+    await expect(
+      createTransaction(test.db, test.business.id, {
+        kind: "debt",
+        description: "Hutang bukan milik warung ini",
+        amount: 10000,
+        source: "whatsapp",
+        customerId: otherCustomer.id,
+      }),
+    ).rejects.toThrow("Pelanggan tidak ditemukan pada warung ini");
   });
 });

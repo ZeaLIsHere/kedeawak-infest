@@ -1,4 +1,5 @@
 import { PGlite } from "@electric-sql/pglite";
+import { eq } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { createDatabase, type DatabaseHandle } from "./client";
@@ -126,5 +127,35 @@ describe("migrasi basis data", () => {
         purchasePrice: 15000,
       }),
     ).rejects.toThrow();
+  });
+
+  it("membatalkan seluruh penulisan bila satu pernyataan di dalamnya gagal", async () => {
+    const db = opened().db;
+    const [business] = await db
+      .insert(businesses)
+      .values({ name: "Warung Transaksi" })
+      .returning();
+
+    if (business === undefined) {
+      throw new Error("Warung uji gagal dibuat");
+    }
+
+    await expect(
+      db.transaction(async (tx) => {
+        await tx.insert(products).values({
+          businessId: business.id,
+          name: "Gula",
+          unit: "kilogram",
+          salePrice: 16000,
+          purchasePrice: 15000,
+        });
+
+        throw new Error("dibatalkan oleh pengujian");
+      }),
+    ).rejects.toThrow("dibatalkan oleh pengujian");
+
+    expect(
+      await db.select().from(products).where(eq(products.businessId, business.id)),
+    ).toEqual([]);
   });
 });

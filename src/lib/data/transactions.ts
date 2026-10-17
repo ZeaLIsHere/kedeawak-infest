@@ -2,6 +2,8 @@ import { and, desc, eq, gte, lte } from "drizzle-orm";
 
 import type { Database } from "../db/client";
 import { transactions, type Transaction } from "../db/schema";
+import { isUuid } from "./ids";
+import { assertCustomerOwned } from "./ownership";
 
 /** Data satu transaksi keuangan. Jumlahnya bilangan bulat rupiah penuh. */
 export type TransactionInput = {
@@ -28,26 +30,32 @@ export async function createTransaction(
   businessId: string,
   input: TransactionInput,
 ): Promise<Transaction> {
-  const [transaction] = await db
-    .insert(transactions)
-    .values({
-      businessId,
-      kind: input.kind,
-      description: input.description,
-      amount: input.amount,
-      source: input.source,
-      customerId: input.customerId ?? null,
-      proofUrl: input.proofUrl ?? null,
-      confidence: input.confidence ?? null,
-      ...(input.occurredAt === undefined ? {} : { occurredAt: input.occurredAt }),
-    })
-    .returning();
+  return db.transaction(async (tx) => {
+    if (input.customerId !== undefined && input.customerId !== null) {
+      await assertCustomerOwned(tx, businessId, input.customerId);
+    }
 
-  if (transaction === undefined) {
-    throw new Error("Transaksi gagal ditulis");
-  }
+    const [transaction] = await tx
+      .insert(transactions)
+      .values({
+        businessId,
+        kind: input.kind,
+        description: input.description,
+        amount: input.amount,
+        source: input.source,
+        customerId: input.customerId ?? null,
+        proofUrl: input.proofUrl ?? null,
+        confidence: input.confidence ?? null,
+        ...(input.occurredAt === undefined ? {} : { occurredAt: input.occurredAt }),
+      })
+      .returning();
 
-  return transaction;
+    if (transaction === undefined) {
+      throw new Error("Transaksi gagal ditulis");
+    }
+
+    return transaction;
+  });
 }
 
 /** Daftar transaksi pada satu rentang waktu, terbaru lebih dulu. */
@@ -83,6 +91,10 @@ export async function findTransaction(
   businessId: string,
   transactionId: string,
 ): Promise<Transaction | undefined> {
+  if (!isUuid(transactionId)) {
+    return undefined;
+  }
+
   const [transaction] = await db
     .select()
     .from(transactions)

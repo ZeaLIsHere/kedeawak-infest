@@ -2,6 +2,7 @@ import { and, asc, eq, lte, sql } from "drizzle-orm";
 
 import type { Database } from "../db/client";
 import { products, type Product } from "../db/schema";
+import { isUuid } from "./ids";
 
 /** Data pokok sebuah produk. Jumlah stok tidak diisi di sini, lihat `stock.ts`. */
 export type ProductInput = {
@@ -36,6 +37,10 @@ export async function findProduct(
   businessId: string,
   productId: string,
 ): Promise<Product | undefined> {
+  if (!isUuid(productId)) {
+    return undefined;
+  }
+
   const [product] = await db
     .select()
     .from(products)
