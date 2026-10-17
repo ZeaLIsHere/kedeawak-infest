@@ -342,6 +342,7 @@ langsung dari dokumentasi resmi. Tanggal: 17 Oktober 2026.
 | A8 | Penyedia kanal WhatsApp | **Belum diputuskan.** Meta Cloud API, Fonnte, atau n8n sebagai perantara | User menunda keputusan. Rincian pertimbangan ada di bagian 11 |
 | A9 | Versi dan opsi bawaan Next.js | Next.js 16.4.2, React 19.3.0, Tailwind 4, `cacheComponents` aktif, `partialPrefetching` aktif | Keluaran `create-next-app`. Lihat catatan di bawah tabel |
 | A10 | Penulisan otomatis blok aturan Next.js ke `AGENTS.md` | Dimatikan, memakai `agentRules: false` pada `next.config.ts` | `AGENTS.md` dikelola tim. Panduan Next.js 16 dibaca dari `node_modules/next/dist/docs/` |
+| A11 | Pustaka primitif dan preset shadcn/ui | Pustaka primitif `radix`, preset `nova`, warna dasar `neutral`, ikon `lucide` | Radix paling matang dan sudah tertulis di rencana. Preset nova memakai Lucide, sejalan dengan aturan ikon SVG dan larangan emoji |
 
 Catatan A9: `cacheComponents` aktif berarti halaman yang membaca data saat
 berjalan wajib dibungkus `Suspense` atau memakai arahan `"use cache"`.
