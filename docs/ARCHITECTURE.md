@@ -74,7 +74,7 @@ src/
       health/route.ts             Pemeriksaan kesiapan
   components/
     ui/                           Komponen dasar dari shadcn/ui
-    shell/                        Kerangka aplikasi: navigasi, header
+    shell/                        Kerangka aplikasi: navigasi, header, keadaan kartu
     dashboard/                    Komponen khusus dasbor
     chat/                         Komponen khusus percakapan agen
     whatsapp/                     Komponen khusus integrasi WhatsApp
@@ -113,6 +113,7 @@ src/
       knowledge.ts
       quota-usage.ts
       reports.ts
+      server.ts                   Jembatan pegangan basis data untuk halaman
     channel/
       incoming.ts                 Titik masuk tunggal untuk semua pesan pelanggan
       fonnte.ts                   Penerjemah payload webhook Fonnte
@@ -136,8 +137,11 @@ src/
       number.ts                   Format angka Indonesia
     ui-copy/
       rules.ts                    Aturan teks UI, dipakai bersama pengujian
+      labels.ts                   Label Indonesia untuk nilai enum basis data
   scripts/
     db-migrate.ts                 Penerap migrasi lewat driver yang aktif
+    db-seed.ts                    Pengisi data demo
+    load-env.ts                   Pembaca .env.local untuk skrip di luar Next.js
     lint-ui-copy.ts               Pemeriksa larangan emoji dan tanda hubung
 
 e2e/
