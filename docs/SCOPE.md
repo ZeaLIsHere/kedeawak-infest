@@ -63,9 +63,9 @@ aplikasi, dan pemilik menghubungkan nomornya sendiri dari dalam aplikasi.
   percakapan berada di luar web dan di luar jangkauan tempo lomba.
 - **Batas:** tidak ada pengiriman pesan ke nomor pelanggan yang sesungguhnya.
   Tidak ada token penyedia yang disimpan di dalam repo.
-- **Menunggu keputusan:** penyedia kanal yang dipakai, yaitu Meta Cloud API,
-  Fonnte, atau n8n sebagai perantara. Isi tata cara pada tombol Hubungkan ke
-  WhatsApp bergantung pada pilihan ini. Rincian ada di
+- **Penyedia kanal yang dipakai:** Fonnte, dengan paket gratis. Nomor warung
+  dihubungkan lewat dasbor Fonnte, dan aplikasi memeriksa token perangkat untuk
+  menampilkan status koneksi. Tata cara dan batasannya ada di
   `docs/ARCHITECTURE.md` bagian 11 dan keputusan K9 pada `PLAN.md`.
 
 ### 3.2 Ekstraksi Data Multimodal — MASUK
@@ -172,8 +172,10 @@ Tidak dikerjakan. Tidak ada kode, halaman, endpoint, maupun tabel untuk ini.
 
 ### 6.1 Di luar web, sesuai arahan user
 
-1. Koneksi nyata ke WhatsApp Business Cloud API Meta, termasuk pendaftaran
-   aplikasi Meta, verifikasi bisnis, dan pengelolaan nomor.
+1. Pendaftaran dan pengelolaan akun penyedia kanal WhatsApp, termasuk
+   pemindaian kode QR di dasbor penyedia, verifikasi bisnis, pemasangan webhook
+   di sisi penyedia, dan pembelian paket. Yang dikerjakan aplikasi hanyalah
+   menampilkan tata cara, memeriksa token, dan menyimpan status koneksi.
 2. Tampilan WhatsApp mobile dan pembuatan akun pelanggan.
 3. Credit scoring dan penyaluran data keuangan ke bank, koperasi, atau
    lembaga pembiayaan.
@@ -240,3 +242,12 @@ manual di luar aplikasi:
 
 Semua langkah di atas adalah pengujian penerimaan yang harus lulus sebelum
 proyek dinyatakan selesai.
+
+Catatan langkah 1 dan 2: penyedia kanal yang dipakai adalah Fonnte dengan paket
+gratis, dan dokumentasi resmi Fonnte menyatakan lampiran hanya diteruskan ke
+perangkat berpakat `all feature`, serta berkas audio yang diterima hanya `mp3`
+sehingga voice note WhatsApp yang berformat `ogg` tidak pernah masuk. Karena
+itu langkah tersebut diuji lewat panel pengirim pesan tiruan pada permukaan S3,
+yang menulis ke jalur pemrosesan pesan masuk yang sama dengan webhook penyedia.
+Pesan teks nyata lewat Fonnte tetap dipakai sebagai nilai tambah demo.
+Rinciannya di `docs/ARCHITECTURE.md` bagian 11.

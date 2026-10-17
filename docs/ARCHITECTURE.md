@@ -64,7 +64,7 @@ src/
     persetujuan/page.tsx          S6 Persetujuan
     pengaturan/page.tsx           Status koneksi nomor, privasi data
     api/
-      whatsapp/webhook/route.ts   Kanal masuk, bentuk payload WhatsApp Cloud API
+      whatsapp/webhook/route.ts   Kanal masuk, menerima webhook penyedia
       whatsapp/simulate/route.ts  Panel pengirim pesan tiruan sebagai pelanggan
       agent/chat/route.ts         Percakapan dengan agen, streaming
       agent/transcribe/route.ts   Voice note menjadi teks
@@ -103,6 +103,9 @@ src/
       approvals.ts
       reports.ts
       customers.ts
+    channel/
+      incoming.ts                 Titik masuk tunggal untuk semua pesan pelanggan
+      fonnte.ts                   Penerjemah payload webhook Fonnte
     ai/
       orchestrator.ts             Pemahaman maksud dan pemilihan tool
       tools/                      Sepuluh tool dari proposal
@@ -138,6 +141,9 @@ Aturan struktur:
 4. `src/components/` tidak boleh mengimpor dari `src/lib/db/`.
 5. Tidak ada fungsi yang dipanggil dari dua tempat berbeda tanpa diletakkan di
    `src/lib/`.
+6. `src/lib/channel/` adalah satu satunya tempat yang membaca bentuk payload
+   penyedia kanal WhatsApp. Logika bisnis tidak pernah menyentuh bentuk payload
+   penyedia.
 
 ## 4. Skema data
 
@@ -179,8 +185,11 @@ Aturan skema:
    ditampilkan ke pemilik adalah orderan, bukti pembayaran, dan pesan asal
    sebagai dasar orderan. Keputusan ini tercatat di `docs/SCOPE.md` bagian 3.1.
 6. `businesses` memuat keadaan koneksi kanal WhatsApp, yaitu status koneksi,
-   nomor bisnis, dan waktu koneksi. Nilai rahasia penyedia tidak disimpan di
-   baris ini, lihat bagian 8.
+   nomor bisnis, waktu koneksi, nama paket penyedia, sisa kuota, dan waktu
+   pemeriksaan terakhir. Nama paket dan sisa kuota ikut disimpan supaya
+   halaman Pengaturan dapat menyampaikan apa adanya batas paket yang dipakai,
+   termasuk bahwa lampiran masuk belum aktif pada paket gratis. Nilai rahasia
+   penyedia tidak disimpan di baris ini, lihat bagian 8.
 
 ## 5. Antarmuka penyedia AI
 
@@ -359,7 +368,7 @@ langsung dari dokumentasi resmi. Tanggal: 17 Oktober 2026.
 | A5    | Pencarian vektor                                      | Ekstensi pgvector untuk PGlite                                                                                                                                  | PGlite menyediakan paket `@electric-sql/pglite-pgvector`                                                                                                                                                                                                                                                                                                                                                         |
 | A6    | Identitas git dan autentikasi push                    | Nama `ZeaLIsHere`, email noreply GitHub, kredensial Windows Credential Manager                                                                                  | Push sudah terverifikasi berhasil                                                                                                                                                                                                                                                                                                                                                                                |
 | A7    | Akses skill desain                                    | Belum diputuskan, akan dipakai saat fase 1                                                                                                                      | Data skill dibaca lewat Node selama Python belum terpasang                                                                                                                                                                                                                                                                                                                                                       |
-| A8    | Penyedia kanal WhatsApp                               | **Belum diputuskan.** Meta Cloud API, Fonnte, atau n8n sebagai perantara                                                                                        | User menunda keputusan. Rincian pertimbangan ada di bagian 11                                                                                                                                                                                                                                                                                                                                                    |
+| A8    | Penyedia kanal WhatsApp                               | **Fonnte.** Paket gratis, tanpa n8n sebagai perantara                                                                                                           | Nomor user sudah terhubung ke Fonnte dan chat teks berjalan, sehingga demo punya kanal WhatsApp nyata tanpa menunggu verifikasi bisnis Meta. Batasan lampiran dan voice note sudah dipastikan dari dokumentasi resmi dan dicatat di bagian 11. Ditinjau ulang bila keadaan berubah                                                                                                                               |
 | A9    | Versi dan opsi bawaan Next.js                         | Next.js 16.4.2, React 19.3.0, Tailwind 4, `cacheComponents` aktif, `partialPrefetching` aktif                                                                   | Keluaran `create-next-app`. Lihat catatan di bawah tabel                                                                                                                                                                                                                                                                                                                                                         |
 | A10   | Penulisan otomatis blok aturan Next.js ke `AGENTS.md` | Dimatikan, memakai `agentRules: false` pada `next.config.ts`                                                                                                    | `AGENTS.md` dikelola tim. Panduan Next.js 16 dibaca dari `node_modules/next/dist/docs/`                                                                                                                                                                                                                                                                                                                          |
 | A11   | Pustaka primitif dan preset shadcn/ui                 | Pustaka primitif `radix`, preset `nova`, warna dasar `neutral`, ikon `lucide`                                                                                   | Radix paling matang dan sudah tertulis di rencana. Preset nova memakai Lucide, sejalan dengan aturan ikon SVG dan larangan emoji                                                                                                                                                                                                                                                                                 |
@@ -375,33 +384,63 @@ Peraturan ini harus dipatuhi mulai fase 2, saat lapisan data dipasang. Bila
 ternyata terlalu menyulitkan untuk tempo lomba, opsi ini dapat dimatikan, dan
 keputusan itu dicatat ulang di tabel ini.
 
-## 11. Penyedia kanal WhatsApp yang belum diputuskan
+## 11. Penyedia kanal WhatsApp
 
-Permukaan S3 memuat aksi Hubungkan ke WhatsApp beserta tata caranya. Isi tata
-cara itu bergantung pada penyedia yang dipilih, sehingga bagian ini sengaja
-dibelum difinalkan.
+**Ditetapkan:** Fonnte, pada 17 Oktober 2026.
 
-Tiga jalur yang dipertimbangkan beserta akibatnya pada kode:
+Alasannya, nomor warung sudah terhubung ke Fonnte dan chat teks berjalan, jadi
+demo punya kanal WhatsApp nyata tanpa menunggu verifikasi bisnis Meta yang
+jangka waktunya di luar kendali kita. n8n tidak dipakai, karena n8n bukan
+penyedia WhatsApp, hanya orkestrasi alur.
 
-| Jalur                                     | Tata cara yang ditulis                                                                                                                    | Akibat pada kode                                                                                                                |
-| ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| Meta WhatsApp Business Cloud API langsung | Daftar aplikasi Meta, verifikasi bisnis, daftarkan nomor, ambil Phone Number ID dan token akses, atur alamat webhook dan token verifikasi | Bentuk payload webhook mengikuti Cloud API. Perlu penanganan verifikasi webhook dan tanda tangan permintaan                     |
-| Penyedia perantara seperti Fonnte         | Daftar akun penyedia, hubungkan nomor, ambil token perangkat, atur alamat webhook                                                         | Bentuk payload mengikuti penyedia. Perlu lapisan penerjemah payload agar inti aplikasi tetap bebas dari penyedia                |
-| n8n sebagai perantara alur                | Pasang n8n, susun alur penerimaan pesan, arahkan ke webhook aplikasi                                                                      | n8n bukan penyedia WhatsApp, sehingga tetap butuh salah satu dari dua jalur di atas. Nilainya adalah perantara alur dan antrean |
+### 11.1 Tata cara Hubungkan ke WhatsApp
 
-Yang tidak berubah dari pilihan mana pun:
+1. Pemilik membuat akun di fonnte.com, lalu menghubungkan nomor warung dengan
+   memindai kode QR pada halaman perangkat di dasbor Fonnte.
+2. Pemilik menyalin token perangkat dari dasbor Fonnte, lalu mengisinya pada
+   `.env.local` sebagai `FONNTE_TOKEN`, sesuai bagian 8 butir 5 yang
+   menetapkan kredensial kanal hanya berasal dari variabel lingkungan.
+3. Pemilik membuka permukaan S3 dan menjalankan aksi Hubungkan ke WhatsApp.
+4. Aplikasi memeriksa token dengan `POST https://api.fonnte.com/device`
+   beserta header `Authorization`. Jawaban yang berhasil memuat nomor
+   perangkat, status koneksi, nama paket, dan sisa kuota. Jawaban yang gagal
+   memuat alasan, misalnya token tidak sah.
+5. Aplikasi menyimpan nomor perangkat, status koneksi, nama paket, sisa kuota,
+   dan waktu pemeriksaan pada baris `businesses`. Status koneksi pada S3
+   mengikuti hasil pemeriksaan ini, bukan tebakan.
+6. Pemilik menempelkan alamat webhook aplikasi pada halaman webhook Fonnte.
+7. Aksi memutuskan koneksi menandai nomor tidak terhubung dan menghapus
+   simpanan status koneksi.
 
-1. Permukaan S3 tetap memuat status koneksi, aksi menghubungkan, dan aksi
-   memutuskan, sesuai butir opt in pada proposal.
-2. Bentuk data pesan masuk yang disimpan tetap sama, yaitu percakapan, pesan,
-   orderan, dan bukti pembayaran.
-3. Seluruh pemrosesan pesan masuk lewat satu titik, yaitu fungsi yang sama
-   dengan parameter penyedia, supaya penggantian penyedia tidak menyentuh
-   logika bisnis.
+Token tidak pernah disimpan di baris basis data, sesuai bagian 8 butir 5. Bila
+`FONNTE_TOKEN` belum diisi, S3 menampilkan tata cara di atas beserta keterangan
+bahwa token belum ada, bukan tombol yang tidak berfungsi.
 
-Keputusan ini wajib diambil sebelum tugas T5.11 dikerjakan.
+### 11.2 Batasan Fonnte yang sudah dipastikan
 
-### Kemampuan PGlite yang sudah dipastikan
+Diambil dari dokumentasi resmi Fonnte pada 17 Oktober 2026.
+
+| Batasan         | Isi dokumentasi                                                                                                              | Akibat pada aplikasi                                                                                                                                                                    |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Lampiran masuk  | Halaman Webhook Get Attachment menyatakan `url`, `filename`, dan `extension` hanya diterima perangkat berpakat `all feature` | Pada paket gratis yang dipakai sekarang, gambar dari pelanggan tidak sampai ke webhook. Penerjemah payload tetap ditulis mengikuti bentuk itu dan menangani ketiadaan `url` tanpa gagal |
+| Jenis berkas    | Hanya `png`, `jpg`, `jpeg`, `webp`, `mp4`, `pdf`, `doc`, `docx`, `xls`, `xlsx`, `csv`, `txt`, dan `mp3`, paling besar 10 MB  | Voice note WhatsApp berformat `ogg`, jadi tidak pernah diteruskan ke webhook walaupun paket dinaikkan. Fitur voice note tetap ada di permukaan S2 lewat Web Speech API, sesuai A3       |
+| Pengiriman luar | Tool `send_whatsapp` hanya menulis balasan pada konteks pesan pelanggan, tidak mengirim ke luar, sesuai `docs/SCOPE.md`      | Balasan otomatis agen terlihat pada orderan di dalam aplikasi. Ini sudah sesuai kriteria demo langkah 4 yang tidak meminta tampilan obrolan                                             |
+| Autoreply       | Fitur autoreply Fonnte tidak bekerja bila webhook dipakai                                                                    | Tidak merugikan, karena balasan otomatis disusun aplikasi sendiri                                                                                                                       |
+
+### 11.3 Akibat pada rancangan
+
+1. Aplikasi tidak menggantungkan kriteria demo pada kanal luar. Panel pengirim
+   pesan tiruan menulis ke fungsi pemrosesan pesan masuk yang sama dengan
+   webhook penyedia, sehingga seluruh langkah kriteria demo tetap berjalan
+   ketika jaringan bermasalah atau kuota Fonnte habis.
+2. Penerjemah payload penyedia berada di `src/lib/channel/`, sesuai aturan
+   struktur butir 6.
+3. Nama paket dan sisa kuota ditampilkan pada halaman Pengaturan apa adanya,
+   termasuk keterangan bahwa lampiran masuk belum aktif pada paket gratis.
+   Pemilik jadi tahu batasnya, bukan menemukan sendiri lewat kegagalan.
+4. Pesan teks nyata lewat Fonnte adalah nilai tambah demo, bukan tumpuan.
+
+## 12. Kemampuan PGlite yang sudah dipastikan
 
 PGlite adalah PostgreSQL asli yang dikompilasi ke WebAssembly dan berjalan di
 dalam proses Node. Yang tersedia dan akan dipakai:
