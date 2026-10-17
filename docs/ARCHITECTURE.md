@@ -469,9 +469,27 @@ dalam proses Node. Yang tersedia dan akan dipakai:
 | Transaksi         | Method `transaction` dengan commit otomatis dan rollback otomatis bila gagal |
 | Query bertemplate | Method `sql` dengan pengikatan parameter otomatis                            |
 | Impor dan ekspor  | Device virtual `/dev/blob` lewat perintah `COPY`                             |
-| Ekstensi          | Tidak ada ekstensi tambahan                                                  | Seluruh fitur yang dipakai adalah fitur bawaan Postgres |
+| Ekstensi          | Tidak ada ekstensi tambahan                                                  |
 | Penyimpanan       | `file://` ke disk, `memory://` sementara, atau `idb://` di peramban          |
 
 Konsekuensi: seluruh operasi basis data yang dibutuhkan aplikasi ini, termasuk
 CRUD dan transaksi dapat berjalan tanpa server basis data.
 Berkas basis data disimpan di direktori yang masuk `.gitignore`.
+
+Pemilih driver ada di `src/lib/db/client.ts`. Aturannya satu: bila
+`DATABASE_URL` terisi, aplikasi memakai Postgres biasa lewat driver `pg`, dan
+bila kosong, aplikasi memakai PGlite dengan folder penyimpanan dari
+`PGLITE_DATA_DIR`. Lapisan akses data hanya menerima satu tipe `Database`,
+sehingga tidak ada kode aplikasi lain yang berubah saat berpindah driver.
+
+PGlite juga sudah dipastikan berjalan di dalam proses server Next, bukan hanya
+di skrip Node. Dua hal yang ditemukan saat pengujian, beserta penanganannya:
+
+1. PGlite hanya membuat direktori terakhir dari jalur penyimpanannya, bukan
+   direktori bertingkat. Karena itu pemilih driver membuat folder lebih dulu
+   dengan `mkdirSync` sebelum membuka penyimpanan.
+2. Data hanya berada di dalam proses server, dan berkasnya tidak ikut ke
+   produksi. Halaman yang menampilkan data tidak boleh disajikan dari hasil
+   build, karena isinya akan terbekukan pada saat build dan tidak berubah saat
+   pemilik memakai aplikasi. Mekanisme pencegahannya ditetapkan pada T5.1,
+   dengan memperhatikan `cacheComponents` yang aktif.
