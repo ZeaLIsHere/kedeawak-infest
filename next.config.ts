@@ -7,6 +7,13 @@ const nextConfig: NextConfig = {
   agentRules: false,
   cacheComponents: true,
   partialPrefetching: true,
+  /*
+   * PGlite memuat berkas runtime miliknya sendiri dari cakram. Bila paket ini
+   * ikut dibundel, alamat berkasnya berubah menjadi URL dan ditolak oleh
+   * `node:fs`, sehingga setiap query gagal. Karena itu paket ini dibiarkan
+   * dimuat langsung oleh Node. Driver `pg` sudah masuk daftar bawaan Next.js.
+   */
+  serverExternalPackages: ["@electric-sql/pglite"],
   turbopack: {
     rules: {
       "*.css": {

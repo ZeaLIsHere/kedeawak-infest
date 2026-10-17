@@ -2,6 +2,7 @@
 
 import { TriangleAlert } from "lucide-react";
 
+import { StateBlock } from "@/components/shell/state-block";
 import { Button } from "@/components/ui/button";
 
 type ErrorStateProps = {
@@ -19,18 +20,20 @@ type ErrorStateProps = {
  */
 export function ErrorState({ title, onRetry }: ErrorStateProps) {
   return (
-    <div
-      role="alert"
-      className="flex flex-col items-start gap-2 rounded-lg border border-dashed border-border-strong bg-card p-5"
-    >
-      <TriangleAlert aria-hidden="true" className="size-8 text-expense" />
-      <p className="text-section-title font-semibold">{title} gagal dimuat</p>
-      <p className="max-w-md text-body text-muted-foreground">
-        Terjadi kesalahan saat membaca data warung. Coba lagi sebentar lagi.
-      </p>
-      <Button type="button" variant="secondary" onClick={onRetry}>
-        Coba lagi
-      </Button>
-    </div>
+    <StateBlock
+      icon={TriangleAlert}
+      title={`${title} gagal dimuat`}
+      description="Terjadi kesalahan saat membaca data warung. Coba lagi sebentar lagi."
+      action={
+        <Button
+          type="button"
+          variant="secondary"
+          className="min-h-touch px-4"
+          onClick={onRetry}
+        >
+          Coba lagi
+        </Button>
+      }
+    />
   );
 }
