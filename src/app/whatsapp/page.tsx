@@ -1,40 +1,180 @@
-import {formatNumber} from "@/lib/format/number";
-import {Suspense} from "react";
-import {connection} from "next/server";
-import {CardError} from "@/components/shell/card-error";
-import {PageHeader} from "@/components/shell/page-header";
-import {SectionCard} from "@/components/shell/section-card";
-import {NoWarungState} from "@/components/shell/no-warung-state";
-import {ConnectionPanel} from "@/components/whatsapp/connection-panel";
-import {MessageSimulator} from "@/components/whatsapp/message-simulator";
-import {CustomerControls} from "@/components/whatsapp/customer-controls";
-import {withCurrentBusiness} from "@/lib/data/server";
-import {findBusiness} from "@/lib/data/business";
-import {listProducts} from "@/lib/data/products";
-import {listCustomers,readCustomerName,readCustomerPhone} from "@/lib/data/customers";
-import {getChannelOverview} from "@/lib/data/channel-intake";
-import {safeChannelText} from "@/lib/channels/fonnte";
-import {formatRupiah} from "@/lib/format/currency";
+import { Suspense } from "react";
+import { connection } from "next/server";
 
-async function ChannelContent(){
- await connection();
- const data=await withCurrentBusiness(async(db,id)=>({business:await findBusiness(db,id),products:await listProducts(db,id),overview:await getChannelOverview(db,id),customers:(await listCustomers(db,id)).map(c=>({id:c.id,name:readCustomerName(c)??"Pelanggan warung",phone:readCustomerPhone(c)}))}));
- if(!data?.business)return <NoWarungState/>;
- const connected=data.business.channelStatus==="terhubung";
- const statuses={baru:"Baru",dikonfirmasi:"Dikonfirmasi",selesai:"Selesai"};
- const paymentStatuses={menunggu:"Menunggu pemeriksaan",cocok:"Nominal cocok",tidak_cocok:"Nominal berbeda"};
- return <div className="flex flex-col gap-section">
-  <SectionCard title="Koneksi nomor"><ConnectionPanel connected={connected} simulation={data.business.channelPackage==="Simulasi web"} phone={data.business.channelPhoneNumber}/></SectionCard>
-  <SectionCard title="Panel pelanggan"><MessageSimulator connected={connected} products={data.products.map(p=>({id:p.id,name:safeChannelText(p.name),stock:p.stock}))} orders={data.overview.orders.map(o=>({id:o.id,phone:o.phone,customerName:o.customerName,total:o.total}))}/></SectionCard>
-  <SectionCard title="Orderan pelanggan">
-   {!data.overview.orders.length?<p className="text-sm text-muted-foreground">Belum ada orderan. Kirim pesanan dari panel pelanggan untuk memulai demonstrasi.</p>:<div className="flex flex-col gap-4">{data.overview.orders.map(order=><article key={order.id} data-testid="channel-order" data-order-id={order.id} data-total={order.total} className="min-w-0 rounded-lg border border-border p-4">
-    <div className="flex flex-wrap items-start justify-between gap-3"><div><h3 className="font-medium">{safeChannelText(order.customerName)}</h3><p className="text-sm tabular-nums">{order.phone}</p></div><div className="text-right"><p className="font-medium tabular-nums">{formatRupiah(order.total)}</p><p className="text-sm">{statuses[order.status]}</p></div></div>
-    <ul className="mt-3 space-y-1 text-sm">{order.items.map(item=><li key={item.id}>{safeChannelText(item.name)+" sebanyak "+formatNumber(item.quantity)}</li>)}</ul>
-    <dl className="mt-3 space-y-2 text-sm"><div><dt className="text-muted-foreground">Pesan asal</dt><dd className="break-words">{safeChannelText(order.origin)}</dd></div><div><dt className="text-muted-foreground">Balasan tercatat</dt><dd className="break-words">{safeChannelText(order.reply)}</dd></div></dl>
-    <div className="mt-3 flex flex-col gap-2 text-sm">{!order.payments.length?<p className="text-muted-foreground">Belum ada bukti pembayaran</p>:order.payments.map(payment=><div key={payment.id} className="rounded-lg bg-muted p-3"><p className="font-medium">{paymentStatuses[payment.status]}</p><p>{"Nominal pesanan "+formatRupiah(payment.expectedAmount)}</p>{payment.readAmount!==null&&<p>{"Nominal terbaca "+formatRupiah(payment.readAmount)}</p>}</div>)}</div>
-   </article>)}</div>}
-  </SectionCard>
-  <SectionCard title="Data pelanggan"><CustomerControls customers={data.customers.map(c=>({...c,name:safeChannelText(c.name)}))}/></SectionCard>
- </div>;
+import { CardError } from "@/components/shell/card-error";
+import { NoWarungState } from "@/components/shell/no-warung-state";
+import { PageHeader } from "@/components/shell/page-header";
+import { WhatsAppInbox, type InboxConversation, type InboxMessage } from "@/components/whatsapp/inbox";
+import { ConnectionPanel } from "@/components/whatsapp/connection-panel";
+import { CustomerControls } from "@/components/whatsapp/customer-controls";
+import { MessageSimulator } from "@/components/whatsapp/message-simulator";
+import { safeChannelText } from "@/lib/channels/fonnte";
+import { getChannelOverview } from "@/lib/data/channel-intake";
+import { listMessages, listWhatsAppConversations } from "@/lib/data/conversations";
+import { findBusiness } from "@/lib/data/business";
+import { listCustomers, readCustomerName, readCustomerPhone } from "@/lib/data/customers";
+import { listProducts } from "@/lib/data/products";
+import { withCurrentBusiness } from "@/lib/data/server";
+
+async function ChannelContent({
+  searchParams,
+}: Pick<PageProps<"/whatsapp">, "searchParams">) {
+  const params = await searchParams;
+
+  await connection();
+
+  const requested = typeof params.percakapan === "string" ? params.percakapan : undefined;
+  const data = await withCurrentBusiness(async (db, id) => {
+    const [business, products, inbox, overview, customers] = await Promise.all([
+      findBusiness(db, id),
+      listProducts(db, id),
+      listWhatsAppConversations(db, id),
+      getChannelOverview(db, id),
+      listCustomers(db, id),
+    ]);
+    const selected = inbox.find((conversation) => conversation.id === requested) ?? inbox[0];
+    const selectedMessages =
+      selected === undefined
+        ? []
+        : (await listMessages(db, id, selected.id)).filter(
+            (message) => message.sender === "customer",
+          );
+
+    return {
+      business,
+      products,
+      inbox,
+      overview,
+      customers,
+      selectedId: selected?.id,
+      messages: selectedMessages,
+    };
+  });
+
+  if (!data?.business) return <NoWarungState />;
+
+  const connected = data.business.channelStatus === "terhubung";
+  const simulation = data.business.channelPackage === "Simulasi web";
+  const channelLabel = simulation
+    ? "Simulasi web"
+    : connected && data.business.channelPackage === "Twilio Sandbox"
+      ? "WhatsApp Sandbox"
+      : "Belum terhubung";
+
+  const conversations: InboxConversation[] = data.inbox.map((conversation) => {
+    const last = conversation.lastCustomerMessage;
+    return {
+      id: conversation.id,
+      name: safeChannelText(conversation.customerName),
+      phone: conversation.phone,
+      preview:
+        last === undefined
+          ? "Belum ada pesan"
+          : last.kind === "voice"
+            ? "Pesan suara"
+            : last.kind === "image"
+              ? "Foto"
+              : safeChannelText(last.body ?? "Pesan pelanggan"),
+      previewKind: last?.kind ?? "text",
+      lastMessageAt: last?.createdAt ?? null,
+    };
+  });
+  const selected = conversations.find(
+    (conversation) => conversation.id === data.selectedId,
+  );
+  const messages: InboxMessage[] = data.messages.map((message) => ({
+    id: message.id,
+    kind: message.kind,
+    body: safeChannelText(message.body ?? ""),
+    createdAt: message.createdAt,
+  }));
+
+  return (
+    <>
+      <WhatsAppInbox
+        conversations={conversations}
+        selected={selected}
+        messages={messages}
+        channelLabel={channelLabel}
+        connected={connected}
+        simulation={simulation}
+      />
+
+      <details
+        id="pengaturan"
+        className="mt-4 rounded-xl border border-border bg-card shadow-card"
+      >
+        <summary className="cursor-pointer px-5 py-4 font-medium">
+          Pengaturan koneksi, simulasi, dan data pelanggan
+        </summary>
+        <div className="grid gap-6 border-t border-border p-5 lg:grid-cols-2">
+          <section>
+            <h2 className="text-section-title font-semibold">Koneksi nomor</h2>
+            <div className="mt-3">
+              <ConnectionPanel
+                connected={connected}
+                simulation={simulation}
+                phone={data.business.channelPhoneNumber}
+              />
+            </div>
+          </section>
+          <section>
+            <h2 className="text-section-title font-semibold">Data pelanggan</h2>
+            <div className="mt-3">
+              <CustomerControls
+                customers={data.customers.map((customer) => ({
+                  id: customer.id,
+                  name: safeChannelText(readCustomerName(customer) ?? "Pelanggan warung"),
+                  phone: readCustomerPhone(customer),
+                }))}
+              />
+            </div>
+          </section>
+          <section className="lg:col-span-2">
+            <h2 className="text-section-title font-semibold">Panel pelanggan</h2>
+            <div className="mt-3">
+              <MessageSimulator
+                connected={connected}
+                products={data.products.map((product) => ({
+                  id: product.id,
+                  name: safeChannelText(product.name),
+                  stock: product.stock,
+                }))}
+                orders={data.overview.orders.map((order) => ({
+                  id: order.id,
+                  phone: order.phone,
+                  customerName: order.customerName,
+                  total: order.total,
+                }))}
+              />
+            </div>
+          </section>
+        </div>
+      </details>
+    </>
+  );
 }
-export default function WhatsappPage(){return <><PageHeader title="Integrasi WhatsApp" description="Hubungkan kanal bisnis dan periksa pesanan serta bukti pembayaran pelanggan."/><div className="mx-auto w-full max-w-content p-page"><CardError title="Integrasi WhatsApp"><Suspense fallback={<p className="text-sm text-muted-foreground">Memuat kanal bisnis</p>}><ChannelContent/></Suspense></CardError></div></>;}
+
+export default function WhatsappPage(props: PageProps<"/whatsapp">) {
+  return (
+    <>
+      <PageHeader
+        title="Integrasi WhatsApp"
+        description="Percakapan pelanggan dari WhatsApp dan rincian pesan yang masuk."
+      />
+      <div className="mx-auto w-full max-w-content p-page">
+        <CardError title="Integrasi WhatsApp">
+          <Suspense
+            fallback={
+              <p role="status" className="text-sm text-muted-foreground">
+                Memuat percakapan WhatsApp
+              </p>
+            }
+          >
+            <ChannelContent searchParams={props.searchParams} />
+          </Suspense>
+        </CardError>
+      </div>
+    </>
+  );
+}

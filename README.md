@@ -28,7 +28,7 @@ DeepSeek nyata untuk alur baru ini.
 | Laporan Keuangan          | Harian, mingguan, rincian transaksi dan jenis pembayaran                                                | Audit akhir                                                                    |
 | Persetujuan               | Antrean, rincian draft, setujui/tolak, riwayat, stok, pencegahan keputusan berulang                     | Penerimaan demo bersama AI nyata                                               |
 | Percakapan dengan Agen AI | Teks, riwayat, mode lokal, laporan, parser foto, tinjau bacaan, context lock, kuota                     | Uji AI/foto/mikrofon nyata dan unggah voice note S2                            |
-| Integrasi WhatsApp        | Panel pelanggan simulasi, orderan, bukti, hapus data pelanggan; webhook Twilio bertanda tangan, media, transkripsi Groq, balasan REST | Uji Sandbox, Groq, DeepSeek nyata dan demo ngrok |
+| Integrasi WhatsApp        | Kotak masuk percakapan pelanggan, webhook Twilio bertanda tangan, media, transkripsi Groq, balasan REST | Uji Sandbox, Groq, DeepSeek nyata dan demo ngrok |
 | Pengaturan                | Keterangan persetujuan pemrosesan pesan dan privasi                                                     | Penyesuaian penyedia dan audit akhir                                           |
 
 Sepuluh tool berada di `src/lib/tools/`; setiap pemanggilan meninggalkan audit.

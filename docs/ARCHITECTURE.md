@@ -567,8 +567,9 @@ penerimaan provider nyata. Tidak ada server terpisah atau n8n.
 4. Teks diproses menjadi orderan; audio melewati Groq Whisper lalu DeepSeek.
    Transkrip disimpan sebagai pesan asal. Balasan nyata dicatat pada konteks
    orderan, tanpa menambah halaman obrolan pelanggan.
-5. UI perlu polling atau muat ulang sesudah proses latar selesai. Refresh
-   otomatis dapat ditambahkan pada implementasi, belum diklaim tersedia.
+5. UI memuat ulang otomatis setiap 15 detik dan menyediakan tombol Perbarui,
+   supaya pesan baru muncul setelah proses latar selesai. Panel kanan hanya
+   menampilkan pesan pelanggan; balasan agen tidak ditampilkan di aplikasi.
 
 **Batas demo yang wajib disampaikan:** `after()` bukan antrean atau durable
 worker. Stop server/redeploy sebelum selesai dapat kehilangan pemrosesan

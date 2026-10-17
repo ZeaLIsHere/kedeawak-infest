@@ -11,6 +11,7 @@ import {
   findConversationByPhone,
   listConversations,
   listMessages,
+  listWhatsAppConversations,
   recordInboundMessage,
 } from "./conversations";
 import { readCustomerName } from "./customers";
@@ -134,6 +135,22 @@ describe("data percakapan", () => {
 
     expect(voice.message.kind).toBe("voice");
     expect(voice.message.mediaUrl).toBe("https://contoh.test/suara.ogg");
+  });
+
+  it("meringkas pesan pelanggan terakhir tanpa balasan agen", async () => {
+    const summaries = await listWhatsAppConversations(test.db, test.business.id);
+    const conversation = await findConversationByPhone(
+      test.db,
+      test.business.id,
+      customerPhone,
+    );
+    const own = summaries.find((summary) => summary.id === conversation?.id);
+    const voice = summaries.find((summary) => summary.phone === "081200000010");
+
+    expect(own?.customerName).toBe("Bu Rina");
+    expect(own?.phone).toBe(customerPhone);
+    expect(own?.lastCustomerMessage?.body).toBe("Yang lima kilogram");
+    expect(voice?.lastCustomerMessage?.kind).toBe("voice");
   });
 
   it("menutup percakapan dan membukanya kembali saat ada pesan baru", async () => {

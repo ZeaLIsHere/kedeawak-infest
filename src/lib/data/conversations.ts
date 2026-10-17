@@ -8,7 +8,13 @@ import {
   type Customer,
   type Message,
 } from "../db/schema";
-import { findOrCreateCustomer, phoneHash } from "./customers";
+import {
+  findCustomer,
+  findOrCreateCustomer,
+  phoneHash,
+  readCustomerName,
+  readCustomerPhone,
+} from "./customers";
 import { isUuid } from "./ids";
 import { assertConversationOwned } from "./ownership";
 
@@ -89,6 +95,64 @@ export async function listConversations(
     .from(conversations)
     .where(eq(conversations.businessId, businessId))
     .orderBy(desc(conversations.createdAt));
+}
+
+/** Ringkasan satu percakapan WhatsApp untuk daftar pesan masuk. */
+export type WhatsAppConversationSummary = {
+  readonly id: string;
+  readonly customerName: string;
+  readonly phone: string | null;
+  readonly lastCustomerMessage: Message | undefined;
+  readonly lastMessageAt: Date;
+};
+
+/**
+ * Percakapan WhatsApp beserta pesan pelanggan terakhir.
+ *
+ * Balasan agen sengaja tidak ikut diringkas, karena daftar pesan masuk hanya
+ * menampilkan isi pesan pelanggan. Nama dan nomor dibuka di lapisan data supaya
+ * komponen tidak menyentuh sandi kolom.
+ */
+export async function listWhatsAppConversations(
+  db: Database,
+  businessId: string,
+): Promise<WhatsAppConversationSummary[]> {
+  const rows = (await listConversations(db, businessId)).filter(
+    (conversation) => conversation.channel === "whatsapp",
+  );
+
+  const summaries = await Promise.all(
+    rows.map(async (conversation) => {
+      const [customer, conversationMessages] = await Promise.all([
+        conversation.customerId === null
+          ? Promise.resolve(undefined)
+          : findCustomer(db, businessId, conversation.customerId),
+        listMessages(db, businessId, conversation.id),
+      ]);
+      const customerMessages = conversationMessages.filter(
+        (message) => message.sender === "customer",
+      );
+      const lastCustomerMessage = customerMessages.at(-1);
+
+      return {
+        id: conversation.id,
+        customerName:
+          customer === undefined
+            ? "Data pelanggan dihapus"
+            : (readCustomerName(customer) ?? "Pelanggan warung"),
+        phone: customer === undefined ? null : readCustomerPhone(customer),
+        lastCustomerMessage,
+        lastMessageAt:
+          lastCustomerMessage?.createdAt ??
+          conversation.lastMessageAt ??
+          conversation.createdAt,
+      };
+    }),
+  );
+
+  return summaries.sort(
+    (left, right) => right.lastMessageAt.getTime() - left.lastMessageAt.getTime(),
+  );
 }
 
 /** Pesan pesan dalam satu percakapan, dari yang paling lama. */

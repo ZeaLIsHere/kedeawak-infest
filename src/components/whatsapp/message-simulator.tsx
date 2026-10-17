@@ -10,7 +10,7 @@ const selectClass="min-h-12 w-full rounded-lg border border-input bg-background 
 export function MessageSimulator({products,orders,connected}:{products:Product[];orders:Order[];connected:boolean}){
  const [phone,setPhone]=useState("");const [customerName,setCustomerName]=useState("");
  const [mode,setMode]=useState("order");const [key,setKey]=useState(()=>crypto.randomUUID());const [message,setMessage]=useState("");const [pending,start]=useTransition();const router=useRouter();
- function submit(form:FormData){form.set("eventId",key);start(async()=>{const result=await receiveSimulatedMessage(form);setMessage(result.ok?result.message:result.error);if(result.ok){setKey(crypto.randomUUID());router.refresh();}});}
+ function submit(form:FormData){form.set("eventId",key);start(async()=>{const result=await receiveSimulatedMessage(form);setMessage(result.ok?"Pesan simulasi sudah dicatat.":result.error);if(result.ok){setKey(crypto.randomUUID());router.refresh();}});}
  return <form action={submit} className="flex flex-col gap-4">
   <p className="text-sm text-muted-foreground">Anda berperan sebagai pelanggan pada panel simulasi. Pesanan dan bukti diproses ke basis data, tanpa pengiriman pesan keluar.</p>
   {!connected&&<p role="status">Hubungkan simulasi atau nomor warung terlebih dahulu.</p>}
