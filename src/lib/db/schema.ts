@@ -509,9 +509,9 @@ export const toolInvocations = pgTable(
 /**
  * Potongan konteks bisnis yang dipakai agen untuk menjawab.
  *
- * Kolom vektor embedding belum ditulis di sini, karena pemilihan sumber
- * embedding menunggu keputusan T4.6. Bila keputusannya memakai vektor, kolom
- * vektor ditambahkan lewat migrasi baru.
+ * Tidak ada kolom vektor di sini. Sesuai keputusan A5, konteks bisnis diambil
+ * lewat query terstruktur, bukan lewat kemiripan vektor, sebab DeepSeek tidak
+ * menyediakan endpoint embedding dan data warung berupa data terstruktur.
  */
 export const knowledgeChunks = pgTable(
   "knowledge_chunks",
