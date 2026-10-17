@@ -19,22 +19,23 @@ Rencana kerja induk KedeAwak. Ini satu satunya daftar pekerjaan yang dikerjakan.
 berikutnya sebelum tugas yang menghambat selesai. Setiap tugas selesai langsung
 di commit dan di push, sesuai `docs/WORKFLOW.md`.
 
-**Blocker saat ini:** bagian "Keputusan yang menunggu konfirmasi" di bawah.
-Tugas yang tidak bergantung pada keputusan itu bisa mulai dikerjakan.
+**Blocker saat ini:** tidak ada. Fase 0 selesai. Keputusan K3, K4, K5, dan K7
+belum dijawab, tetapi baru dibutuhkan pada fase 1 dan fase 4. Lihat bagian
+"Keputusan yang menunggu konfirmasi" di bawah.
 
 ---
 
 ## Keputusan yang menunggu konfirmasi
 
-| ID | Pertanyaan | Rekomendasi saya | Dampak bila ditunda |
+| ID | Pertanyaan | Rekomendasi saya | Status |
 | --- | --- | --- | --- |
-| K1 | Nama dan email untuk identitas git | Perlu dari user | Commit tidak bisa dibuat |
-| K2 | Cara autentikasi push ke GitHub | Perlu dari user | Push tidak bisa dilakukan |
-| K3 | Penyedia model bahasa untuk demo | Google Gemini, ada tingkat gratis dan mendukung gambar serta suara | Tidak menghambat, pengganti lokal dipakai |
-| K4 | Apakah kunci API sudah tersedia | Bila belum, pengganti lokal aktif dan ditampilkan terus terang | Tidak menghambat |
-| K5 | Pemasangan Python untuk data skill desain | Boleh dipasang, atau data dibaca dengan Node | Tidak menghambat |
-| K6 | Konfirmasi daftar fitur di `docs/SCOPE.md` | Sudah saya susun berdasarkan proposal | Berisiko salah bangun |
-| K7 | Pemakaian PGlite untuk demo, bukan Postgres terpisah | PGlite, supaya demo tidak butuh jaringan | Tidak menghambat |
+| K1 | Nama dan email untuk identitas git | Perlu dari user | Selesai. Nama `ZeaLIsHere`, email memakai alamat noreply GitHub `180758619+ZeaLIsHere@users.noreply.github.com`. Ganti bila ingin memakai email lain |
+| K2 | Cara autentikasi push ke GitHub | Perlu dari user | Selesai. Kredensial `ZeaLIsHere` sudah tersimpan di Windows Credential Manager, push terverifikasi berhasil |
+| K3 | Penyedia model bahasa untuk demo | Google Gemini, ada tingkat gratis dan mendukung gambar serta suara | Belum dijawab. Tidak menghambat, baru dipakai di fase 4 |
+| K4 | Apakah kunci API sudah tersedia | Bila belum, pengganti lokal aktif dan ditampilkan terus terang | Belum dijawab. Tidak menghambat |
+| K5 | Pemasangan Python untuk data skill desain | Boleh dipasang, atau data dibaca dengan Node | Belum dijawab. Tidak menghambat, baru terasa saat fase 1 |
+| K6 | Konfirmasi daftar fitur di `docs/SCOPE.md` | Sudah saya susun berdasarkan proposal | **Dikonfirmasi user.** Enam permukaan sesuai `docs/SCOPE.md` |
+| K7 | Pemakaian PGlite untuk demo, bukan Postgres terpisah | PGlite, supaya demo tidak butuh jaringan | Belum dijawab. Tidak menghambat |
 
 ---
 
@@ -54,7 +55,7 @@ Tujuan: aturan main dan rencana tersedia, repo siap menerima kode.
 | T0.8 | Tulis `docs/THIRD-PARTY-SKILLS.md` | Provenance dan lisensi skills | `[x]` |
 | T0.9 | Tulis `PLAN.md` dan `README.md` | Rencana induk dan gambaran proyek | `[x]` |
 | T0.10 | Siapkan `.gitignore` dan konfigurasi OpenCode | Repo aman dari rahasia dan berkas hasil build | `[x]` |
-| T0.11 | Atur remote, identitas git, dan autentikasi | Commit pertama terkirim ke `origin` | `[!]` perlu K1 dan K2 |
+| T0.11 | Atur remote, identitas git, dan autentikasi | Commit pertama terkirim ke `origin` | `[x]` |
 
 Kriteria selesai fase 0: dokumen aturan main lengkap, commit pertama ada di
 `origin`.
