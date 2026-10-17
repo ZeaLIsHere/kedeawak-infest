@@ -6,96 +6,201 @@ Universitas Sumatera Utara, 2026.
 
 ## Status
 
-Pengembangan dihentikan pada titik yang diminta pemilik, 18 Oktober 2026.
-Kasir, kelola produk, laporan pembayaran, Persetujuan, percakapan teks,
-panel simulasi WhatsApp, dan privasi sudah memiliki implementasi.
-Sebagian integrasi dan verifikasi masih terbuka. Lihat `PLAN.md` untuk
-status setiap tugas; proyek belum dinyatakan memenuhi seluruh kriteria demo.
+Kasir, kelola produk, laporan pembayaran, Persetujuan, percakapan teks, panel
+simulasi WhatsApp, dan privasi sudah memiliki implementasi. Checkpoint
+penghentian sebelumnya tetap merupakan riwayat, bukan bukti integrasi baru.
+
+Pada 18 Oktober 2026 user menyetujui **Twilio Sandbox menggantikan Fonnte**,
+termasuk balasan nyata kepada peserta yang sudah join/opt in, serta WhatsApp
+voice note otomatis menjadi transkrip lalu orderan melalui DeepSeek. Groq
+Whisper dipilih tim implementasi untuk transkripsi, bukan permintaan penyedia
+spesifik dari user. Migrasi dan verifikasi masih parsial; lihat `PLAN.md` dan
+`docs/plans/2026-10-18-twilio.md`. Belum ada klaim uji Twilio, Groq, atau
+DeepSeek nyata untuk alur baru ini.
 
 ## Fitur yang tersedia dan pekerjaan terbuka
 
-| Halaman | Sudah diimplementasikan | Masih terbuka |
-| --- | --- | --- |
-| Dasbor | Penjualan, pengeluaran, laba, jumlah order, produk terlaris, alert stok dari basis data | Audit akhir dan penerimaan demo lengkap |
-| Kasir | Pencarian produk, keranjang, batas stok, tunai, transfer, QRIS, uang diterima, kembalian, simpan penjualan, usulan pesanan dari ketikan atau mikrofon | Uji DeepSeek dan mikrofon nyata |
-| Stok dan Produk | Tambah, ubah, stok awal, ambang minimum, penyesuaian beralasan, arsip, aktifkan kembali, alert, draft pembelian, dialog tinjau produk dari asisten | Uji asisten nyata dan tampilan prediksi restok |
-| Laporan Keuangan | Harian, mingguan, rincian transaksi, jenis pembayaran dan ringkasan uang masuk | Audit akhir |
-| Persetujuan | Antrean, rincian draft, setujui, tolak, riwayat, pembaruan stok, pencegahan keputusan berulang | Penerimaan demo lengkap bersama AI nyata |
-| Percakapan dengan Agen AI | Teks, riwayat, mode lokal, laporan bahasa alami, parser foto struk, tinjau bacaan, penguncian konteks, kuota | Uji AI dan foto nyata, mikrofon nyata, unggah berkas voice note |
-| Integrasi WhatsApp | Koneksi simulasi, pemeriksaan profil Fonnte, panel pelanggan, orderan, nominal bukti simulasi, balasan tercatat, hapus data pelanggan | Uji Fonnte dan webhook nyata, pembacaan foto bukti lewat AI |
-| Pengaturan | Keterangan persetujuan pemrosesan pesan dan privasi | Audit akhir |
+| Halaman                   | Sudah diimplementasikan pada checkpoint                                                                 | Masih terbuka                                                                  |
+| ------------------------- | ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| Dasbor                    | Penjualan, pengeluaran, laba, jumlah order, produk terlaris, alert stok dari basis data                 | Audit akhir dan penerimaan demo lengkap                                        |
+| Kasir                     | Produk, keranjang, stok, tunai/transfer/QRIS, kembalian, simpan penjualan, usulan pesanan teks/mikrofon | Uji DeepSeek dan mikrofon nyata                                                |
+| Stok dan Produk           | Tambah, ubah, stok awal, ambang, penyesuaian, arsip, alert, draft pembelian, tinjau produk dari asisten | Uji asisten nyata dan kartu prediksi restok                                    |
+| Laporan Keuangan          | Harian, mingguan, rincian transaksi dan jenis pembayaran                                                | Audit akhir                                                                    |
+| Persetujuan               | Antrean, rincian draft, setujui/tolak, riwayat, stok, pencegahan keputusan berulang                     | Penerimaan demo bersama AI nyata                                               |
+| Percakapan dengan Agen AI | Teks, riwayat, mode lokal, laporan, parser foto, tinjau bacaan, context lock, kuota                     | Uji AI/foto/mikrofon nyata dan unggah voice note S2                            |
+| Integrasi WhatsApp        | Panel pelanggan simulasi, orderan, bukti, hapus data pelanggan; webhook Twilio bertanda tangan, media, transkripsi Groq, balasan REST | Uji Sandbox, Groq, DeepSeek nyata dan demo ngrok |
+| Pengaturan                | Keterangan persetujuan pemrosesan pesan dan privasi                                                     | Penyesuaian penyedia dan audit akhir                                           |
 
-Sepuluh tool berada di `src/lib/tools/`: stok, penjualan, pengeluaran,
-hutang, draft pembelian, balasan simulasi, pencocokan bukti, laporan, prediksi
-stok, dan strategi bisnis. Setiap pemanggilan tool meninggalkan jejak audit.
-Keberadaan tool prediksi belum berarti kartu prediksi tersedia pada halaman Stok.
+Sepuluh tool berada di `src/lib/tools/`; setiap pemanggilan meninggalkan audit.
+Keberadaan tool prediksi belum berarti kartu prediksi tersedia pada Stok.
+Kasir menyimpan orderan, item, transaksi, dan stok secara atomik dengan harga
+yang diperiksa ulang di server serta deduplikasi. Orderan WhatsApp baru belum
+mengurangi stok. **Perilaku lama tetap berlaku:** nominal bukti cocok dan
+confidence >= 0.7 otomatis menyelesaikan orderan, mencatat penjualan dan stok
+sekali. Ini pencocokan bacaan nominal, **bukan verifikasi bank**, bukan bukti
+uang benar benar diterima. Confidence rendah tetap menunggu. Foto hanya boleh
+dikaitkan jika tepat satu orderan menunggu milik pengirim di warung yang sama;
+untuk kasus ambigu, minta klarifikasi, jangan menebak orderan.
 
-Kasir menyimpan orderan, item, transaksi, dan pergerakan stok secara atomik.
-Harga diperiksa ulang di server. Identitas permintaan mencegah kiriman ulang
-yang sama mencatat penjualan dua kali. Produk arsip tidak masuk daftar aktif.
-Pesanan WhatsApp baru belum mengurangi stok; bukti yang cocok menyelesaikan
-orderan dan mencatat penjualan serta stok sekali.
+## Menjalankan demo Twilio
 
-## Menjalankan
-
-Persyaratan: Node.js 24 atau lebih baru. Untuk pemasangan baru:
+Gunakan **Node.js 24** sebagai runtime normal. Mesin pada pemeriksaan dokumentasi
+ini masih Node 20.19.5; jangan menganggap Node 20 memenuhi kebutuhan proyek.
+Pasang dependensi dari lockfile:
 
 ```powershell
-npm install
-if (-not (Test-Path .env.local)) { Copy-Item .env.example .env.local }
+npm ci
 ```
 
-Jangan menimpa `.env.local` yang sudah berisi kunci. Nama konfigurasi tersedia
-di `.env.example`. Buat `FIELD_ENCRYPTION_KEY` sesuai petunjuk di berkas itu
-dan pertahankan kunci yang sama agar data pelanggan lama tetap dapat dibuka.
+### Konfigurasi lokal
 
-Pemilik sudah mengisi `DEEPSEEK_API_KEY` di `.env.local`. Nilainya tetap
-lokal dan tidak masuk git. Untuk pemasangan lain, isi kunci sendiri.
+Berikut contoh lengkap konfigurasi demo untuk diisi sendiri pada `.env.local`.
+Semua nilai pengganti di bawah bukan kredensial nyata. Jangan timpa konfigurasi
+atau kunci yang sudah dipakai. Akses template env diblokir pengaturan privasi;
+tidak ada upaya melewati blokir, membaca template dengan cara lain, atau
+menulis berkas env pada tugas dokumentasi ini.
 
-Hentikan server yang memakai basis data PGlite sebelum menerapkan migrasi:
+```dotenv
+# Kosong memakai PGlite, bukan Postgres jaringan
+DATABASE_URL=
+PGLITE_DATA_DIR=.pglite/data
+FIELD_ENCRYPTION_KEY=GANTI_DENGAN_64_KARAKTER_HEX_DARI_32_BYTE
+
+DEEPSEEK_API_KEY=GANTI_DENGAN_KUNCI_DEEPSEEK
+DEEPSEEK_BASE_URL=https://api.deepseek.com
+DEEPSEEK_MODEL=deepseek-flash
+# Override khusus teks/gambar tetap didukung; kosong mengikuti DEEPSEEK_MODEL
+DEEPSEEK_CHAT_MODEL=
+DEEPSEEK_VISION_MODEL=
+
+GROQ_API_KEY=GANTI_DENGAN_KUNCI_GROQ
+GROQ_TRANSCRIPTION_MODEL=whisper-large-v3-turbo
+
+TWILIO_ACCOUNT_SID=GANTI_DENGAN_ACCOUNT_SID
+TWILIO_AUTH_TOKEN=GANTI_DENGAN_AUTH_TOKEN
+TWILIO_WHATSAPP_FROM=whatsapp:+GANTI_DENGAN_NOMOR_SANDBOX
+WEBHOOK_URL=https://GANTI_DENGAN_DOMAIN_NGROK/api/channels/whatsapp
+```
+
+Target pemilihan model: override `DEEPSEEK_CHAT_MODEL` atau
+`DEEPSEEK_VISION_MODEL`, lalu `DEEPSEEK_MODEL`, lalu bawaan `deepseek-flash`.
+Dukungan `DEEPSEEK_MODEL` sudah diimplementasikan di `provider.ts`; override
+gambar tetap harus mampu menerima gambar. Pemilihan model ini belum diuji
+dengan panggilan DeepSeek nyata.
+`FONNTE_TOKEN` dan `CHANNEL_WEBHOOK_SECRET` adalah konfigurasi historis, bukan
+autentikasi webhook Twilio; gunakan tanda tangan resmi Twilio.
+
+**Format kunci sudah diperiksa pada `src/lib/crypto/field-encryption.ts`:**
+cipher AES-256-GCM menerima 32 byte dalam **64 karakter hex**, bukan base64.
+Perintah Node berikut menghasilkan nilai hex yang dibutuhkan:
+
+```powershell
+node -e "console.log(require('node:crypto').randomBytes(32).toString('hex'))"
+```
+
+Konversi hasilnya sebelum mengisi `FIELD_ENCRYPTION_KEY`:
+
+```powershell
+node -e "console.log(Buffer.from('GANTI_DENGAN_HASIL_BASE64', 'base64').toString('hex'))"
+```
+
+Atau langsung hasilkan format yang diterima cipher:
+
+```powershell
+node -e "console.log(require('node:crypto').randomBytes(32).toString('hex'))"
+```
+
+Jaga kunci tetap sama agar identitas pelanggan lama dapat dibuka. Jangan
+masukkan hasilnya ke git, log, atau percakapan. `PGLITE_DATA_DIR=.pglite/data`
+valid sebagai pilihan eksplisit di `src/lib/db/client.ts`; nilai bawaan kode
+sebenarnya `.pglite/kedeawak`. Mengganti direktori berarti membuka data lain,
+bukan memigrasikan data lama. `DATABASE_URL` yang terisi memilih Postgres.
+
+### Migrasi, server dan Sandbox
+
+Hentikan proses yang mengakses direktori PGlite yang sama sebelum migrasi.
 
 ```powershell
 npm run db:migrate
-npm run dev
+# Hanya untuk database demo baru yang boleh direset
+npm run db:seed
+npm run dev -- --port 3100
 ```
 
-Buka http://localhost:3000. Pada basis data baru yang masih kosong, jalankan
-`npm run db:seed` sebelum menyalakan server.
+**`db:seed` menghapus dan membuat ulang seluruh data demo.** Jangan jalankan
+pada data yang ingin dipertahankan. Seed berisi satu warung, 20 produk aktif,
+satu produk arsip, pelanggan, transaksi, dan draft persetujuan.
 
-**Perhatian data:** `db:seed` menghapus dan membuat ulang seluruh data demo.
-Jangan jalankan pada data yang ingin dipertahankan. Seed berisi satu warung,
-20 produk aktif, satu produk arsip, pelanggan, transaksi, dan draft persetujuan.
-Migrasi 0001 sampai 0003 menambahkan jenis pembayaran, arsip produk, deduplikasi
-pesan dan penjualan, serta konteks sesi. Data lokal pemilik belum dimigrasi
-dalam sesi implementasi ini.
+Buka http://localhost:3100/whatsapp. Di terminal lain, setelah server hidup:
 
-## Kunci API dan keterbatasan
+```powershell
+ngrok http 3100
+```
 
-- Percakapan memakai DeepSeek bila kunci dan jaringan tersedia. Saat tidak
-  tersedia, mode lokal ditulis jelas dan hanya menjawab fungsi deterministik
-  yang didukung dari data warung.
-- Kasir dan tambah produk lewat asisten tidak memakai penafsir lokal yang
-  menyamar sebagai AI. Formulir manual tetap dapat dipakai saat asisten gagal.
-- Pengenalan suara memakai Web Speech API. Jalur ketik tersedia bila dukungan
-  peramban, izin mikrofon, atau jaringan tidak memadai. Unggah voice note
-  sebagai berkas belum diimplementasikan.
-- Foto struk ditinjau sebelum menjadi pengeluaran. Parser dan konfirmasi
-  sudah diuji dengan penyedia uji; panggilan vision nyata belum diuji ulang.
-- Hubungkan simulasi pada halaman WhatsApp untuk demonstrasi tanpa Fonnte.
-  Nominal bukti simulasi adalah data uji, bukan verifikasi saldo bank.
-- Pemeriksaan nomor Fonnte membaca `FONNTE_TOKEN` dari server. Koneksi aplikasi
-  dapat diputus untuk menghentikan pemrosesan. Tindakan itu tidak keluar dari
-  perangkat WhatsApp pada dasbor Fonnte.
-- Webhook `/api/channels/whatsapp` memerlukan `CHANNEL_WEBHOOK_SECRET`
-  melalui header Authorization Bearer atau parameter key. Tanpa kunci,
-  penerima menolak pesan. Payload tanpa identitas pesan hanya diproses sebagai
-  pertanyaan agar pengulangan penyedia tidak membuat orderan rangkap.
-- Balasan pelanggan dan pesanan pembelian disimpan di aplikasi tanpa dikirim
-  ke pelanggan atau pemasok asli.
-- Tidak ada ekspor PDF atau Excel, cetak struk, pemrosesan pembayaran,
-  marketplace, atau fitur lain di luar `docs/SCOPE.md`.
+1. Isi `WEBHOOK_URL` dengan URL HTTPS ngrok lengkap, misalnya bentuk
+   `https://DOMAIN_NGROK/api/channels/whatsapp`, lalu restart server setelah
+   perubahan env. URL harus persis, termasuk path dan query bila ada.
+2. Pada konfigurasi Twilio WhatsApp Sandbox, atur **When a message comes in**
+   ke URL tersebut dengan metode **POST**. Bila domain ngrok berubah, perbarui
+   konfigurasi Twilio dan `WEBHOOK_URL` bersama sama.
+3. Setiap peserta mengirim kode `join ...` yang ditampilkan Twilio ke nomor
+   Sandbox dan menunggu konfirmasi join. Balasan nyata hanya kepada peserta
+   yang opt in dan sesuai batas Sandbox/jendela pesan Twilio.
+4. Jalankan Hubungkan pada UI, lalu uji teks, voice note OGG, dan foto bukti.
+   Tunggu proses selesai dan muat ulang UI bila belum ada polling/refresh.
+   Status konfigurasi terhubung sendiri bukan bukti join atau pengiriman sukses.
+
+Webhook adalah **`POST /api/channels/whatsapp` pada server Next.js/UI port
+3100 yang sama**. `/whatsapp` hanya halaman UI, bukan webhook. Tidak ada
+server webhook tambahan, port 3101, atau endpoint webhook `/whatsapp`.
+
+Bila Node 24 belum terpasang, alternatif sementara untuk perintah berhingga:
+
+```powershell
+npx --package=node@24 -- node --version
+npx --package=node@24 -- node node_modules/tsx/dist/cli.mjs src/scripts/db-migrate.ts
+# Destruktif: hanya jika data demo boleh direset
+npx --package=node@24 -- node node_modules/tsx/dist/cli.mjs src/scripts/db-seed.ts
+npx --package=node@24 -- node node_modules/vitest/vitest.mjs run
+```
+
+Untuk server, rekomendasinya tetap pasang Node 24 dan gunakan perintah npm
+normal di atas; alternatifnya jalankan sendiri
+`npx --package=node@24 -- node node_modules/next/dist/bin/next dev --port 3100`.
+
+## Media, keamanan dan keterbatasan
+
+- Parse seluruh parameter form Twilio, lalu validasi `X-Twilio-Signature`
+  dengan SDK resmi dan `WEBHOOK_URL` publik persis, bukan URL localhost dari
+  proxy. Pesan media-only dengan `Body` kosong tetap valid.
+- Maksimal satu media: gambar JPEG/PNG/WebP <= 3 MiB; audio OGG/MP3/MP4/WAV/
+  WebM/FLAC <= 16 MiB. MP4/WebM di sini audio, bukan fitur video. Validasi MIME,
+  ukuran aktual saat streaming, timeout, dan jumlah media.
+- Unduhan awal hanya HTTPS `api.twilio.com` dengan Basic Auth akun Twilio.
+  Redirect harus HTTPS ke host allowlist eksplisit, bukan URL bebas, dan
+  **tidak boleh meneruskan Authorization** ke target redirect.
+- Groq Whisper mengubah audio menjadi teks, kemudian DeepSeek menafsirkan teks
+  menjadi orderan. Transkrip disimpan sebagai pesan asal. Audio tidak dikirim
+  langsung ke DeepSeek. Jika gagal, minta kirim ulang atau ketik, jangan
+  mengarang transkrip/orderan. Web Speech API untuk mikrofon web tetap terpisah.
+- Webhook segera mengembalikan **TwiML kosong**, lalu Next.js `after()`
+  menjalankan pemrosesan dan pengiriman balasan melalui REST Twilio.
+  **Ini bukan durable worker.** Stop server/redeploy sebelum selesai dapat
+  kehilangan pemrosesan meskipun webhook sudah sukses. Ini batas demo:
+  biarkan server hidup dan kirim ulang pesan baru jika tidak ada balasan.
+  Jangan mengandalkan retry Twilio setelah respons sukses atau replay SID lama.
+- Panel simulasi tetap untuk demo lokal tanpa provider, bukan bukti Twilio
+  nyata. Pengiriman PO ke pemasok tetap hanya dicatat di aplikasi.
+- Pemrosesan memerlukan persetujuan: Twilio menerima pesan, Groq menerima
+  audio, DeepSeek menerima transkrip dan foto. Pertimbangkan privasi/retensi
+  masing masing penyedia, biaya pesan, transkripsi dan token, kuota, serta
+  jendela pesan dan batas Sandbox. Jangan gunakan data sensitif untuk demo.
+- Tidak ada verifikasi bank, pemrosesan uang, ekspor PDF/Excel, cetak struk,
+  marketplace atau fitur di luar `docs/SCOPE.md`.
 
 ## Verifikasi
+
+Dengan Node 24, jalankan:
 
 ```powershell
 npm run format:check
@@ -107,38 +212,35 @@ npm run build
 npm run test:e2e
 ```
 
-Uji peramban memakai lebar 393 dan 1280 piksel. Untuk menjaga server dan data
-pemilik, sesi ini memakai `PGLITE_DATA_DIR=.pglite/test-completion-20261018`,
+Gunakan direktori data uji terpisah dari data pemilik. Riwayat checkpoint
+sebelum Twilio ada pada `docs/verification/2026-10-18-checkpoint.md`: peramban
+393/1280 piksel, `PGLITE_DATA_DIR=.pglite/test-completion-20261018`,
 `NEXT_DIST_DIR=.next-test-completion`, dan
-`PLAYWRIGHT_BASE_URL=http://localhost:3100`. Konfigurasi tersebut dipasang
-pada proses pengujian, tanpa mengubah `.env.local`.
-
-Hasil pemeriksaan sesi ini dicatat pada
-`docs/verification/2026-10-18-checkpoint.md`. Pengujian otomatis dengan
-penyedia uji tidak membuktikan mikrofon, DeepSeek, atau Fonnte nyata.
+`PLAYWRIGHT_BASE_URL=http://localhost:3100`, dipasang pada proses tanpa
+mengubah `.env.local`. Hasil lama tidak membuktikan Twilio, Groq, DeepSeek,
+foto/audio provider, atau mikrofon nyata sudah lulus. Rencana uji baru ada di
+`docs/plans/2026-10-18-twilio.md`; proyek belum memenuhi seluruh kriteria demo.
 
 ## Dokumen
 
-| Berkas | Isi |
-| --- | --- |
-| `AGENTS.md` | Aturan kerja dan definisi selesai |
-| `PLAN.md` | Rencana induk, status, serta pekerjaan tersisa |
-| `DESIGN.md` | Arah visual dan token |
-| `docs/PRODUCT.md` | Kebenaran produk dari proposal |
-| `docs/SCOPE.md` | Batas fitur dan penerimaan demo |
-| `docs/ARCHITECTURE.md` | Teknologi, skema, dan alur |
-| `docs/CONVENTIONS.md` | Aturan kode dan teks antarmuka |
-| `docs/WORKFLOW.md` | Git, commit, push, dan verifikasi |
-| `docs/specs/2026-10-17-kasir-kelola-produk-design.md` | Rancangan Kasir, produk, dan Persetujuan |
-| `docs/plans/2026-10-18-penyelesaian-web.md` | Tahapan pelaksanaan |
-| `docs/THIRD-PARTY-SKILLS.md` | Asal dan lisensi skills pihak ketiga |
+| Berkas                                                | Isi                                               |
+| ----------------------------------------------------- | ------------------------------------------------- |
+| `AGENTS.md`                                           | Aturan kerja dan definisi selesai                 |
+| `PLAN.md`                                             | Rencana induk, status dan pekerjaan tersisa       |
+| `DESIGN.md`                                           | Arah visual dan token                             |
+| `docs/PRODUCT.md`                                     | Kebenaran proposal, tidak diubah pada migrasi ini |
+| `docs/SCOPE.md`                                       | Batas fitur dan penerimaan demo                   |
+| `docs/ARCHITECTURE.md`                                | Teknologi, keamanan dan alur                      |
+| `docs/CONVENTIONS.md`                                 | Aturan kode dan teks antarmuka                    |
+| `docs/WORKFLOW.md`                                    | Git dan verifikasi                                |
+| `docs/specs/2026-10-17-kasir-kelola-produk-design.md` | Rancangan Kasir, produk dan Persetujuan           |
+| `docs/plans/2026-10-18-penyelesaian-web.md`           | Rencana sesi sebelumnya                           |
+| `docs/plans/2026-10-18-twilio.md`                     | Rencana migrasi Twilio Sandbox                    |
+| `docs/THIRD-PARTY-SKILLS.md`                          | Asal dan lisensi skills pihak ketiga              |
 
 ## Kontribusi dan lisensi
 
 Ikuti `AGENTS.md` dan `docs/WORKFLOW.md`. Teks pengguna berbahasa Indonesia,
-tanpa emoji dan tanda hubung, serta memakai format angka Indonesia.
-Semua perubahan kode wajib di commit dan di push ke origin.
-
-Repo: https://github.com/ZeaLIsHere/kedeawak-infest.
-Kode proyek milik tim KedeAwak. Skills pihak ketiga mengikuti lisensi masing
-masing yang tercatat pada `docs/THIRD-PARTY-SKILLS.md`.
+tanpa emoji dan tanda hubung, dengan format angka Indonesia. Tidak ada commit
+pada tugas dokumentasi ini. Repo: https://github.com/ZeaLIsHere/kedeawak-infest.
+Kode milik tim KedeAwak; skills pihak ketiga mengikuti lisensi masing masing.

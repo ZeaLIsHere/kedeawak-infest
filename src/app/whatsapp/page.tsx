@@ -1,5 +1,6 @@
 import {formatNumber} from "@/lib/format/number";
 import {Suspense} from "react";
+import {connection} from "next/server";
 import {CardError} from "@/components/shell/card-error";
 import {PageHeader} from "@/components/shell/page-header";
 import {SectionCard} from "@/components/shell/section-card";
@@ -16,6 +17,7 @@ import {safeChannelText} from "@/lib/channels/fonnte";
 import {formatRupiah} from "@/lib/format/currency";
 
 async function ChannelContent(){
+ await connection();
  const data=await withCurrentBusiness(async(db,id)=>({business:await findBusiness(db,id),products:await listProducts(db,id),overview:await getChannelOverview(db,id),customers:(await listCustomers(db,id)).map(c=>({id:c.id,name:readCustomerName(c)??"Pelanggan warung",phone:readCustomerPhone(c)}))}));
  if(!data?.business)return <NoWarungState/>;
  const connected=data.business.channelStatus==="terhubung";

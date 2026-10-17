@@ -1,12 +1,14 @@
 ﻿"use client";
-import {useEffect,useRef,useState} from "react";
+import {useEffect,useRef,useState,useSyncExternalStore} from "react";
 import {Mic,Square} from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {speechConstructor,type SpeechConstructor,type SpeechRecognitionInstance} from "@/lib/ai/speech";
 const RECOGNITION_LANGUAGE = "id-ID"; // lint-ui-ignore: kode bahasa Web Speech API, bukan teks antarmuka
+const noSubscription=()=>()=>{};
 export function SpeechInput({onTranscript,disabled=false}:{onTranscript:(text:string)=>void;disabled?:boolean}){
- const [supported,setSupported]=useState(false);const [listening,setListening]=useState(false);const [error,setError]=useState(""); const recognition=useRef<SpeechRecognitionInstance|null>(null);
- useEffect(()=>{setSupported(!!speechConstructor(window as unknown as {SpeechRecognition?:SpeechConstructor;webkitSpeechRecognition?:SpeechConstructor}));return()=>recognition.current?.abort();},[]);
+ const supported=useSyncExternalStore(noSubscription,()=>!!speechConstructor(window as unknown as {SpeechRecognition?:SpeechConstructor;webkitSpeechRecognition?:SpeechConstructor}),()=>false);
+ const [listening,setListening]=useState(false);const [error,setError]=useState(""); const recognition=useRef<SpeechRecognitionInstance|null>(null);
+ useEffect(()=>()=>recognition.current?.abort(),[]);
  function start(){
   const Constructor=speechConstructor(window as unknown as {SpeechRecognition?:SpeechConstructor;webkitSpeechRecognition?:SpeechConstructor});if(!Constructor)return;
   try{const instance=new Constructor();recognition.current=instance;instance.lang=RECOGNITION_LANGUAGE;instance.continuous=false;instance.interimResults=false;instance.onresult=e=>{const text=e.results[0]?.[0]?.transcript;if(text)onTranscript(text);};instance.onerror=()=>{setError("Suara belum dapat dikenali. Gunakan kolom ketik.");setListening(false);};instance.onend=()=>setListening(false);setError("");instance.start();setListening(true);}catch{setError("Mikrofon belum dapat digunakan. Gunakan kolom ketik.");setListening(false);}

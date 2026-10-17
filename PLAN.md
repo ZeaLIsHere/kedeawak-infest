@@ -11,7 +11,7 @@ Rencana kerja induk KedeAwak. Ini satu satunya daftar pekerjaan yang dikerjakan.
 | Tanda | Arti                                                  |
 | ----- | ----------------------------------------------------- |
 | `[ ]` | Belum dikerjakan                                      |
-| `[~]` | Sedang dikerjakan                                     |
+| `[~]` | Parsial: implementasi atau verifikasi belum lengkap   |
 | `[x]` | Selesai dan sudah di push                             |
 | `[!]` | Terhambat, butuh keputusan atau sumber daya dari user |
 
@@ -21,8 +21,11 @@ di commit dan di push, sesuai `docs/WORKFLOW.md`.
 
 **Ketergantungan saat ini:** keputusan K1 sampai K4 dan K6 sampai K9 sudah
 ditetapkan. Kunci DeepSeek sudah diisi pemilik pada 18 Oktober 2026. K5 tetap
-terbuka dan tidak menghambat. Token Fonnte perlu diperiksa saat integrasi nyata
-diuji; panel simulasi tidak bergantung padanya.
+terbuka dan tidak menghambat. Keputusan kanal diperbarui dengan persetujuan
+user pada 18 Oktober 2026: Twilio Sandbox menggantikan Fonnte, termasuk balasan
+nyata ke peserta opt in dan voice note otomatis menjadi teks lalu orderan.
+Kredensial Twilio/Groq dan alur provider nyata masih perlu diverifikasi;
+panel simulasi tetap tidak bergantung pada layanan luar.
 
 ---
 
@@ -33,17 +36,19 @@ diperbarui 18 Oktober 2026.
 
 | Fase | Isi                                 | Selesai | Total |
 | ---- | ----------------------------------- | ------- | ----- |
-| 0 | Fondasi repo dan aturan main        | 11 | 11 |
-| 1 | Kerangka aplikasi dan sistem desain | 9 | 9 |
-| 2 | Basis data dan lapisan data         | 8 | 8 |
-| 3 | Tool layer                          | 12 | 12 |
-| 4 | Lapisan AI dan context lock         | 5 | 10 |
-| 5 | Permukaan aplikasi                  | 37 | 46 |
-| 6 | Pematangan dan bukti                | 2 | 7 |
-| | Jumlah | 84 | 103 |
+| 0    | Fondasi repo dan aturan main        | 11      | 11    |
+| 1    | Kerangka aplikasi dan sistem desain | 9       | 9     |
+| 2    | Basis data dan lapisan data         | 8       | 8     |
+| 3    | Tool layer                          | 12      | 12    |
+| 4    | Lapisan AI dan context lock         | 5       | 10    |
+| 5    | Permukaan aplikasi                  | 35      | 46    |
+| 6    | Pematangan dan bukti                | 2       | 7     |
+|      | Jumlah                              | 82      | 103   |
 
-Pengembangan dihentikan atas permintaan pemilik. Tugas terbuka dan alasan
-verifikasinya dicatat pada bagian Titik penghentian sesi.
+Checkpoint penghentian sebelumnya dipertahankan sebagai riwayat di bawah.
+Pekerjaan kanal dibuka kembali sesuai persetujuan Twilio Sandbox. T5.13 dan
+T5.16 kembali parsial karena bukti simulasi lama tidak membuktikan media dan
+balasan Twilio nyata.
 
 Pelacak kedua adalah riwayat git. Setiap commit memuat baris `Refs:` yang
 menunjuk ID tugas, sehingga `git log` dapat dipakai untuk menelusuri kapan
@@ -63,13 +68,40 @@ Seluruh status tugas hanya dilacak pada tabel di berkas ini.
 `DEEPSEEK_API_KEY` sudah diisi pemilik di `.env.local`, dikonfirmasi
 18 Oktober 2026. Nilainya tidak ditulis dalam dokumen, keluaran, atau git.
 Kunci tersedia tidak berarti seluruh integrasi sudah diverifikasi.
-Token dan layanan Fonnte nyata belum diperiksa; simulasi tidak bergantung
-padanya. S2, S3, dan context lock tetap masuk cakupan, tanpa pembatalan fitur.
+Pada checkpoint lama, token dan layanan Fonnte nyata belum diperiksa.
+Keputusan terkini menggantikannya dengan Twilio Sandbox. S2, S3, dan context
+lock tetap masuk cakupan, tanpa pembatalan fitur.
 
+### Rencana lanjutan Twilio Sandbox
 
-## Titik penghentian sesi
+Rincian: `docs/plans/2026-10-18-twilio.md`. Implementasi dan pengujian dengan
+penyedia uji sudah masuk; validasi provider nyata belum diklaim.
 
-Pengembangan dihentikan atas permintaan pemilik pada 18 Oktober 2026.
+- [x] T5.11, T5.12: status koneksi, panduan Sandbox/join, Hubungkan/Putuskan.
+- [x] T5.13, T5.14, T5.16: webhook bertanda tangan, TwiML kosong segera,
+      `after()` lalu REST reply, teks menjadi orderan dan balasan peserta opt in.
+- [x] T5.13, T5.14: satu media, unduh aman, Groq Whisper ke transkrip lalu
+      DeepSeek ke orderan; foto hanya untuk orderan sendiri yang tidak ambigu.
+- [x] Unit keamanan: tanda tangan, semua parameter form, media-only, SSRF,
+      redirect tanpa auth, MIME/ukuran, deduplikasi dan isolasi pengirim/warung.
+- [x] Integrasi: teks/audio/foto sampai orderan, bukti, stok, laporan,
+      balasan REST serta polling atau muat ulang UI setelah proses selesai.
+- [ ] Validasi Node 24, unit/integrasi/E2E dan demo ngrok dengan provider nyata;
+      catat kegagalan dan jangan menyebut mock sebagai uji provider nyata.
+
+Webhook adalah `POST /api/channels/whatsapp` pada server Next/UI port 3100,
+`WEBHOOK_URL` harus URL HTTPS publik lengkap persis. `/whatsapp` hanya UI;
+tidak ada webhook baru atau port 3101. `after()` tidak tahan restart/redeploy:
+ini demo, bukan durable worker; bila tidak ada balasan, kirim ulang pesan baru.
+Pencocokan nominal lama tetap otomatis mencatat pada confidence >= 0.7,
+bukan verifikasi bank. Groq dipilih tim untuk audio, bukan permintaan penyedia
+spesifik dari user. `docs/PRODUCT.md` tidak diubah, tidak ada berkas env ditulis,
+dan tidak ada commit dalam tugas dokumentasi ini.
+
+## Titik penghentian sesi sebelumnya (historis, sebelum Twilio)
+
+Catatan historis: pengembangan dihentikan atas permintaan pemilik pada
+18 Oktober 2026 sebelum persetujuan lanjutan Twilio Sandbox.
 Kode yang sudah dibuat disimpan bersama pembaruan dokumen, pemeriksaan, commit,
 dan push. Tidak ada fitur lanjutan yang ditambahkan setelah permintaan itu.
 
@@ -84,18 +116,18 @@ Status `[~]` berarti implementasi atau verifikasi masih belum lengkap.
 Pekerjaan tidak sedang dilanjutkan setelah titik ini. Tugas tersebut tetap
 terbuka untuk sesi berikutnya, tanpa mengubah cakupan produk.
 
-| Bagian terbuka | Kondisi sebenarnya |
-| --- | --- |
-| T4.1, T4.3, T4.5, T4.9, T5.7, T5.8 | Adapter, orkestrator, unggah foto, dan tinjau bacaan ada; uji API nyata serta alur foto di peramban belum lengkap |
-| T4.2, T5.6 | Pengenalan mikrofon Web Speech API dan jalur ketik ada; mikrofon nyata belum diuji, unggah berkas voice note belum dibuat |
-| T5.11, T5.12 | Profil Fonnte dan aksi koneksi aplikasi ada; token, nomor, dan webhook penyedia nyata belum diuji |
-| T5.14 | Nominal bukti simulasi diuji; pembacaan foto bukti nyata masih memerlukan uji layanan AI |
-| T5.26 | Tool prediksi stok ada dan diuji; kartu prediksi pada halaman Stok belum dibuat |
-| T5.38, T5.43 | Formulir ketikan, suara, parser, serta dialog tinjau ada; penafsiran DeepSeek dan mikrofon nyata belum diuji ulang |
-| T6.1 | Alur otomatis baru mencakup bagian yang tersedia, belum seluruh sepuluh langkah penerimaan |
-| T6.2, T6.3 | Uji dua lebar layar tersedia; audit menyeluruh aksesibilitas dan desain belum dijalankan |
-| T6.6 | Mode lokal membaca data tanpa AI; simulasi tidak memakai Fonnte, tetapi uji jaringan terputus menyeluruh belum dijalankan |
-| T6.7 | Belum ada rekaman demonstrasi lengkap; bukti pemeriksaan dicatat dalam laporan sesi |
+| Bagian terbuka                     | Kondisi sebenarnya                                                                                                        |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| T4.1, T4.3, T4.5, T4.9, T5.7, T5.8 | Adapter, orkestrator, unggah foto, dan tinjau bacaan ada; uji API nyata serta alur foto di peramban belum lengkap         |
+| T4.2, T5.6                         | Pengenalan mikrofon Web Speech API dan jalur ketik ada; mikrofon nyata belum diuji, unggah berkas voice note belum dibuat |
+| T5.11, T5.12                       | Profil Fonnte dan aksi koneksi aplikasi ada; token, nomor, dan webhook penyedia nyata belum diuji                         |
+| T5.14                              | Nominal bukti simulasi diuji; pembacaan foto bukti nyata masih memerlukan uji layanan AI                                  |
+| T5.26                              | Tool prediksi stok ada dan diuji; kartu prediksi pada halaman Stok belum dibuat                                           |
+| T5.38, T5.43                       | Formulir ketikan, suara, parser, serta dialog tinjau ada; penafsiran DeepSeek dan mikrofon nyata belum diuji ulang        |
+| T6.1                               | Alur otomatis baru mencakup bagian yang tersedia, belum seluruh sepuluh langkah penerimaan                                |
+| T6.2, T6.3                         | Uji dua lebar layar tersedia; audit menyeluruh aksesibilitas dan desain belum dijalankan                                  |
+| T6.6                               | Mode lokal membaca data tanpa AI; simulasi tidak memakai Fonnte, tetapi uji jaringan terputus menyeluruh belum dijalankan |
+| T6.7                               | Belum ada rekaman demonstrasi lengkap; bukti pemeriksaan dicatat dalam laporan sesi                                       |
 
 Data lokal pemilik tidak dimigrasi atau disiapkan ulang selama sesi ini.
 Migrasi 0001 sampai 0003 dan seed hanya dijalankan pada direktori pengujian
@@ -107,17 +139,17 @@ Jangan menjalankan `db:seed` pada data yang ingin dipertahankan.
 
 ## Keputusan
 
-| ID  | Pertanyaan                                                                  | Rekomendasi saya | Status                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| --- | --------------------------------------------------------------------------- | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| K1  | Nama dan email untuk identitas git                                          | Perlu dari user  | Selesai. Nama `ZeaLIsHere`, email memakai alamat noreply GitHub `180758619+ZeaLIsHere@users.noreply.github.com`. Ganti bila ingin memakai email lain                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| K2  | Cara autentikasi push ke GitHub                                             | Perlu dari user  | Selesai. Kredensial `ZeaLIsHere` sudah tersimpan di Windows Credential Manager, push terverifikasi berhasil                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| K3  | Penyedia model bahasa untuk demo                                            | Ditanyakan       | **Ditetapkan.** DeepSeek, model `deepseek-flash`, karena token sudah tersedia dari user                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| K4  | Apakah kunci API sudah tersedia                                             | Ditanyakan       | **Ditetapkan.** Kunci DeepSeek sudah diisi pemilik di `.env.local` sebagai `DEEPSEEK_API_KEY`, dikonfirmasi 18 Oktober 2026                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| K5  | Pemasangan Python untuk data skill desain                                   | Ditanyakan       | Belum dijawab. Tidak menghambat, data CSV dibaca lewat Node sampai diputuskan                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
-| K6  | Konfirmasi daftar fitur di `docs/SCOPE.md`                                  | Ditanyakan       | **Dikonfirmasi user.** Tujuh permukaan, termasuk S7 Kasir yang ditambahkan 18 Oktober 2026                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| K7  | Pemakaian PGlite untuk demo, bukan Postgres terpisah                        | **Ditetapkan.**  | PGlite dipilih setelah dipastikan mendukung CRUD penuh dan transaksi. Pencarian vektor tidak dipakai, jadi pgvector tidak diperlukan.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| K8  | Transkripsi voice note                                                      | Diusulkan        | **Ditetapkan.** Web Speech API peramban, karena DeepSeek tidak punya endpoint audio dan proposal menyebut Google STT                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| K9  | Penyedia kanal WhatsApp: Meta Cloud API, Fonnte, atau n8n sebagai perantara | Fonnte           | **Ditetapkan user: Fonnte, dengan paket gratis lebih dulu.** Nomor user sudah terhubung dan chat teks berjalan, sehingga demo punya kanal WhatsApp nyata tanpa menunggu verifikasi bisnis Meta. Batasan yang sudah dipastikan dari dokumentasi resmi Fonnte: lampiran hanya diterima perangkat berpakat `all feature`, dan berkas audio yang diterima hanya `mp3` sedangkan voice note WhatsApp berformat `ogg`, sehingga voice note pelanggan tidak pernah masuk walaupun paket dinaikkan. Karena itu orderan dan bukti transfer pada demo tetap lewat panel pengirim tiruan yang sudah masuk cakupan `docs/SCOPE.md` bagian 2, dan pesan teks nyata lewat Fonnte menjadi nilai tambah. Tata cara dan akibatnya ada di `docs/ARCHITECTURE.md` bagian 11 |
+| ID  | Pertanyaan                                           | Rekomendasi saya         | Status                                                                                                                                                                                                                                                                                                                                                               |
+| --- | ---------------------------------------------------- | ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| K1  | Nama dan email untuk identitas git                   | Perlu dari user          | Selesai. Nama `ZeaLIsHere`, email memakai alamat noreply GitHub `180758619+ZeaLIsHere@users.noreply.github.com`. Ganti bila ingin memakai email lain                                                                                                                                                                                                                 |
+| K2  | Cara autentikasi push ke GitHub                      | Perlu dari user          | Selesai. Kredensial `ZeaLIsHere` sudah tersimpan di Windows Credential Manager, push terverifikasi berhasil                                                                                                                                                                                                                                                          |
+| K3  | Penyedia model bahasa untuk demo                     | Ditanyakan               | **Ditetapkan.** DeepSeek, model `deepseek-flash`, karena token sudah tersedia dari user                                                                                                                                                                                                                                                                              |
+| K4  | Apakah kunci API sudah tersedia                      | Ditanyakan               | **Ditetapkan.** Kunci DeepSeek sudah diisi pemilik di `.env.local` sebagai `DEEPSEEK_API_KEY`, dikonfirmasi 18 Oktober 2026                                                                                                                                                                                                                                          |
+| K5  | Pemasangan Python untuk data skill desain            | Ditanyakan               | Belum dijawab. Tidak menghambat, data CSV dibaca lewat Node sampai diputuskan                                                                                                                                                                                                                                                                                        |
+| K6  | Konfirmasi daftar fitur di `docs/SCOPE.md`           | Ditanyakan               | **Dikonfirmasi user.** Tujuh permukaan, termasuk S7 Kasir yang ditambahkan 18 Oktober 2026                                                                                                                                                                                                                                                                           |
+| K7  | Pemakaian PGlite untuk demo, bukan Postgres terpisah | **Ditetapkan.**          | PGlite dipilih setelah dipastikan mendukung CRUD penuh dan transaksi. Pencarian vektor tidak dipakai, jadi pgvector tidak diperlukan.                                                                                                                                                                                                                                |
+| K8  | Transkripsi voice note                               | Pilihan implementasi tim | **Diperbarui 18 Oktober 2026.** Groq Whisper untuk berkas audio WhatsApp, termasuk OGG, memakai `GROQ_API_KEY` dan `GROQ_TRANSCRIPTION_MODEL=whisper-large-v3-turbo`, lalu DeepSeek menafsirkan transkrip menjadi orderan. User menyetujui alur otomatis, bukan secara khusus memilih Groq. Web Speech API tetap untuk mikrofon peramban                             |
+| K9  | Penyedia kanal WhatsApp                              | Twilio Sandbox           | **Disetujui user 18 Oktober 2026, menggantikan Fonnte.** Pesan teks, foto bukti, voice note otomatis dan balasan nyata ke peserta yang sudah join/opt in masuk scope demo. Panel simulasi tetap tersedia sebagai jalur lokal. Webhook Next.js dan UI memakai server port 3100 yang sama; keamanan dan keterbatasan `after()` ada di `docs/ARCHITECTURE.md` bagian 11 |
 
 ---
 
@@ -262,15 +294,16 @@ Tujuan: tujuh permukaan berfungsi penuh, sesuai `docs/SCOPE.md` bagian 2.
 | ----- | ---------------------------------------------------------------------------------------------------- | ------ |
 | T5.11 | Status koneksi nomor WhatsApp                                                                        | `[~]`  |
 | T5.12 | Tata cara dan aksi Hubungkan ke WhatsApp sampai berstatus terhubung, beserta aksi memutuskan koneksi | `[~]`  |
-| T5.13 | Orderan yang masuk dari kanal WhatsApp                                                               | `[x]`  |
-| T5.14 | Bukti pembayaran dan status verifikasi                                                               | `[~]`  |
+| T5.13 | Orderan WhatsApp dari teks dan transkrip voice note Twilio                                           | `[~]`  |
+| T5.14 | Foto bukti pada orderan sendiri yang tidak ambigu, pencocokan nominal bukan verifikasi bank          | `[~]`  |
 | T5.15 | Panel pengirim pesan tiruan sebagai pelanggan                                                        | `[x]`  |
-| T5.16 | Balasan otomatis agen tercatat pada konteks orderan                                                  | `[x]`  |
+| T5.16 | Balasan otomatis tercatat dan dikirim nyata melalui Twilio ke peserta opt in                         | `[~]`  |
 | T5.17 | Penghapusan data pelanggan dari antarmuka                                                            | `[x]`  |
 
-Catatan: penyedia kanal WhatsApp sudah ditetapkan, yaitu Fonnte. Tata cara
-menghubungkan, batasan lampiran, dan akibatnya pada rancangan ada di
-`docs/ARCHITECTURE.md` bagian 11.
+Catatan terkini: Twilio Sandbox menggantikan Fonnte berdasarkan persetujuan
+user. Status parsial mencakup migrasi kanal, media dan balasan nyata yang belum
+memiliki bukti penerimaan lengkap. Tata cara dan batas demo ada di
+`docs/ARCHITECTURE.md` bagian 11 dan `docs/plans/2026-10-18-twilio.md`.
 
 ### S4 Laporan Keuangan
 
@@ -306,27 +339,27 @@ Tambah, ubah, arsip, dan asisten produk dilacak pada T5.41 sampai T5.44.
 
 ### S7 Kasir
 
-| ID | Tugas | Status |
-| --- | --- | --- |
-| T5.33 | Skema dan migrasi jenis pembayaran beserta data demo | `[x]` |
-| T5.34 | Penyimpanan penjualan, orderan, item, dan pergerakan stok secara atomik | `[x]` |
-| T5.35 | Daftar produk, pencarian, keranjang, dan pembatas jumlah menurut stok | `[x]` |
-| T5.36 | Pilihan tunai, transfer, QRIS, uang diterima, dan kembalian | `[x]` |
-| T5.37 | Simpan penjualan dan perbarui Kasir, Stok, Dasbor, serta Laporan | `[x]` |
-| T5.38 | Pesanan lewat suara atau ketikan dengan penafsiran DeepSeek | `[~]` |
-| T5.39 | Ringkasan uang masuk per jenis pembayaran dan rincian transaksi | `[x]` |
-| T5.40 | Uji Kasir sampai stok dan laporan berubah pada dua lebar layar | `[x]` |
+| ID    | Tugas                                                                   | Status |
+| ----- | ----------------------------------------------------------------------- | ------ |
+| T5.33 | Skema dan migrasi jenis pembayaran beserta data demo                    | `[x]`  |
+| T5.34 | Penyimpanan penjualan, orderan, item, dan pergerakan stok secara atomik | `[x]`  |
+| T5.35 | Daftar produk, pencarian, keranjang, dan pembatas jumlah menurut stok   | `[x]`  |
+| T5.36 | Pilihan tunai, transfer, QRIS, uang diterima, dan kembalian             | `[x]`  |
+| T5.37 | Simpan penjualan dan perbarui Kasir, Stok, Dasbor, serta Laporan        | `[x]`  |
+| T5.38 | Pesanan lewat suara atau ketikan dengan penafsiran DeepSeek             | `[~]`  |
+| T5.39 | Ringkasan uang masuk per jenis pembayaran dan rincian transaksi         | `[x]`  |
+| T5.40 | Uji Kasir sampai stok dan laporan berubah pada dua lebar layar          | `[x]`  |
 
 ### Kelengkapan kelola produk dan alur persetujuan
 
-| ID | Tugas | Status |
-| --- | --- | --- |
-| T5.41 | Tambah dan ubah produk dengan pencatatan stok awal | `[x]` |
-| T5.42 | Arsip dan aktifkan kembali produk tanpa menghapus riwayat | `[x]` |
-| T5.43 | Tambah produk lewat asisten dengan dialog tinjau sebelum simpan | `[~]` |
-| T5.44 | Uji kelola produk, ambang, stok, dan arsip pada dua lebar layar | `[x]` |
-| T5.45 | Buat draft pesanan dari alert stok dan cegah draft rangkap yang menunggu | `[x]` |
-| T5.46 | Uji setujui, tolak, riwayat, dan perubahan stok pada dua lebar layar | `[x]` |
+| ID    | Tugas                                                                    | Status |
+| ----- | ------------------------------------------------------------------------ | ------ |
+| T5.41 | Tambah dan ubah produk dengan pencatatan stok awal                       | `[x]`  |
+| T5.42 | Arsip dan aktifkan kembali produk tanpa menghapus riwayat                | `[x]`  |
+| T5.43 | Tambah produk lewat asisten dengan dialog tinjau sebelum simpan          | `[~]`  |
+| T5.44 | Uji kelola produk, ambang, stok, dan arsip pada dua lebar layar          | `[x]`  |
+| T5.45 | Buat draft pesanan dari alert stok dan cegah draft rangkap yang menunggu | `[x]`  |
+| T5.46 | Uji setujui, tolak, riwayat, dan perubahan stok pada dua lebar layar     | `[x]`  |
 
 ### Halaman pengaturan
 
@@ -335,8 +368,10 @@ Tambah, ubah, arsip, dan asisten produk dilacak pada T5.41 sampai T5.44.
 | T5.31 | Keterangan opt in dan persetujuan pemilik atas pemrosesan pesan | `[x]`  |
 | T5.32 | Keterangan privasi data sesuai butir proposal                   | `[x]`  |
 
-Kriteria selesai fase 5: ketujuh permukaan dan halaman pengaturan dapat dipakai
-dari awal sampai akhir tanpa langkah manual di luar aplikasi.
+Kriteria selesai fase 5: setelah setup manual Sandbox, ngrok, webhook dan
+join peserta sesuai `README.md`, ketujuh permukaan dan halaman pengaturan
+dapat dipakai dari awal sampai akhir. Integrasi baru tetap memerlukan bukti
+provider nyata, bukan hanya panel simulasi.
 
 ---
 

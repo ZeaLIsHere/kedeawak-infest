@@ -1,33 +1,97 @@
-import {randomUUID,timingSafeEqual} from "node:crypto";
-import {revalidatePath} from "next/cache";
-import {withCurrentBusiness} from "@/lib/data/server";
-import {receiveChannelEvent} from "@/lib/channels/intake";
+import { after } from "next/server";
+import { revalidatePath } from "next/cache";
+import { withCurrentBusiness } from "@/lib/data/server";
+import {
+  getTwilioConfig,
+  parseTwilioMessage,
+  sendTwilioReply,
+  twimlReply,
+  validateTwilioSignature,
+  type TwilioConfig,
+  type TwilioMessage,
+} from "@/lib/channels/twilio";
+import { receiveTwilioMessage } from "@/lib/channels/twilio-intake";
+import { safeChannelText } from "@/lib/channels/fonnte";
 
-export const runtime="nodejs";
-function authorized(request:Request):boolean{
- const expected=process.env.CHANNEL_WEBHOOK_SECRET?.trim();
- if(!expected)return false;
- const actual=request.headers.get("authorization")?.replace(/^Bearer\s+/i,"")??new URL(request.url).searchParams.get("key")??"";
- const left=Buffer.from(expected),right=Buffer.from(actual);
- return left.length===right.length&&timingSafeEqual(left,right);
+const PATHS = ["/whatsapp", "/", "/stok", "/laporan"];
+
+function textResponse(body: string, status: number): Response {
+  return new Response(body, {
+    status,
+    headers: { "Content-Type": "text/plain; charset=utf-8" }, // lint-ui-ignore: MIME resmi HTTP
+  });
 }
-export async function POST(request:Request){
- if(!process.env.CHANNEL_WEBHOOK_SECRET?.trim())return Response.json({error:"Penerima pesan belum diatur"},{status:503});
- if(!authorized(request))return Response.json({error:"Akses pesan tidak diizinkan"},{status:401});
- if(Number(request.headers.get("content-length")??0)>1_000_000)return Response.json({error:"Pesan terlalu besar"},{status:413}); // lint-ui-ignore: nama header HTTP internal
- try{
-  const raw:unknown=await request.json();
-  if(typeof raw!=="object"||raw===null)return Response.json({error:"Pesan belum sesuai"},{status:400});
-  const body=raw as Record<string,unknown>;
-  if(typeof body.sender!=="string"||typeof body.message!=="string")return Response.json({error:"Pesan belum sesuai"},{status:400});
-  const id=typeof body.id==="string"?body.id:typeof body.message_id==="string"?body.message_id:undefined;
-  // Payload tanpa identitas hanya diterima sebagai pertanyaan, supaya retry tidak menggandakan order.
-  const message=id?body.message:"Pertanyaan pelanggan: "+body.message;
-  const payload={eventId:id??randomUUID(),phoneNumber:body.sender,customerName:typeof body.name==="string"?body.name:undefined,body:message};
-  const result=await withCurrentBusiness((db,businessId)=>receiveChannelEvent(db,businessId,payload,"fonnte",id!==undefined));
-  if(!result)return Response.json({error:"Data warung belum tersedia"},{status:409});
-  for(const path of ["/whatsapp","/","/stok","/laporan"])revalidatePath(path);
-  // Jangan kembalikan format autoreply penyedia, karena balasan tidak boleh dikirim ke luar.
-  return Response.json({accepted:true,duplicate:result.duplicate});
- }catch{return Response.json({error:"Pesan belum dapat diproses"},{status:400});}
+
+function readParams(form: FormData): Record<string, string> | undefined {
+  const params: Record<string, string> = {};
+  for (const [key, value] of form) {
+    if (typeof value !== "string") return undefined;
+    params[key] = value;
+  }
+  return params;
+}
+
+async function processMessage(
+  config: TwilioConfig,
+  message: TwilioMessage,
+): Promise<void> {
+  try {
+    const result = await withCurrentBusiness(async (db, businessId) => {
+      const outcome = await receiveTwilioMessage(db, businessId, message, config);
+      // Pesan ulang tidak dibalas lagi supaya retry Twilio tidak menggandakan balasan.
+      if (!outcome.duplicate) {
+        await sendTwilioReply(config, message.phoneNumber, safeChannelText(outcome.reply));
+      }
+      return outcome;
+    });
+    if (result && !result.duplicate) {
+      for (const path of PATHS) revalidatePath(path);
+    }
+  } catch {
+    // Kegagalan pemrosesan latar tidak boleh membocorkan kredensial ke respons.
+    console.error("Pemrosesan pesan WhatsApp belum berhasil");
+  }
+}
+
+export async function POST(request: Request): Promise<Response> {
+  let config: TwilioConfig;
+  try {
+    config = getTwilioConfig();
+  } catch {
+    return textResponse("Penerima pesan belum diatur", 503);
+  }
+
+  const length = Number(request.headers.get("content-length") ?? 0); // lint-ui-ignore: nama header HTTP resmi
+  if (Number.isFinite(length) && length > 1_000_000) {
+    return textResponse("Pesan terlalu besar", 413);
+  }
+
+  let params: Record<string, string> | undefined;
+  try {
+    params = readParams(await request.formData());
+  } catch {
+    return textResponse("Pesan belum sesuai", 400);
+  }
+  if (!params) return textResponse("Pesan belum sesuai", 400);
+
+  const signature = request.headers.get("X-Twilio-Signature") ?? ""; // lint-ui-ignore: nama header resmi Twilio
+  if (!validateTwilioSignature(config, signature, params)) {
+    return textResponse("Tanda tangan pesan tidak sah", 403);
+  }
+
+  let message: TwilioMessage;
+  try {
+    message = parseTwilioMessage(params, config);
+  } catch {
+    return textResponse("Pesan belum sesuai", 400);
+  }
+
+  // Twilio menerima TwiML kosong lebih dulu; pemrosesan dan balasan REST
+  // berjalan setelah respons selesai. Ini bukan worker tahan restart.
+  after(() => processMessage(config, message));
+
+  return new Response(twimlReply(), {
+    status: 200,
+    headers: { "Content-Type": "text/xml; charset=utf-8" }, // lint-ui-ignore: MIME resmi TwiML
+  });
 }

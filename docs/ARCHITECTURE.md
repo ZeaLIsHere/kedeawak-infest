@@ -21,21 +21,21 @@ Basis: bagian "Mekanisme Teknologi" dan "Desain Sistem" pada proposal.
 
 ## 2. Tumpukan teknologi
 
-| Lapisan               | Pilihan                                                      | Alasan                                                                                                                                     |
-| --------------------- | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| Bahasa                | TypeScript, mode strict                                      | Menjaga tipe data transaksi tetap benar                                                                                                    |
-| Framework             | Next.js App Router                                           | Server Component untuk data, Route Handler untuk webhook dan agen                                                                          |
-| Antarmuka             | Tailwind CSS, shadcn/ui, lucide-react                        | Cepat, aksesibel, ikon SVG bukan emoji, sesuai aturan UI                                                                                   |
-| Basis data            | PostgreSQL                                                   | Sesuai proposal                                                                                                                            |
-| Driver lokal          | PGlite                                                       | PostgreSQL asli yang berjalan di dalam proses, tanpa pemasangan server, sehingga demo tetap jalan di Windows                               |
-| Driver produksi       | Postgres biasa                                               | Supabase atau Neon, kode aplikasi tidak berubah                                                                                            |
-| ORM                   | Drizzle                                                      | Skema bertipe, migrasi ringan, mendukung PGlite dan Postgres                                                                               |
-| Pengambilan konteks   | Query SQL terstruktur                                        | DeepSeek tidak menyediakan endpoint embedding, dan data warung berupa data terstruktur, sehingga konteks diambil lewat query, bukan vektor |
-| Sesi dan context lock | Tabel di PostgreSQL lewat satu antarmuka                     | Menggantikan Redis saat demo, tanpa mengubah pemanggil                                                                                     |
-| Model bahasa          | DeepSeek, model `deepseek-flash`, endpoint kompatibel OpenAI | Token sudah tersedia dari user. Mendukung pemanggilan fungsi dan keluaran JSON, dua hal yang dibutuhkan tool layer                         |
-| Speech to text        | Web Speech API peramban, yang di Chrome dilayani Google      | Sesuai proposal yang menyebut Google STT. Tidak menambah kunci API, tidak menambah titik gagal                                             |
-| Ekstraksi struk       | Model vision, yaitu `deepseek-flash`                         | Satu penyedia menangani teks sekaligus gambar. Fallback tiga lapis sesuai proposal tetap berlaku                                           |
-| Uji                   | Vitest untuk unit, Playwright untuk alur browser             | Menutup kriteria demo di `docs/SCOPE.md` bagian 7                                                                                          |
+| Lapisan               | Pilihan                                                               | Alasan                                                                                                                                     |
+| --------------------- | --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Bahasa                | TypeScript, mode strict                                               | Menjaga tipe data transaksi tetap benar                                                                                                    |
+| Framework             | Next.js App Router                                                    | Server Component untuk data, Route Handler untuk webhook dan agen                                                                          |
+| Antarmuka             | Tailwind CSS, shadcn/ui, lucide-react                                 | Cepat, aksesibel, ikon SVG bukan emoji, sesuai aturan UI                                                                                   |
+| Basis data            | PostgreSQL                                                            | Sesuai proposal                                                                                                                            |
+| Driver lokal          | PGlite                                                                | PostgreSQL asli yang berjalan di dalam proses, tanpa pemasangan server, sehingga demo tetap jalan di Windows                               |
+| Driver produksi       | Postgres biasa                                                        | Supabase atau Neon, kode aplikasi tidak berubah                                                                                            |
+| ORM                   | Drizzle                                                               | Skema bertipe, migrasi ringan, mendukung PGlite dan Postgres                                                                               |
+| Pengambilan konteks   | Query SQL terstruktur                                                 | DeepSeek tidak menyediakan endpoint embedding, dan data warung berupa data terstruktur, sehingga konteks diambil lewat query, bukan vektor |
+| Sesi dan context lock | Tabel di PostgreSQL lewat satu antarmuka                              | Menggantikan Redis saat demo, tanpa mengubah pemanggil                                                                                     |
+| Model bahasa          | DeepSeek, model `deepseek-flash`, endpoint kompatibel OpenAI          | Token sudah tersedia dari user. Mendukung pemanggilan fungsi dan keluaran JSON, dua hal yang dibutuhkan tool layer                         |
+| Speech to text        | Groq Whisper untuk berkas WhatsApp; Web Speech API untuk mikrofon web | OGG ditranskripsi otomatis sebelum DeepSeek menafsirkan teks; Groq dipilih tim implementasi                                                |
+| Ekstraksi struk       | Model vision, yaitu `deepseek-flash`                                  | Satu penyedia menangani teks sekaligus gambar. Fallback tiga lapis sesuai proposal tetap berlaku                                           |
+| Uji                   | Vitest untuk unit, Playwright untuk alur browser                      | Menutup kriteria demo di `docs/SCOPE.md` bagian 7                                                                                          |
 
 Catatan penyimpangan dari proposal, disengaja dan dicatat:
 
@@ -44,11 +44,14 @@ Catatan penyimpangan dari proposal, disengaja dan dicatat:
    yaitu sesi, context lock, dan pembatas kuota harian, tetap ada.
 2. Proposal tidak menyebut framework frontend. Next.js dipilih karena satu
    basis kode menangani antarmuka, webhook, dan pemanggilan model bahasa.
-3. Proposal menyebut Whisper atau Google STT untuk voice note. Yang dipakai
-   adalah Web Speech API peramban, yang di Chrome memang dilayani Google STT.
-   Alasannya, DeepSeek tidak menyediakan endpoint transkripsi audio, sehingga
-   menambah penyedia lain berarti menambah kunci API dan satu titik gagal lagi
-   saat demo. Rincian ada di bagian 5.
+3. Proposal menyebut Whisper atau Google STT untuk voice note. Keputusan
+   awal Web Speech API dipertahankan untuk mikrofon peramban. Untuk audio
+   WhatsApp, termasuk OGG, tim memilih Groq Whisper karena DeepSeek tidak
+   menyediakan transkripsi audio. Ini menambah kunci, biaya dan ketergantungan
+   jaringan; kegagalan harus dilaporkan, bukan diganti transkrip rekaan.
+4. User menyetujui penggantian Fonnte dengan Twilio Sandbox pada 18 Oktober
+   2026, termasuk balasan nyata ke peserta opt in. Rincian bagian 11; bukan
+   integrasi produksi. `docs/PRODUCT.md` tetap tidak diubah.
 
 ## 3. Struktur direktori
 
@@ -114,9 +117,10 @@ src/
       quota-usage.ts
       reports.ts
       server.ts                   Jembatan pegangan basis data untuk halaman
-    channel/
-      incoming.ts                 Titik masuk tunggal untuk semua pesan pelanggan
-      fonnte.ts                   Penerjemah payload webhook Fonnte
+    channels/
+      intake.ts                   Titik masuk pemrosesan pesan pelanggan
+      twilio.ts                   Adapter Sandbox, validasi dan unduhan media
+      fonnte.ts                   Adapter lama/simulasi, bukan penyedia terkini
     ai/
       orchestrator.ts             Pemahaman maksud dan pemilihan tool
       tools/                      Sepuluh tool dari proposal
@@ -329,25 +333,36 @@ Konsekuensi yang wajib dipatuhi saat implementasi:
    fungsi boleh dipakai untuk memaksa keluaran sesuai skema, sehingga
    pembacaan nilai dan tanggal konsisten.
 
-Kunci disimpan di `DEEPSEEK_API_KEY`. Nama variabel lain ada di
-`.env.example`.
+Kunci disimpan di `DEEPSEEK_API_KEY`; basis URL `DEEPSEEK_BASE_URL`.
+Target prioritas model adalah override `DEEPSEEK_CHAT_MODEL` untuk teks atau
+`DEEPSEEK_VISION_MODEL` untuk gambar, lalu `DEEPSEEK_MODEL`, lalu bawaan
+`deepseek-flash`. Dukungan variabel umum `DEEPSEEK_MODEL=deepseek-flash` masuk
+pekerjaan migrasi: pada pembacaan awal `provider.ts` baru membaca dua override
+lama. Jangan mengklaim selesai sebelum diuji. Override vision harus mendukung
+gambar. Contoh konfigurasi lengkap ada di `README.md`; akses template env
+terblokir privasi tidak boleh dilewati.
 
 ### 5.2 Voice note
 
-DeepSeek tidak menyediakan transkripsi audio. Yang dipakai adalah Web Speech
-API peramban:
+DeepSeek tidak menyediakan transkripsi audio. Ada dua jalur berbeda:
 
-1. Peramban merekam suara dan mengubahnya menjadi teks secara langsung pada
-   perangkat atau lewat layanan yang dipakai peramban tersebut. Chrome
-   memakai layanan Google, yang sejalan dengan penyebutan Google STT pada
-   proposal.
-2. Bahasa diatur ke Indonesia.
-3. Bila peramban tidak mendukung, atau transkripsi gagal, permukaan S2
-   menampilkan pemberitahuan dan menyediakan kolom isian teks. Pemilik tetap
-   dapat mencatat transaksi.
-4. Tidak ada berkas audio yang dikirim ke penyedia model bahasa.
+1. **Mikrofon web:** Web Speech API, bahasa Indonesia, dengan isian teks bila
+   dukungan peramban, izin atau jaringan gagal. Ini tidak mentranskripsi
+   lampiran WhatsApp; unggah berkas S2 tetap dilacak terpisah.
+2. **Voice note WhatsApp:** unduh audio melalui aturan bagian 11, kirim ke
+   `https://api.groq.com/openai/v1/audio/transcriptions` memakai
+   `GROQ_API_KEY` dan `GROQ_TRANSCRIPTION_MODEL=whisper-large-v3-turbo`.
+   Groq Whisper menangani OGG dan format audio yang diizinkan; hasil teks
+   diteruskan ke DeepSeek untuk interpretasi orderan. Groq adalah pilihan
+   implementasi tim, bukan penyedia spesifik yang diminta user.
+3. Simpan transkrip sebagai pesan asal orderan supaya pemilik dapat meninjau
+   dasarnya. Audio tidak dikirim langsung ke DeepSeek. Kegagalan meminta
+   ketik/kirim ulang tanpa membuat transkrip atau orderan rekaan.
+4. Batas audio 16 MiB, timeout dan validasi MIME berlaku sebelum panggilan
+   penyedia. Penambahan adapter atau uji mock bukan bukti layanan Groq nyata.
 
-Keterbatasan ini dicatat di `README` supaya tidak mengejutkan saat demo.
+Groq menerima audio; DeepSeek menerima transkrip/foto. Persetujuan peserta,
+retensi pihak ketiga, kuota dan biaya dicatat di `README.md` dan scope.
 
 ### 5.3 Pembacaan struk dan fallback tiga lapis
 
@@ -418,7 +433,12 @@ Rincian enkripsi, sesuai `src/lib/crypto/field-encryption.ts`:
    nomor tidak dapat ditebak dengan mencoba seluruh nomor yang mungkin.
 4. Dua kunci diturunkan dari satu `FIELD_ENCRYPTION_KEY` memakai HKDF, supaya
    kunci penyandian dan kunci sidik jari tidak pernah sama.
-5. Nomor diseragamkan lebih dulu, sehingga `0812...`, `62812...`, dan
+5. `FIELD_ENCRYPTION_KEY` saat ini wajib 64 karakter hex (32 byte), sesuai
+   `parseKey`; base64 tidak diterima langsung. Output
+   `randomBytes(32).toString('base64')` harus dikonversi ke hex, atau hasilkan
+   hex langsung. Jangan mengganti kunci data lama tanpa migrasi. Contoh aman
+   ada di `README.md`; format ciphertext tetap `v1:iv:tag:isi`.
+6. Nomor diseragamkan lebih dulu, sehingga `0812...`, `62812...`, dan
    `+62 812 ...` menghasilkan sidik jari yang sama. Tanpa keseragaman ini,
    pelanggan yang sama akan tercatat dua kali.
 
@@ -469,29 +489,31 @@ dua lebar layar, 393 dan 1280 piksel.
 
 ## 10. Keputusan yang sudah ditetapkan
 
-Semua keputusan berikut sudah dikonfirmasi user atau sudah diverifikasi
-langsung dari dokumentasi resmi. Tanggal: 17 Oktober 2026.
+Tabel keputusan awal 17 Oktober 2026 diperbarui untuk persetujuan kanal
+18 Oktober 2026. Pilihan Groq adalah keputusan implementasi tim. Catatan
+pemeriksaan dokumentasi di bagian 5.1 adalah historis, bukan bukti panggilan
+provider nyata; status implementasi/verifikasi mengikuti `PLAN.md`.
 
-| Nomor | Hal                                                   | Keputusan                                                                                                                                                       | Dasar                                                                                                                                                                                                                                                                                                                                                                                                            |
-| ----- | ----------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| A1    | Penyedia model bahasa                                 | DeepSeek, model `deepseek-flash`                                                                                                                                | User memiliki token DeepSeek                                                                                                                                                                                                                                                                                                                                                                                     |
-| A2    | Pembacaan foto struk                                  | `deepseek-flash`, yang menerima gambar                                                                                                                          | Dokumentasi DeepSeek bagian Vision                                                                                                                                                                                                                                                                                                                                                                               |
-| A3    | Transkripsi voice note                                | Web Speech API peramban                                                                                                                                         | DeepSeek tidak punya endpoint audio, lihat bagian 5.2                                                                                                                                                                                                                                                                                                                                                            |
-| A4    | Basis data demo                                       | PGlite, PostgreSQL di dalam proses                                                                                                                              | User menyetujui setelah dipastikan mendukung CRUD penuh                                                                                                                                                                                                                                                                                                                                                          |
-| A5    | Pengambilan konteks bisnis                            | Query SQL terstruktur, tanpa pgvector                                                                                                                           | DeepSeek tidak menyediakan endpoint embedding, sehingga kolom vektor tidak dapat diisi data nyata. Data warung juga berupa data terstruktur, sehingga query lebih tepat daripada kemiripan vektor. PGlite tetap dipakai sesuai K7                                                                                                                                                                                |
-| A6    | Identitas git dan autentikasi push                    | Nama `ZeaLIsHere`, email noreply GitHub, kredensial Windows Credential Manager                                                                                  | Push sudah terverifikasi berhasil                                                                                                                                                                                                                                                                                                                                                                                |
-| A7    | Akses skill desain                                    | Dipakai sebagian; data skill dibaca langsung dari berkasnya, tanpa `scripts/search.py` karena Python belum terpasang                                            | Token dan aturan desain disusun dari `DESIGN.md` serta bacaan berkas data skill                                                                                                                                                                                                                                                                                                                                  |
-| A8    | Penyedia kanal WhatsApp                               | **Fonnte.** Paket gratis, tanpa n8n sebagai perantara                                                                                                           | Nomor user sudah terhubung ke Fonnte dan chat teks berjalan, sehingga demo punya kanal WhatsApp nyata tanpa menunggu verifikasi bisnis Meta. Batasan lampiran dan voice note sudah dipastikan dari dokumentasi resmi dan dicatat di bagian 11. Ditinjau ulang bila keadaan berubah                                                                                                                               |
-| A9    | Versi dan opsi bawaan Next.js                         | Next.js 16.4.2, React 19.3.0, Tailwind 4, `cacheComponents` aktif, `partialPrefetching` aktif                                                                   | Keluaran `create-next-app`. Lihat catatan di bawah tabel                                                                                                                                                                                                                                                                                                                                                         |
-| A10   | Penulisan otomatis blok aturan Next.js ke `AGENTS.md` | Dimatikan, memakai `agentRules: false` pada `next.config.ts`                                                                                                    | `AGENTS.md` dikelola tim. Panduan Next.js 16 dibaca dari `node_modules/next/dist/docs/`                                                                                                                                                                                                                                                                                                                          |
-| A11   | Pustaka primitif dan preset shadcn/ui                 | Pustaka primitif `radix`, preset `nova`, warna dasar `neutral`, ikon `lucide`                                                                                   | Radix paling matang dan sudah tertulis di rencana. Preset nova memakai Lucide, sejalan dengan aturan ikon SVG dan larangan emoji                                                                                                                                                                                                                                                                                 |
-| A12   | Arah warna dan susunan token                          | Warna utama hijau `#059669`, susunan tiga lapis di `src/styles/tokens/`, pemetaan ke utilitas Tailwind lewat `@theme inline` di `src/app/globals.css`           | Pilihan user: hijau warung, karena pintu masuk aplikasi adalah WhatsApp. Sumber palet: data skill `ui-ux-pro-max`, profil Grocery dan E-commerce                                                                                                                                                                                                                                                                 |
-| A13   | Mode gelap                                            | Tidak dikerjakan                                                                                                                                                | Tidak ada di `docs/SCOPE.md`. Variabel `dark` tetap dideklarasikan tanpa pernah dipasang, supaya kelas `dark:` bawaan shadcn/ui tidak mengikuti pengaturan sistem operasi pengguna                                                                                                                                                                                                                               |
-| A14   | Penggabung nama kelas                                 | `cn` diambil dari `src/lib/utils.ts`, bukan langsung dari paket `cn`                                                                                            | Mesin bawaan paket `cn` hanya mengenal ukuran huruf bawaan Tailwind. Tanpa perluasan, `text-body` dan `text-caption` dianggap warna teks dan terbuang saat digabung dengan kelas warna, sehingga ukuran huruf token tidak terpakai. Komponen baru dari perkakas shadcn/ui harus diubah dulu impornya. Bila token `--text-` bertambah di `src/app/globals.css`, daftar di `src/lib/utils.ts` harus ikut bertambah |
-| A15   | Perapian format dan pemeriksaan tipe                  | Prettier dengan `eslint-config-prettier`, lebar baris 90, akhir baris LF. Perintah `npm run format`, `npm run format:check`, dan `npm run typecheck`            | Menghentikan perdebatan gaya dan menjaga kode terbaca. `AGENTS.md` dan `docs/PRODUCT.md` dikecualikan karena isinya tidak diubah tanpa persetujuan user. Berkas `src/components/ui/` yang dihasilkan CLI shadcn/ui ikut dirapikan, jadi hasil `shadcn add` berikutnya perlu dirapikan ulang                                                                                                                      |
-| A16   | Alat pengujian                                        | Vitest 5 untuk unit dan integrasi pada `src/**/*.test.ts`, Playwright 1.64 untuk alur peramban pada `e2e/*.spec.ts`. Dua proyek tata letak: 393 dan 1280 piksel | Sudah ditetapkan pada rencana dan `docs/ARCHITECTURE.md` bagian 9. Node 24 menjalankan TypeScript langsung, sehingga Vitest tidak perlu pustaka tambahan. `@types/node` dinaikkan dari 20 ke 24 karena Vitest 5 menuntutnya, sekaligus sejalan dengan Node 24 di mesin pengembangan. `vitest.config.mts` memakai akhiran `.mts` karena `package.json` tidak menetapkan `type`                                    |
-| A17   | Bentuk skema basis data                               | uuid sebagai kunci utama, `business_id` di setiap tabel, nilai enum bahasa Indonesia, kolom uang bilangan bulat                                                 | Diputuskan saat T2.1 karena tidak diatur di dokumen mana pun. Rinciannya menjadi aturan skema pada bagian 4. Tidak ada kolom vektor, sesuai keputusan A5                                                                                                                                                                                                                                                         |
-| A18   | Penerapan migrasi                                     | Penerap milik Drizzle ORM, bukan drizzle-kit migrate                                                                                                            | Perintah drizzle-kit migrate hanya dapat menyambung ke Postgres lewat jaringan, sedangkan demo memakai PGlite di dalam proses. Berkas migrasi tetap dibuat drizzle-kit lewat npm run db:generate, dan folder drizzle/ masuk repo                                                                                                                                                                                 |
+| Nomor | Hal                                                   | Keputusan                                                                                                                                                       | Dasar                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| ----- | ----------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A1    | Penyedia model bahasa                                 | DeepSeek, model `deepseek-flash`                                                                                                                                | User memiliki token DeepSeek                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| A2    | Pembacaan foto struk                                  | `deepseek-flash`, yang menerima gambar                                                                                                                          | Dokumentasi DeepSeek bagian Vision                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| A3    | Transkripsi voice note                                | Groq Whisper untuk berkas WhatsApp, Web Speech API untuk mikrofon web                                                                                           | Tim memilih Groq untuk alur otomatis audio ke teks lalu DeepSeek; lihat bagian 5.2                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| A4    | Basis data demo                                       | PGlite, PostgreSQL di dalam proses                                                                                                                              | User menyetujui setelah dipastikan mendukung CRUD penuh                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| A5    | Pengambilan konteks bisnis                            | Query SQL terstruktur, tanpa pgvector                                                                                                                           | DeepSeek tidak menyediakan endpoint embedding, sehingga kolom vektor tidak dapat diisi data nyata. Data warung juga berupa data terstruktur, sehingga query lebih tepat daripada kemiripan vektor. PGlite tetap dipakai sesuai K7                                                                                                                                                                                                                                                                                                        |
+| A6    | Identitas git dan autentikasi push                    | Nama `ZeaLIsHere`, email noreply GitHub, kredensial Windows Credential Manager                                                                                  | Push sudah terverifikasi berhasil                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| A7    | Akses skill desain                                    | Dipakai sebagian; data skill dibaca langsung dari berkasnya, tanpa `scripts/search.py` karena Python belum terpasang                                            | Token dan aturan desain disusun dari `DESIGN.md` serta bacaan berkas data skill                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| A8    | Penyedia kanal WhatsApp                               | **Twilio Sandbox**, menggantikan Fonnte, tanpa n8n                                                                                                              | User menyetujui 18 Oktober 2026: media dan balasan nyata ke peserta opt in; webhook Next pada port UI 3100, lihat bagian 11                                                                                                                                                                                                                                                                                                                                                                                                              |
+| A9    | Versi dan opsi bawaan Next.js                         | Next.js 16.4.2, React 19.3.0, Tailwind 4, `cacheComponents` aktif, `partialPrefetching` aktif                                                                   | Keluaran `create-next-app`. Lihat catatan di bawah tabel                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| A10   | Penulisan otomatis blok aturan Next.js ke `AGENTS.md` | Dimatikan, memakai `agentRules: false` pada `next.config.ts`                                                                                                    | `AGENTS.md` dikelola tim. Panduan Next.js 16 dibaca dari `node_modules/next/dist/docs/`                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| A11   | Pustaka primitif dan preset shadcn/ui                 | Pustaka primitif `radix`, preset `nova`, warna dasar `neutral`, ikon `lucide`                                                                                   | Radix paling matang dan sudah tertulis di rencana. Preset nova memakai Lucide, sejalan dengan aturan ikon SVG dan larangan emoji                                                                                                                                                                                                                                                                                                                                                                                                         |
+| A12   | Arah warna dan susunan token                          | Warna utama hijau `#059669`, susunan tiga lapis di `src/styles/tokens/`, pemetaan ke utilitas Tailwind lewat `@theme inline` di `src/app/globals.css`           | Pilihan user: hijau warung, karena pintu masuk aplikasi adalah WhatsApp. Sumber palet: data skill `ui-ux-pro-max`, profil Grocery dan E-commerce                                                                                                                                                                                                                                                                                                                                                                                         |
+| A13   | Mode gelap                                            | Tidak dikerjakan                                                                                                                                                | Tidak ada di `docs/SCOPE.md`. Variabel `dark` tetap dideklarasikan tanpa pernah dipasang, supaya kelas `dark:` bawaan shadcn/ui tidak mengikuti pengaturan sistem operasi pengguna                                                                                                                                                                                                                                                                                                                                                       |
+| A14   | Penggabung nama kelas                                 | `cn` diambil dari `src/lib/utils.ts`, bukan langsung dari paket `cn`                                                                                            | Mesin bawaan paket `cn` hanya mengenal ukuran huruf bawaan Tailwind. Tanpa perluasan, `text-body` dan `text-caption` dianggap warna teks dan terbuang saat digabung dengan kelas warna, sehingga ukuran huruf token tidak terpakai. Komponen baru dari perkakas shadcn/ui harus diubah dulu impornya. Bila token `--text-` bertambah di `src/app/globals.css`, daftar di `src/lib/utils.ts` harus ikut bertambah                                                                                                                         |
+| A15   | Perapian format dan pemeriksaan tipe                  | Prettier dengan `eslint-config-prettier`, lebar baris 90, akhir baris LF. Perintah `npm run format`, `npm run format:check`, dan `npm run typecheck`            | Menghentikan perdebatan gaya dan menjaga kode terbaca. `AGENTS.md` dan `docs/PRODUCT.md` dikecualikan karena isinya tidak diubah tanpa persetujuan user. Berkas `src/components/ui/` yang dihasilkan CLI shadcn/ui ikut dirapikan, jadi hasil `shadcn add` berikutnya perlu dirapikan ulang                                                                                                                                                                                                                                              |
+| A16   | Alat pengujian                                        | Vitest 5 untuk unit dan integrasi pada `src/**/*.test.ts`, Playwright 1.64 untuk alur peramban pada `e2e/*.spec.ts`. Dua proyek tata letak: 393 dan 1280 piksel | Sudah ditetapkan pada rencana dan `docs/ARCHITECTURE.md` bagian 9. Node 24 menjalankan TypeScript langsung, sehingga Vitest tidak perlu pustaka tambahan. `@types/node` dinaikkan dari 20 ke 24 karena Vitest 5 menuntutnya, sekaligus menetapkan Node 24 sebagai runtime proyek. Mesin pada pemeriksaan dokumentasi 18 Oktober masih Node 20.19.5; gunakan Node 24 terpasang atau `npx --package=node@24 -- node` untuk menjalankan pengujian. `vitest.config.mts` memakai akhiran `.mts` karena `package.json` tidak menetapkan `type` |
+| A17   | Bentuk skema basis data                               | uuid sebagai kunci utama, `business_id` di setiap tabel, nilai enum bahasa Indonesia, kolom uang bilangan bulat                                                 | Diputuskan saat T2.1 karena tidak diatur di dokumen mana pun. Rinciannya menjadi aturan skema pada bagian 4. Tidak ada kolom vektor, sesuai keputusan A5                                                                                                                                                                                                                                                                                                                                                                                 |
+| A18   | Penerapan migrasi                                     | Penerap milik Drizzle ORM, bukan drizzle-kit migrate                                                                                                            | Perintah drizzle-kit migrate hanya dapat menyambung ke Postgres lewat jaringan, sedangkan demo memakai PGlite di dalam proses. Berkas migrasi tetap dibuat drizzle-kit lewat npm run db:generate, dan folder drizzle/ masuk repo                                                                                                                                                                                                                                                                                                         |
 
 Catatan A9: `cacheComponents` aktif berarti halaman yang membaca data saat
 berjalan wajib dibungkus `Suspense` atau memakai arahan `"use cache"`.
@@ -501,59 +523,101 @@ keputusan itu dicatat ulang di tabel ini.
 
 ## 11. Penyedia kanal WhatsApp
 
-**Ditetapkan:** Fonnte, pada 17 Oktober 2026.
+**Keputusan terkini, disetujui user 18 Oktober 2026:** Twilio WhatsApp Sandbox
+menggantikan Fonnte, termasuk balasan nyata kepada peserta opt in dan voice
+note otomatis menjadi teks lalu orderan. Rancangan ini belum merupakan bukti
+penerimaan provider nyata. Tidak ada server terpisah atau n8n.
 
-Alasannya, nomor warung sudah terhubung ke Fonnte dan chat teks berjalan, jadi
-demo punya kanal WhatsApp nyata tanpa menunggu verifikasi bisnis Meta yang
-jangka waktunya di luar kendali kita. n8n tidak dipakai, karena n8n bukan
-penyedia WhatsApp, hanya orkestrasi alur.
+### 11.1 Setup, koneksi dan endpoint
 
-### 11.1 Tata cara Hubungkan ke WhatsApp
+1. Pasang dependensi dengan `npm ci` dan gunakan Node 24. Contoh konfigurasi
+   lengkap, format kunci, migrasi dan peringatan reset seed ada di `README.md`.
+   `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN` dan `TWILIO_WHATSAPP_FROM`
+   hanya di server. Nomor pengirim memakai awalan `whatsapp:` sesuai Sandbox.
+2. Jalankan Next/UI dengan `npm run dev -- --port 3100` dan `ngrok http 3100`.
+   Route Handler adalah **`POST /api/channels/whatsapp`**, bukan `/whatsapp`.
+   `/whatsapp` hanya UI. Tidak ada port 3101 atau webhook server tambahan.
+3. Isi `WEBHOOK_URL` dengan URL HTTPS publik lengkap ngrok, termasuk path
+   `/api/channels/whatsapp` dan query bila dipakai. Pasang URL persis itu pada
+   **When a message comes in**, metode **POST**, di Twilio Sandbox. Perubahan
+   domain memerlukan pembaruan kedua konfigurasi dan restart pembaca env.
+4. Peserta mengirim kode join yang diberikan Twilio ke nomor Sandbox.
+   Pemilik mengaktifkan Hubungkan di S3. Status konfigurasi aplikasi bukan
+   bukti peserta sudah join atau pengiriman nyata berhasil. Terapkan batas
+   Sandbox/jendela pesan; jangan mengirim ke peserta yang belum opt in.
+5. Putuskan menghentikan pemrosesan lokal, bukan menutup akun Twilio atau
+   mengeluarkan peserta dari Sandbox. Simpan hanya status/metadata yang
+   diperlukan; jangan menyimpan auth token dalam database atau browser.
 
-1. Pemilik membuat akun di fonnte.com, lalu menghubungkan nomor warung dengan
-   memindai kode QR pada halaman perangkat di dasbor Fonnte.
-2. Pemilik menyalin token perangkat dari dasbor Fonnte, lalu mengisinya pada
-   `.env.local` sebagai `FONNTE_TOKEN`, sesuai bagian 8 butir 5 yang
-   menetapkan kredensial kanal hanya berasal dari variabel lingkungan.
-3. Pemilik membuka permukaan S3 dan menjalankan aksi Hubungkan ke WhatsApp.
-4. Aplikasi memeriksa token dengan `POST https://api.fonnte.com/device`
-   beserta header `Authorization`. Jawaban yang berhasil memuat nomor
-   perangkat, status koneksi, nama paket, dan sisa kuota. Jawaban yang gagal
-   memuat alasan, misalnya token tidak sah.
-5. Aplikasi menyimpan nomor perangkat, status koneksi, nama paket, sisa kuota,
-   dan waktu pemeriksaan pada baris `businesses`. Status koneksi pada S3
-   mengikuti hasil pemeriksaan ini, bukan tebakan.
-6. Pemilik menempelkan alamat webhook aplikasi pada halaman webhook Fonnte.
-7. Aksi memutuskan koneksi menandai nomor tidak terhubung dan menghapus
-   simpanan status koneksi.
+### 11.2 Webhook dan pemrosesan latar
 
-Token tidak pernah disimpan di baris basis data, sesuai bagian 8 butir 5. Bila
-`FONNTE_TOKEN` belum diisi, S3 menampilkan tata cara di atas beserta keterangan
-bahwa token belum ada, bukan tombol yang tidak berfungsi.
+1. Parse **seluruh parameter** `application/x-www-form-urlencoded` Twilio,
+   bukan hanya field yang dikenal. Validasi `X-Twilio-Signature` memakai
+   validator SDK resmi Twilio, auth token server dan `WEBHOOK_URL` persis.
+   URL localhost hasil proxy tidak cocok sebagai pengganti URL publik.
+   Header Bearer/parameter key lama bukan autentikasi Twilio.
+2. Setelah validasi, normalisasi `MessageSid`, `From`, `To`, `Body`,
+   `NumMedia` dan field media. `Body` boleh kosong jika ada media. Periksa
+   tujuan Sandbox, koneksi aplikasi, pengirim, `business_id` dan deduplikasi
+   SID sebelum perubahan domain. Pesan ulang tidak boleh menggandakan stok.
+3. Segera kembalikan HTTP sukses dengan **TwiML kosong** (`<Response/>`).
+   Jangan menunggu unduh/transkripsi/DeepSeek di jalur respons. Next.js
+   **`after()`** menjalankan proses domain dan balasan lewat **REST Twilio**;
+   bukan TwiML berisi pesan. Catat hasil/gagal kirim tanpa membocorkan rahasia.
+4. Teks diproses menjadi orderan; audio melewati Groq Whisper lalu DeepSeek.
+   Transkrip disimpan sebagai pesan asal. Balasan nyata dicatat pada konteks
+   orderan, tanpa menambah halaman obrolan pelanggan.
+5. UI perlu polling atau muat ulang sesudah proses latar selesai. Refresh
+   otomatis dapat ditambahkan pada implementasi, belum diklaim tersedia.
 
-### 11.2 Batasan Fonnte yang sudah dipastikan
+**Batas demo yang wajib disampaikan:** `after()` bukan antrean atau durable
+worker. Stop server/redeploy sebelum selesai dapat kehilangan pemrosesan
+meskipun Twilio sudah menerima respons sukses. Tidak ada janji retry otomatis
+Twilio untuk pesan yang sudah diakui. Biarkan server hidup; bila tidak mendapat
+balasan, kirim ulang sebagai pesan baru, bukan mengandalkan replay SID lama.
+Antrean tahan restart dan pemulihan produksi bukan bagian pekerjaan ini.
 
-Diambil dari dokumentasi resmi Fonnte pada 17 Oktober 2026.
+### 11.3 Media, bukti dan keamanan unduhan
 
-| Batasan         | Isi dokumentasi                                                                                                              | Akibat pada aplikasi                                                                                                                                                                    |
-| --------------- | ---------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Lampiran masuk  | Halaman Webhook Get Attachment menyatakan `url`, `filename`, dan `extension` hanya diterima perangkat berpakat `all feature` | Pada paket gratis yang dipakai sekarang, gambar dari pelanggan tidak sampai ke webhook. Penerjemah payload tetap ditulis mengikuti bentuk itu dan menangani ketiadaan `url` tanpa gagal |
-| Jenis berkas    | Hanya `png`, `jpg`, `jpeg`, `webp`, `mp4`, `pdf`, `doc`, `docx`, `xls`, `xlsx`, `csv`, `txt`, dan `mp3`, paling besar 10 MB  | Voice note WhatsApp berformat `ogg`, jadi tidak pernah diteruskan ke webhook walaupun paket dinaikkan. Fitur voice note tetap ada di permukaan S2 lewat Web Speech API, sesuai A3       |
-| Pengiriman luar | Tool `send_whatsapp` hanya menulis balasan pada konteks pesan pelanggan, tidak mengirim ke luar, sesuai `docs/SCOPE.md`      | Balasan otomatis agen terlihat pada orderan di dalam aplikasi. Ini sudah sesuai kriteria demo langkah 4 yang tidak meminta tampilan obrolan                                             |
-| Autoreply       | Fitur autoreply Fonnte tidak bekerja bila webhook dipakai                                                                    | Tidak merugikan, karena balasan otomatis disusun aplikasi sendiri                                                                                                                       |
+- Maksimal satu media per pesan. Gambar: JPEG, PNG, WebP <= 3 MiB. Audio:
+  OGG, MP3, MP4, WAV, WebM, FLAC <= 16 MiB. MP4/WebM hanya audio. Validasi
+  MIME yang dinormalisasi, ukuran aktual streaming, jumlah media dan timeout;
+  jangan mempercayai nama berkas atau Content-Length saja.
+- URL awal media wajib HTTPS dengan host **`api.twilio.com`** dan tanpa
+  kredensial URL. Gunakan **Basic Auth** account SID/auth token hanya untuk
+  unduhan awal tersebut. Tangani redirect secara manual dengan batas hop:
+  setiap target wajib HTTPS dan host CDN masuk allowlist eksplisit, bukan
+  kecocokan substring/sufiks bebas. **Jangan meneruskan Authorization** pada
+  redirect. Tolak host tak dikenal dan tujuan lokal/internal. Daftar host CDN
+  yang diperlukan harus ditetapkan dan diuji pada implementasi, bukan
+  membuka semua URL agar unduhan berhasil.
+- Audio dikirim ke Groq memakai konfigurasi bagian 5.2, bukan ke DeepSeek.
+  DeepSeek menerima teks dan gambar. Gagal unduh/AI meminta ketik atau kirim
+  ulang, tidak menghasilkan bukti/orderan rekaan.
+- Foto bukti hanya dikaitkan jika tepat satu orderan menunggu milik pengirim
+  di warung yang sama. Jangan memilih orderan terbaru secara buta; nol/lebih
+  dari satu kandidat meminta klarifikasi. Confidence rendah tetap menunggu.
+- **Perilaku pencocokan nominal lama dipertahankan:** cocok dan confidence
+  > = 0.7 menyelesaikan orderan, mencatat transaksi/stok sekali. Ini bukan
+  > verifikasi bank, pengecekan saldo atau jaminan uang diterima; risiko foto
+  > palsu tetap ada. Tidak menambahkan rekonsiliasi atau approval wajib baru.
 
-### 11.3 Akibat pada rancangan
+### 11.4 Privasi, pengujian dan riwayat
 
-1. Aplikasi tidak menggantungkan kriteria demo pada kanal luar. Panel pengirim
-   pesan tiruan menulis ke fungsi pemrosesan pesan masuk yang sama dengan
-   webhook penyedia, sehingga seluruh langkah kriteria demo tetap berjalan
-   ketika jaringan bermasalah atau kuota Fonnte habis.
-2. Penerjemah payload penyedia berada di `src/lib/channels/`, sesuai aturan
-   struktur butir 6.
-3. Nama paket dan sisa kuota ditampilkan pada halaman Pengaturan apa adanya,
-   termasuk keterangan bahwa lampiran masuk belum aktif pada paket gratis.
-   Pemilik jadi tahu batasnya, bukan menemukan sendiri lewat kegagalan.
-4. Pesan teks nyata lewat Fonnte adalah nilai tambah demo, bukan tumpuan.
+Twilio menerima pesan, Groq menerima audio, DeepSeek menerima transkrip/foto.
+Jelaskan persetujuan, retensi pihak ketiga, biaya pesan/transkripsi/token dan
+kuota. Penghapusan lokal tidak otomatis membuktikan penghapusan di penyedia.
+Panel simulasi tetap jalur lokal tanpa provider, bukan bukti penerimaan live.
+Uji keamanan, integrasi dan validasi mengikuti
+`docs/plans/2026-10-18-twilio.md` dan status parsial di `PLAN.md`.
+
+**Historis, tidak berlaku sebagai keputusan terkini:** pada 17 Oktober Fonnte
+gratis dipilih karena nomor sudah terhubung. Catatan dokumentasi saat itu
+menyebut lampiran memerlukan paket `all feature` dan audio hanya MP3, sehingga
+OGG/foto demo mengandalkan simulasi. Balasan lama hanya disimpan, bukan dikirim.
+Keputusan dan batas itu diganti Twilio; checkpoint lama tidak membuktikan
+Twilio/Groq/DeepSeek nyata pernah diuji. Bagian 13 merekam keadaan sebelum
+persetujuan ini dan bukan kontrak webhook yang baru.
 
 ## 12. Kemampuan PGlite yang sudah dipastikan
 
@@ -591,11 +655,13 @@ di skrip Node. Dua hal yang ditemukan saat pengujian, beserta penanganannya:
    pemilik memakai aplikasi. Mekanisme pencegahannya ditetapkan pada T5.1,
    dengan memperhatikan `cacheComponents` yang aktif.
 
-## 13. Titik implementasi 18 Oktober 2026
+## 13. Titik implementasi historis 18 Oktober 2026 (sebelum Twilio)
 
-Bagian struktur dan rancangan di atas memuat sasaran sistem. Kondisi yang
-sudah diimplementasikan sampai pemilik menghentikan sesi dicatat di sini;
-status penerimaan dan pekerjaan terbuka tetap mengikuti PLAN.md.
+Bagian ini merekam kondisi saat pemilik menghentikan sesi sebelumnya.
+Fonnte, secret webhook, port bawaan dan keterbatasan suara di sini adalah
+riwayat, bukan keputusan terkini atau klaim kode migrasi selesai. Kontrak
+Twilio ada di bagian 11; status penerimaan mengikuti `PLAN.md`. Hasil lama
+memakai penyedia uji, tidak membuktikan Twilio/Groq/DeepSeek nyata.
 
 ### 13.1 Mutasi dan konsistensi data
 

@@ -1,6 +1,10 @@
 ﻿const DEFAULT_MODEL = "deepseek-flash"; // lint-ui-ignore: nama model API internal, bukan teks antarmuka
 export type AIInput = { system: string; prompt: string; image?: string };
 export interface AIProvider { complete(input: AIInput): Promise<unknown> }
+function modelFor(image: boolean): string {
+ const override=image?process.env.DEEPSEEK_VISION_MODEL:process.env.DEEPSEEK_CHAT_MODEL;
+ return override?.trim()||process.env.DEEPSEEK_MODEL?.trim()||DEFAULT_MODEL;
+}
 export function getAIProvider(): AIProvider | undefined {
  const key=process.env.DEEPSEEK_API_KEY;
  if(!key?.trim()) return undefined;
@@ -10,7 +14,7 @@ export function getAIProvider(): AIProvider | undefined {
     const response=await fetch(`${(process.env.DEEPSEEK_BASE_URL || "https://api.deepseek.com").replace(/\/$/,"")}/chat/completions`,{
      method:"POST",headers:{"Content-Type":"application/json",Authorization:`Bearer ${key}`},
      signal:AbortSignal.timeout(30000),
-     body:JSON.stringify({model:input.image?(process.env.DEEPSEEK_VISION_MODEL || DEFAULT_MODEL):(process.env.DEEPSEEK_CHAT_MODEL || DEFAULT_MODEL),temperature:0,response_format:{type:"json_object"},messages:[{role:"system",content:input.system+" Kembalikan JSON yang sah tanpa markdown."},{role:"user",content:input.image?[{type:"text",text:input.prompt},{type:"image_url",image_url:{url:input.image}}]:input.prompt}]})
+     body:JSON.stringify({model:modelFor(input.image!==undefined),temperature:0,response_format:{type:"json_object"},messages:[{role:"system",content:input.system+" Kembalikan JSON yang sah tanpa markdown."},{role:"user",content:input.image?[{type:"text",text:input.prompt},{type:"image_url",image_url:{url:input.image}}]:input.prompt}]})
     });
     if(!response.ok) throw Error("Layanan pemrosesan belum tersedia");
     const body:unknown=await response.json();
