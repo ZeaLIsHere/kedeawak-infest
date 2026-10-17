@@ -6,6 +6,8 @@ import {
   type TestDatabase,
 } from "../db/testing";
 import { createCustomer } from "./customers";
+import { endOfDay, startOfDay } from "./period";
+import { summarizePeriod } from "./reports";
 import { createTransaction, findTransaction, listTransactions } from "./transactions";
 
 let test: TestDatabase;
@@ -146,5 +148,49 @@ describe("data transaksi", () => {
         customerId: otherCustomer.id,
       }),
     ).rejects.toThrow("Pelanggan tidak ditemukan pada warung ini");
+  });
+
+  it("menghitung transaksi tepat pada batas periode satu kali saja", async () => {
+    const at = new Date("2026-10-20T03:00:00.000Z");
+    const period = { from: startOfDay(at), to: endOfDay(at) };
+
+    await createTransaction(test.db, test.business.id, {
+      kind: "sale",
+      description: "Penjualan tepat awal hari menurut WIB",
+      amount: 10000,
+      source: "app",
+      occurredAt: period.from,
+    });
+
+    await createTransaction(test.db, test.business.id, {
+      kind: "sale",
+      description: "Penjualan tepat awal hari berikutnya menurut WIB",
+      amount: 20000,
+      source: "app",
+      occurredAt: period.to,
+    });
+
+    const list = await listTransactions(test.db, test.business.id, period);
+    const descriptions = list.map((transaction) => transaction.description);
+
+    expect(descriptions).toContain("Penjualan tepat awal hari menurut WIB");
+    expect(descriptions).not.toContain(
+      "Penjualan tepat awal hari berikutnya menurut WIB",
+    );
+  });
+
+  it("menyamakan daftar transaksi dengan ringkasan periode", async () => {
+    const at = new Date("2026-10-20T03:00:00.000Z");
+    const period = { from: startOfDay(at), to: endOfDay(at) };
+
+    const list = await listTransactions(test.db, test.business.id, period);
+    const summary = await summarizePeriod(test.db, test.business.id, period);
+
+    const sales = list
+      .filter((transaction) => transaction.kind === "sale")
+      .reduce((total, transaction) => total + transaction.amount, 0);
+
+    expect(sales).toBe(summary.sales);
+    expect(list).toHaveLength(summary.transactionCount);
   });
 });

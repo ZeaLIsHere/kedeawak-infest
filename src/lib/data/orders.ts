@@ -1,4 +1,4 @@
-import { and, desc, eq, inArray } from "drizzle-orm";
+import { and, desc, eq, gte, inArray, lt } from "drizzle-orm";
 
 import type { Database } from "../db/client";
 import { orderItems, orders, type Order, type OrderItem } from "../db/schema";
@@ -31,9 +31,16 @@ export type OrderWithItems = {
   readonly items: readonly OrderItem[];
 };
 
-/** Penyaring daftar orderan. */
+/**
+ * Penyaring daftar orderan.
+ *
+ * `from` dan `to` menyaring `createdAt` secara setengah terbuka, sama seperti
+ * `reports.ts`: `from` ikut dihitung dan `to` tidak.
+ */
 export type OrderFilter = {
   readonly status?: Order["status"];
+  readonly from?: Date;
+  readonly to?: Date;
   readonly limit?: number;
 };
 
@@ -114,6 +121,14 @@ export async function listOrders(
 
   if (filter.status !== undefined) {
     conditions.push(eq(orders.status, filter.status));
+  }
+
+  if (filter.from !== undefined) {
+    conditions.push(gte(orders.createdAt, filter.from));
+  }
+
+  if (filter.to !== undefined) {
+    conditions.push(lt(orders.createdAt, filter.to));
   }
 
   const query = db

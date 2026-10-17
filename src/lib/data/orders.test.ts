@@ -6,6 +6,7 @@ import {
   type TestDatabase,
 } from "../db/testing";
 import { createProduct, listProducts } from "./products";
+import { endOfDay, startOfDay } from "./period";
 import {
   createOrder,
   findOrder,
@@ -172,5 +173,32 @@ describe("data orderan", () => {
     expect(
       await updateOrderStatus(test.db, test.business.id, other[0]?.id ?? "", "selesai"),
     ).toBeUndefined();
+  });
+
+  it("menyaring orderan menurut rentang waktu dengan batas atas tidak ikut", async () => {
+    const at = new Date("2026-10-22T04:00:00.000Z");
+
+    await createOrder(test.db, test.business.id, { items: [], createdAt: at });
+
+    const memuat = (orders: readonly { createdAt: Date }[]) =>
+      orders.some((order) => order.createdAt.getTime() === at.getTime());
+
+    const hariYangSama = await listOrders(test.db, test.business.id, {
+      from: startOfDay(at),
+      to: endOfDay(at),
+    });
+    expect(memuat(hariYangSama)).toBe(true);
+
+    const hariBerikutnya = await listOrders(test.db, test.business.id, {
+      from: endOfDay(at),
+      to: new Date(endOfDay(at).getTime() + 24 * 60 * 60 * 1000),
+    });
+    expect(memuat(hariBerikutnya)).toBe(false);
+
+    const sebelumWaktuItu = await listOrders(test.db, test.business.id, {
+      from: startOfDay(at),
+      to: at,
+    });
+    expect(memuat(sebelumWaktuItu)).toBe(false);
   });
 });

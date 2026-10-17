@@ -1,4 +1,4 @@
-import { and, desc, eq, gte, lte } from "drizzle-orm";
+import { and, desc, eq, gte, lt } from "drizzle-orm";
 
 import type { Database } from "../db/client";
 import { transactions, type Transaction } from "../db/schema";
@@ -58,7 +58,14 @@ export async function createTransaction(
   });
 }
 
-/** Daftar transaksi pada satu rentang waktu, terbaru lebih dulu. */
+/**
+ * Daftar transaksi pada satu rentang waktu, terbaru lebih dulu.
+ *
+ * Rentangnya setengah terbuka seperti di `period.ts` dan `reports.ts`: `from`
+ * ikut dihitung dan `to` tidak. Kesamaannya penting supaya daftar transaksi dan
+ * ringkasan periode pada rentang yang sama tidak menghitung satu transaksi dua
+ * kali, tepat pada perbatasan hari atau minggu.
+ */
 export async function listTransactions(
   db: Database,
   businessId: string,
@@ -71,7 +78,7 @@ export async function listTransactions(
   }
 
   if (filter.to !== undefined) {
-    conditions.push(lte(transactions.occurredAt, filter.to));
+    conditions.push(lt(transactions.occurredAt, filter.to));
   }
 
   if (filter.kind !== undefined) {
