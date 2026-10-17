@@ -173,7 +173,7 @@ privasi proposal tentang pemisahan data antar warung.
 | `transactions`         | Jenis, keterangan, jumlah, sumber, rujukan pelanggan, tautan bukti, confidence, waktu     | Jenis bernilai `sale`, `expense`, `debt`                                                                           |
 | `payments`             | Order, tautan bukti transfer, nominal yang diharapkan, nominal terbaca, status verifikasi | Status bernilai `menunggu`, `cocok`, `tidak cocok`                                                                 |
 | `stock_movements`      | Produk, jenis, jumlah perubahan, alasan, waktu                                            | Jejak audit perubahan stok                                                                                         |
-| `stock_alerts`         | Produk, stok saat alert, ambang, status                                                   | Status bernilai `aktif`, `selesai`                                                                                 |
+| `stock_alerts`         | Produk, stok saat alert, ambang, status                                                   | Status bernilai `aktif`, `selesai`. Satu alert aktif per produk. `stock_at_alert` memuat stok saat alert muncul    |
 | `purchase_orders`      | Nama pemasok, daftar item, total, status, waktu persetujuan                               | Status bernilai `draft`, `disetujui`, `ditolak`. Pemasok disimpan sebagai teks, belum ada tabel pemasok tersendiri |
 | `purchase_order_items` | PO, produk, jumlah, harga perkiraan                                                       |                                                                                                                    |
 | `approvals`            | Jenis aksi, muatan aksi, ringkasan, status, waktu keputusan                               | Antrean di S6                                                                                                      |
@@ -189,9 +189,16 @@ Aturan skema:
 2. Semua tabel punya `created_at`. Tabel yang dapat diubah punya `updated_at`.
 3. Penghapusan data pelanggan dilakukan sebagai penghapusan baris sungguhan,
    sesuai butir privasi proposal, bukan penandaan lunak.
-4. Setiap perubahan stok wajib meninggalkan baris di `stock_movements`. Kolom
+4. Setiap perubahan stok wajib meninggalkan baris di `stock_movements`, dan
+   hanya `src/lib/data/stock.ts` yang boleh mengubah `products.stock`. Kolom
    `products.stock` adalah hasil perhitungan terakhir dari baris baris itu,
-   bukan sumber kebenaran.
+   bukan sumber kebenaran. Stok baru dihitung oleh basis data dari nilai yang
+   sedang berlaku, sehingga dua perubahan yang berjalan bersamaan tidak saling
+   menimpa. Alert stok menipis dibuat saat stok berada di bawah ambang minimum
+   dan ditutup saat stok kembali menyentuh ambang, sehingga satu produk hanya
+   punya satu alert aktif pada satu waktu. Menyetujui draft pesanan pembelian
+   menambah stok setiap itemnya lewat pergerakan `masuk`, sesuai alur
+   penerimaan pada `docs/SCOPE.md` bagian 7.
 5. Tabel `conversations` dan `messages` tetap ada karena dibutuhkan untuk
    menerima pesan pelanggan, membentuk orderan, dan menyusun balasan otomatis.
    Keduanya **tidak dirender sebagai tampilan obrolan** di antarmuka. Yang

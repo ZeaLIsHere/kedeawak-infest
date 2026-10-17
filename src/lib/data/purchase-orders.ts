@@ -9,6 +9,7 @@ import {
 } from "../db/schema";
 import { isUuid } from "./ids";
 import { assertProductsOwned, type Queryable } from "./ownership";
+import { applyStockMovement } from "./stock";
 
 /** Satu barang pada draft pesanan pembelian. */
 export type PurchaseOrderItemInput = {
@@ -168,13 +169,17 @@ export async function listPurchaseOrders(
 }
 
 /**
- * Memutuskan sebuah draft pesanan pembelian.
+ * Menerapkan keputusan pada draft tanpa membuka transaksi sendiri.
+ *
+ * Keputusan yang menyetujui draft menambah stok setiap itemnya lewat pergerakan
+ * stok masuk, sesuai alur penerimaan pada `docs/SCOPE.md` bagian 7: pemilik
+ * menyetujui, lalu stok diperbarui. Keputusan yang menolak tidak menyentuh stok.
  *
  * Hanya draft yang dapat diputuskan, sehingga keputusan tidak dapat ditimpa
  * atau dibalik. Draft yang sudah diputuskan menjawab kosong, sama seperti draft
  * yang tidak ada pada warung ini.
  */
-export async function decidePurchaseOrder(
+export async function applyPurchaseOrderDecision(
   db: Queryable,
   businessId: string,
   purchaseOrderId: string,
@@ -196,5 +201,40 @@ export async function decidePurchaseOrder(
     )
     .returning();
 
+  if (order === undefined || decision !== "disetujui") {
+    return order;
+  }
+
+  const items = await db
+    .select()
+    .from(purchaseOrderItems)
+    .where(
+      and(
+        eq(purchaseOrderItems.businessId, businessId),
+        eq(purchaseOrderItems.purchaseOrderId, purchaseOrderId),
+      ),
+    );
+
+  for (const item of items) {
+    await applyStockMovement(db, businessId, {
+      productId: item.productId,
+      kind: "masuk",
+      quantityChange: item.quantity,
+      reason: `Pesanan pembelian dari ${order.supplierName}`,
+    });
+  }
+
   return order;
+}
+
+/** Memutuskan sebuah draft pesanan pembelian dalam satu transaksi. */
+export async function decidePurchaseOrder(
+  db: Database,
+  businessId: string,
+  purchaseOrderId: string,
+  decision: PurchaseOrderDecision,
+): Promise<PurchaseOrder | undefined> {
+  return db.transaction((tx) =>
+    applyPurchaseOrderDecision(tx, businessId, purchaseOrderId, decision),
+  );
 }

@@ -1,8 +1,9 @@
-import { and, asc, eq, lte, sql } from "drizzle-orm";
+import { and, asc, eq, lt, sql } from "drizzle-orm";
 
 import type { Database } from "../db/client";
 import { products, type Product } from "../db/schema";
 import { isUuid } from "./ids";
+import { reconcileStockAlert } from "./stock";
 
 /** Data pokok sebuah produk. Jumlah stok tidak diisi di sini, lihat `stock.ts`. */
 export type ProductInput = {
@@ -79,7 +80,7 @@ export async function findProductByName(
   return product;
 }
 
-/** Produk yang stoknya sudah menyentuh atau melewati ambang minimum. */
+/** Produk yang stoknya berada di bawah ambang minimum. */
 export async function listLowStockProducts(
   db: Database,
   businessId: string,
@@ -88,10 +89,7 @@ export async function listLowStockProducts(
     .select()
     .from(products)
     .where(
-      and(
-        eq(products.businessId, businessId),
-        lte(products.stock, products.minimumStock),
-      ),
+      and(eq(products.businessId, businessId), lt(products.stock, products.minimumStock)),
     )
     .orderBy(asc(products.stock), asc(products.name));
 }
@@ -114,18 +112,38 @@ export async function createProduct(
   return product;
 }
 
-/** Mengubah data produk. Stok tidak ikut berubah. */
+/**
+ * Mengubah data produk. Stok tidak ikut berubah.
+ *
+ * Bila ambang minimum ikut diubah, alert stok menipis disesuaikan di dalam
+ * transaksi yang sama. Tanpa penyesuaian itu, ambang baru yang lebih tinggi
+ * tidak akan memunculkan alert sampai ada pergerakan stok berikutnya.
+ */
 export async function updateProduct(
   db: Database,
   businessId: string,
   productId: string,
   input: ProductUpdate,
 ): Promise<Product | undefined> {
-  const [product] = await db
-    .update(products)
-    .set(input)
-    .where(and(eq(products.businessId, businessId), eq(products.id, productId)))
-    .returning();
+  if (!isUuid(productId)) {
+    return undefined;
+  }
 
-  return product;
+  return db.transaction(async (tx) => {
+    const [product] = await tx
+      .update(products)
+      .set(input)
+      .where(and(eq(products.businessId, businessId), eq(products.id, productId)))
+      .returning();
+
+    if (product === undefined) {
+      return undefined;
+    }
+
+    if (input.minimumStock !== undefined) {
+      await reconcileStockAlert(tx, businessId, product);
+    }
+
+    return product;
+  });
 }

@@ -5,7 +5,8 @@ import {
   createTestDatabase,
   type TestDatabase,
 } from "../db/testing";
-import { createProduct } from "./products";
+import { createProduct, findProduct } from "./products";
+import { listStockAlerts, listStockMovements } from "./stock";
 import {
   createPurchaseOrder,
   decidePurchaseOrder,
@@ -137,7 +138,9 @@ describe("draft pesanan pembelian", () => {
   });
 
   it("memutuskan draft sehingga keadaannya tidak dapat ditimpa", async () => {
-    const draft = (await listPurchaseOrders(test.db, test.business.id))[0];
+    const draft = (await listPurchaseOrders(test.db, test.business.id)).find(
+      (order) => order.total > 0,
+    );
     const decided = await decidePurchaseOrder(
       test.db,
       test.business.id,
@@ -153,6 +156,43 @@ describe("draft pesanan pembelian", () => {
     expect(
       (await findPurchaseOrder(test.db, test.business.id, draft?.id ?? ""))?.status,
     ).toBe("disetujui");
+  });
+
+  it("menambah stok setiap item saat draft disetujui", async () => {
+    expect((await findProduct(test.db, test.business.id, berasId))?.stock).toBe(20);
+    expect((await findProduct(test.db, test.business.id, gulaId))?.stock).toBe(10);
+
+    const movements = await listStockMovements(test.db, test.business.id);
+
+    expect(movements).toHaveLength(2);
+    expect(
+      movements.every(
+        (movement) =>
+          movement.kind === "masuk" &&
+          movement.reason === "Pesanan pembelian dari Pasar Induk",
+      ),
+    ).toBe(true);
+    expect(await listStockAlerts(test.db, test.business.id, "aktif")).toEqual([]);
+  });
+
+  it("tidak menambah stok saat draft ditolak", async () => {
+    const before = await listStockMovements(test.db, test.business.id);
+    const draft = await createPurchaseOrder(test.db, test.business.id, {
+      supplierName: "Pasar Induk",
+      items: [{ productId: berasId, quantity: 50, estimatedPrice: 12000 }],
+    });
+    const decided = await decidePurchaseOrder(
+      test.db,
+      test.business.id,
+      draft.order.id,
+      "ditolak",
+    );
+
+    expect(decided?.status).toBe("ditolak");
+    expect((await findProduct(test.db, test.business.id, berasId))?.stock).toBe(20);
+    expect(await listStockMovements(test.db, test.business.id)).toHaveLength(
+      before.length,
+    );
   });
 
   it("tidak memutuskan draft warung lain", async () => {
@@ -171,5 +211,7 @@ describe("draft pesanan pembelian", () => {
       (await findPurchaseOrder(test.db, otherBusinessId, other.order.id))?.status,
     ).toBe("draft");
     expect(await listPurchaseOrders(test.db, otherBusinessId)).toHaveLength(1);
+    expect((await findProduct(test.db, otherBusinessId, otherBerasId))?.stock).toBe(0);
+    expect(await listStockMovements(test.db, otherBusinessId)).toEqual([]);
   });
 });

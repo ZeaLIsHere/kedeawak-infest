@@ -13,7 +13,7 @@ import {
   listApprovals,
   readPurchaseOrderId,
 } from "./approvals";
-import { createProduct } from "./products";
+import { createProduct, findProduct } from "./products";
 import { createPurchaseOrder, findPurchaseOrder } from "./purchase-orders";
 
 let test: TestDatabase;
@@ -113,6 +113,8 @@ describe("antrean persetujuan", () => {
 
   it("memberlakukan draft begitu aksinya disetujui", async () => {
     const before = await countApprovals(test.db, test.business.id);
+    const stockBefore =
+      (await findProduct(test.db, test.business.id, berasId))?.stock ?? 0;
     const { draftId } = await submitDraft("Tambah stok beras 20 kilogram");
     const approval = await findPendingApproval(draftId);
 
@@ -131,9 +133,14 @@ describe("antrean persetujuan", () => {
       "disetujui",
     );
     expect(await countApprovals(test.db, test.business.id)).toBe(before);
+    expect((await findProduct(test.db, test.business.id, berasId))?.stock).toBe(
+      stockBefore + 20,
+    );
   });
 
   it("membatalkan draft begitu aksinya ditolak", async () => {
+    const stockBefore =
+      (await findProduct(test.db, test.business.id, berasId))?.stock ?? 0;
     const { draftId } = await submitDraft("Tambah stok beras 20 kilogram");
     const pending = await findPendingApproval(draftId);
     const decided = await decideApproval(
@@ -146,6 +153,9 @@ describe("antrean persetujuan", () => {
     expect(decided?.status).toBe("ditolak");
     expect((await findPurchaseOrder(test.db, test.business.id, draftId))?.status).toBe(
       "ditolak",
+    );
+    expect((await findProduct(test.db, test.business.id, berasId))?.stock).toBe(
+      stockBefore,
     );
   });
 

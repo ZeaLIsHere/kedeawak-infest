@@ -4,7 +4,7 @@ import type { Database } from "../db/client";
 import { approvals, type Approval } from "../db/schema";
 import { isUuid } from "./ids";
 import { assertPurchaseOrderOwned } from "./ownership";
-import { decidePurchaseOrder } from "./purchase-orders";
+import { applyPurchaseOrderDecision } from "./purchase-orders";
 
 /**
  * Muatan sebuah aksi yang menunggu persetujuan.
@@ -166,7 +166,7 @@ export async function decideApproval(
         throw new Error("Muatan aksi pesanan pembelian tidak memuat kunci draft");
       }
 
-      const decided = await decidePurchaseOrder(
+      const decided = await applyPurchaseOrderDecision(
         tx,
         businessId,
         purchaseOrderId,
