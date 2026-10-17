@@ -76,8 +76,8 @@ sini.`
 
 ### 2.5 Pemeriksaan otomatis
 
-Skrip `src/scripts/lint-ui-copy.ts` memindai berkas di `src/` dan
-`src/lib/db/seed.ts` untuk:
+Skrip `src/scripts/lint-ui-copy.ts` memindai berkas di `src/`, termasuk
+`src/lib/db/seed.ts`, untuk:
 
 1. Karakter emoji dan simbol unicode dekoratif.
 2. Karakter dash pada string yang terdeteksi sebagai teks antarmuka.
@@ -88,8 +88,16 @@ Cara kerja deteksinya:
 1. Kumpulkan semua literal string dan JSX text node dari berkas TypeScript dan
    TSX.
 2. Lewati string yang bukan teks pengguna: `className`, atribut `import`,
-   alamat halaman, nama variabel, kunci objek, dan pesan galat pengembang.
+   alamat halaman, nama variabel, kunci objek, nama variabel CSS, argumen `cn`
+   dan `cva`, tipe literal, dan pesan galat pengembang.
 3. Laporkan berkas, nomor baris, potongan teks, dan aturan yang dilanggar.
+4. Berkas yang gagal diurai dilaporkan sebagai kegagalan, bukan dilewati diam
+   diam.
+
+Yang tidak ikut diperiksa: `src/lib/ui-copy/rules.ts` karena memuat daftar
+karakter dan kata terlarang, `src/scripts/` karena berisi teks perkakas
+pengembang, dan berkas pengujian karena memuat contoh teks yang sengaja
+melanggar. Aturan teks UI sendiri diuji lewat `npm test`.
 
 Perintah: `npm run lint:ui`.
 

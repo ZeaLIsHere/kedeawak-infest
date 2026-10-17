@@ -39,6 +39,13 @@ const EXCLUDED_FILES: readonly string[] = ["src/lib/ui-copy/rules.ts"];
 const EXCLUDED_DIRECTORIES: readonly string[] = ["src/scripts"];
 
 /**
+ * Berkas pengujian memuat contoh teks yang sengaja melanggar aturan, jadi
+ * teksnya bukan teks antarmuka dan tidak ikut diperiksa. Aturan teks UI sendiri
+ * diuji lewat `npm test` pada `src/lib/ui-copy/rules.test.ts`.
+ */
+const TEST_FILE_PATTERN = /\.(test|spec)\.tsx?$/u;
+
+/**
  * Atribut JSX yang nilainya bukan teks antarmuka: kelas gaya, alamat, nama
  * teknologi, dan pengatur perilaku. Atribut lain tetap diperiksa, termasuk
  * `placeholder`, `alt`, `title`, dan `aria-label`, karena semuanya dibaca
@@ -352,6 +359,10 @@ const collectSourceFiles = (directory: string, root: string): readonly string[] 
 
     if (entry.isDirectory()) {
       files.push(...collectSourceFiles(full, root));
+      continue;
+    }
+
+    if (TEST_FILE_PATTERN.test(entry.name)) {
       continue;
     }
 
