@@ -90,4 +90,16 @@ describe("pesan Twilio sampai data aplikasi", () => {
   await expect(receiveTwilioMessage(test.db,test.business.id,message("wrongphone","6281200000005","pesan beras"),config,{provider:orderProvider})).rejects.toThrow();
   await updateBusinessChannel(test.db,test.business.id,{status:"terhubung",packageName:"Twilio Sandbox",phoneNumber:"14155238886",connectedAt:null,quota:null,checkedAt:new Date()});
  });
+ it("teks pesanan menjadi orderan sekali dan balasannya tercatat", async () => {
+  const body = "Saya mau dua kilogram Beras Uji";
+  const input = message("textorder","6281200000006",body);
+  const result = await receiveTwilioMessage(test.db,test.business.id,input,config,{provider:orderProvider});
+  expect(result.orderId).toBeDefined();
+  const overview = await getChannelOverview(test.db,test.business.id);
+  const order = overview.orders.find(item=>item.id===result.orderId);
+  expect(order?.origin).toBe(body);
+  expect(order?.reply).toContain("Pesanan tercatat");
+  const duplicate = await receiveTwilioMessage(test.db,test.business.id,input,config,{provider:orderProvider});
+  expect(duplicate.duplicate).toBe(true);
+ });
 });

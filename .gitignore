@@ -55,5 +55,5 @@ Thumbs.db
 /public/uploads/
 
 # keluaran server verifikasi terpisah
-.next-test-completion/
-.next-build-completion/
+.next-test-*/
+.next-build-*/

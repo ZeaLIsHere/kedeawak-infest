@@ -218,8 +218,11 @@ sebelum Twilio ada pada `docs/verification/2026-10-18-checkpoint.md`: peramban
 `NEXT_DIST_DIR=.next-test-completion`, dan
 `PLAYWRIGHT_BASE_URL=http://localhost:3100`, dipasang pada proses tanpa
 mengubah `.env.local`. Hasil lama tidak membuktikan Twilio, Groq, DeepSeek,
-foto/audio provider, atau mikrofon nyata sudah lulus. Rencana uji baru ada di
-`docs/plans/2026-10-18-twilio.md`; proyek belum memenuhi seluruh kriteria demo.
+foto/audio provider, atau mikrofon nyata sudah lulus. Bukti pemeriksaan
+implementasi Twilio ada pada `docs/verification/2026-10-18-twilio.md`; uji itu
+memakai port 3110 karena port 3100 dipakai proses lain. Rencana dan batas uji
+berikutnya ada di `docs/plans/2026-10-18-twilio.md`; proyek belum memenuhi
+seluruh kriteria demo.
 
 ## Dokumen
 
@@ -236,6 +239,7 @@ foto/audio provider, atau mikrofon nyata sudah lulus. Rencana uji baru ada di
 | `docs/specs/2026-10-17-kasir-kelola-produk-design.md` | Rancangan Kasir, produk dan Persetujuan           |
 | `docs/plans/2026-10-18-penyelesaian-web.md`           | Rencana sesi sebelumnya                           |
 | `docs/plans/2026-10-18-twilio.md`                     | Rencana migrasi Twilio Sandbox                    |
+| `docs/verification/2026-10-18-twilio.md`              | Bukti pemeriksaan implementasi Twilio             |
 | `docs/THIRD-PARTY-SKILLS.md`                          | Asal dan lisensi skills pihak ketiga              |
 
 ## Kontribusi dan lisensi

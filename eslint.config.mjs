@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
   globalIgnores([
     // Bawaan eslint-config-next
     ".next/**",
+    ".next-test-*/**",
+    ".next-build-*/**",
     "out/**",
     "build/**",
     "next-env.d.ts",
