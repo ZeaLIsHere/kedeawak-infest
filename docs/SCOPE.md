@@ -29,7 +29,7 @@ proposal. Yang ketujuh, Kasir, ditambahkan atas permintaan pemilik proyek.
 | --- | ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ------ |
 | S1  | Dasbor                    | Statistik penjualan, pengeluaran, laba, jumlah order, produk terlaris, alert stok terbaru                                                             | MASUK  |
 | S2  | Percakapan dengan Agen AI | Obrolan dengan AI untuk mencatat transaksi lewat teks, voice note, dan foto struk, termasuk konfirmasi dan persetujuan aksi                           | MASUK  |
-| S3  | Integrasi WhatsApp        | Twilio Sandbox, koneksi aplikasi, peserta opt in, orderan teks/suara, foto bukti, pencocokan nominal dan balasan nyata; panel simulasi tetap tersedia | MASUK  |
+| S3  | Integrasi WhatsApp        | Daftar pesanan WhatsApp. Kontrol koneksi, kotak masuk, panel simulasi, dan pengaturan pelanggan ditunda sampai rancangan baru disepakati | MASUK  |
 | S4  | Laporan Keuangan          | Laporan harian dan mingguan: penjualan, pengeluaran, laba, rincian transaksi                                                                          | MASUK  |
 | S5  | Stok dan Produk           | Daftar, tambah, ubah, dan arsip produk, stok, ambang minimum, alert, penyesuaian beralasan, asisten dengan dialog tinjau                              | MASUK  |
 | S6  | Persetujuan               | Antrean aksi yang menunggu persetujuan pemilik, contohnya draft PO ke supplier, dengan aksi setujui atau tolak                                        | MASUK  |
@@ -66,11 +66,16 @@ Enam fitur dari bagian "Fitur Utama" proposal.
 
 Keputusan terbaru user menggantikan keputusan Fonnte/simulasi saja.
 
-- **Koneksi:** S3 menampilkan konfigurasi Twilio Sandbox, tata cara join,
-  Hubungkan dan Putuskan aplikasi. Pemilik mengaktifkan pemrosesan secara
-  eksplisit; peserta mengirim kode join Sandbox untuk opt in. Nomor Sandbox
-  bukan klaim bahwa nomor pribadi pemilik sudah dimigrasi. Putuskan hanya
-  menghentikan pemrosesan lokal, bukan keluar dari Sandbox Twilio.
+- **Tampilan saat ini:** permukaan S3 hanya menampilkan daftar pesanan.
+  Kontrol koneksi, kotak masuk, panel simulasi, dan pengaturan data pelanggan
+  tidak ditampilkan sampai rancangan baru disepakati. Endpoint webhook dan
+  pemrosesan pesan tetap tersedia di balik layar.
+- **Koneksi:** backend menyediakan konfigurasi Twilio Sandbox, tata cara join,
+  Hubungkan dan Putuskan aplikasi. Kontrol ini belum ditampilkan di S3 sampai
+  rancangan baru disepakati. Pemilik mengaktifkan pemrosesan secara eksplisit;
+  peserta mengirim kode join Sandbox untuk opt in. Nomor Sandbox bukan klaim
+  bahwa nomor pribadi pemilik sudah dimigrasi. Putuskan hanya menghentikan
+  pemrosesan lokal, bukan keluar dari Sandbox Twilio.
 - **Pesan nyata:** teks dan voice note peserta membentuk orderan; audio
   ditranskripsi Groq Whisper lalu DeepSeek menafsirkan transkrip. Transkrip
   disimpan sebagai pesan asal orderan. Gagal transkripsi/interpretasi meminta
@@ -84,9 +89,10 @@ Keputusan terbaru user menggantikan keputusan Fonnte/simulasi saja.
   confidence rendah tetap menunggu. Perilaku lama tidak diubah: nominal cocok
   dan confidence >= 0.7 otomatis menyelesaikan orderan, mencatat penjualan dan
   stok sekali. Ini pencocokan nominal, **bukan verifikasi bank** atau saldo.
-- **Tampilan:** hasil berupa orderan, bukti, pesan asal/transkrip dan balasan
-  agen, bukan halaman obrolan pelanggan. Polling atau muat ulang UI dilakukan
-  setelah pemrosesan latar selesai; refresh otomatis belum diklaim tersedia.
+- **Tampilan:** daftar pesanan beserta rincian item, status pesanan, keadaan
+  pembayaran, dan pesan asal pelanggan. Balasan agen tidak ditampilkan di S3,
+  dan tidak ada halaman obrolan pelanggan. Muat ulang halaman dilakukan manual
+  setelah pemrosesan latar selesai.
 - **Webhook:** `POST /api/channels/whatsapp` adalah Route Handler Next pada
   server UI yang sama port 3100. Parse semua parameter form dan validasi SDK
   resmi `X-Twilio-Signature` terhadap `WEBHOOK_URL` HTTPS ngrok lengkap persis.
@@ -97,7 +103,8 @@ Keputusan terbaru user menggantikan keputusan Fonnte/simulasi saja.
   sukses. Biarkan server hidup; jika tidak ada balasan, kirim ulang pesan baru.
 - **Simulasi tetap ada:** panel pelanggan tiruan memakai jalur domain yang
   sama tanpa mengirim pesan provider nyata. Ini jalur lokal, bukan pengganti
-  bukti penerimaan Sandbox. Kredensial tidak disimpan di repo.
+  bukti penerimaan Sandbox. Kredensial tidak disimpan di repo. Panel ini belum
+  ditampilkan di S3 sampai pembahasan berikutnya.
 
 ### 3.2 Ekstraksi Data Multimodal — MASUK
 

@@ -41,9 +41,9 @@ diperbarui 18 Oktober 2026.
 | 2    | Basis data dan lapisan data         | 8       | 8     |
 | 3    | Tool layer                          | 12      | 12    |
 | 4    | Lapisan AI dan context lock         | 5       | 10    |
-| 5    | Permukaan aplikasi                  | 35      | 46    |
+| 5    | Permukaan aplikasi                  | 33      | 46    |
 | 6    | Pematangan dan bukti                | 2       | 7     |
-|      | Jumlah                              | 82      | 103   |
+|      | Jumlah                              | 80      | 103   |
 
 Checkpoint penghentian sebelumnya dipertahankan sebagai riwayat di bawah.
 Pekerjaan kanal dibuka kembali sesuai persetujuan Twilio Sandbox. T5.13 dan
@@ -325,15 +325,19 @@ Tujuan: tujuh permukaan berfungsi penuh, sesuai `docs/SCOPE.md` bagian 2.
 
 ### S3 Integrasi WhatsApp
 
+Catatan 18 Oktober 2026: permukaan S3 sementara hanya menampilkan daftar
+pesanan. Kontrol koneksi, kotak masuk, panel simulasi, dan pengaturan data
+pelanggan tidak ditampilkan sampai rancangan baru disepakati.
+
 | ID    | Tugas                                                                                                | Status |
 | ----- | ---------------------------------------------------------------------------------------------------- | ------ |
 | T5.11 | Status koneksi nomor WhatsApp                                                                        | `[~]`  |
 | T5.12 | Tata cara dan aksi Hubungkan ke WhatsApp sampai berstatus terhubung, beserta aksi memutuskan koneksi | `[~]`  |
 | T5.13 | Orderan WhatsApp dari teks dan transkrip voice note Fonnte                                          | `[~]`  |
 | T5.14 | Foto bukti pada orderan sendiri yang tidak ambigu, pencocokan nominal bukan verifikasi bank          | `[~]`  |
-| T5.15 | Panel pengirim pesan tiruan sebagai pelanggan, permukaan WhatsApp kini memuat daftar pesanan         | `[x]`  |
+| T5.15 | Panel pengirim pesan tiruan tersedia di kode, belum ditampilkan di S3                                | `[~]`  |
 | T5.16 | Balasan otomatis tercatat dan dikirim nyata melalui Fonnte                                           | `[~]`  |
-| T5.17 | Penghapusan data pelanggan dari antarmuka                                                            | `[x]`  |
+| T5.17 | Penghapusan data pelanggan tersedia di kode, belum ditampilkan di S3                                 | `[~]`  |
 
 Catatan terkini: Fonnte menggantikan Twilio Sandbox berdasarkan keputusan
 user. Permukaan WhatsApp menampilkan daftar pesanan dari pesan masuk di atas
