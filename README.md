@@ -44,6 +44,7 @@ Enam permukaan aplikasi, sesuai `docs/SCOPE.md`:
 | --- | --- |
 | `AGENTS.md` | Aturan main kerja. Wajib dibaca lebih dulu |
 | `PLAN.md` | Rencana induk dan daftar tugas |
+| `DESIGN.md` | Arah visual, warna, huruf, tata letak, dan larangan tampilan |
 | `docs/PRODUCT.md` | Kebenaran produk hasil ekstraksi proposal |
 | `docs/SCOPE.md` | Batas fitur, termasuk yang tidak dikerjakan |
 | `docs/ARCHITECTURE.md` | Tumpukan teknologi, struktur, skema data |

@@ -172,7 +172,7 @@ Yang **wajib** masuk git:
 - migrasi basis data
 - skrip seed
 - berkas konfigurasi proyek
-- seluruh dokumen di `docs/`, `AGENTS.md`, dan `PLAN.md`
+- seluruh dokumen di `docs/`, `AGENTS.md`, `DESIGN.md`, dan `PLAN.md`
 
 `.env.example` harus memuat semua nama variabel yang dibutuhkan, dalam bentuk
 kosong atau contoh, tanpa nilai rahasia.
