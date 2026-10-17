@@ -359,6 +359,21 @@ Ini yang dimaksud human in the loop pada proposal, dan wajib.
 6. Pesan masuk dari webhook wajib divalidasi terhadap skema sebelum dipakai,
    karena bentuk payload penyedia berbeda beda dan isinya berasal dari luar.
 
+Rincian enkripsi, sesuai `src/lib/crypto/field-encryption.ts`:
+
+1. Penyandian memakai AES-256-GCM. Perubahan satu bita pada teks terenkripsi
+   membuat pembukaan gagal, bukan menghasilkan teks yang salah.
+2. Teks terenkripsi disimpan dengan awalan versi, bentuknya
+   `v1:iv:tag:isi`. Bentuk lama masih dapat dikenali bila cara penyandian
+   berganti.
+3. Nomor telepon disidik jari dengan HMAC-SHA256, bukan hash biasa, supaya
+   nomor tidak dapat ditebak dengan mencoba seluruh nomor yang mungkin.
+4. Dua kunci diturunkan dari satu `FIELD_ENCRYPTION_KEY` memakai HKDF, supaya
+   kunci penyandian dan kunci sidik jari tidak pernah sama.
+5. Nomor diseragamkan lebih dulu, sehingga `0812...`, `62812...`, dan
+   `+62 812 ...` menghasilkan sidik jari yang sama. Tanpa keseragaman ini,
+   pelanggan yang sama akan tercatat dua kali.
+
 ## 9. Pengujian
 
 | Tingkat        | Alat          | Sasaran                                                                                                        |

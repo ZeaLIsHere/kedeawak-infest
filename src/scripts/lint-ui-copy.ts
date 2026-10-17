@@ -115,6 +115,30 @@ const STYLING_HELPERS: ReadonlySet<string> = new Set([
 /** Nama variabel CSS, misalnya `--font-geist-sans`, bukan teks antarmuka. */
 const CSS_VARIABLE_PATTERN = /^--[A-Za-z0-9-]+$/u;
 
+/**
+ * Penanda baris untuk teks yang bukan teks antarmuka.
+ *
+ * Sebagian nama berasal dari luar dan memang memuat tanda hubung, misalnya
+ * nama algoritma penyandian milik OpenSSL. Nama seperti itu tidak boleh
+ * diubah, dan tidak pernah dilihat pengguna. Penanda hanya berlaku bila
+ * disertai alasan tertulis, jadi penulisan tanpa alasan tidak mengecualikan
+ * apa pun dan pelanggarannya tetap dilaporkan.
+ */
+const IGNORE_MARKER_PATTERN = /lint-ui-ignore:\s*\S/u;
+
+/** Nomor baris yang dikecualikan dari pemeriksaan. */
+const ignoredLines = (source: string): ReadonlySet<number> => {
+  const lines = new Set<number>();
+
+  source.split(/\r?\n/u).forEach((line, index) => {
+    if (IGNORE_MARKER_PATTERN.test(line)) {
+      lines.add(index + 1);
+    }
+  });
+
+  return lines;
+};
+
 /** Satu potongan teks antarmuka beserta barisnya. */
 export type UiTextPiece = {
   readonly text: string;
@@ -324,8 +348,13 @@ export function scanSource(
   }
 
   const violations: ScannedViolation[] = [];
+  const ignored = ignoredLines(source);
 
   for (const piece of extractUiText(sourceFile)) {
+    if (ignored.has(piece.line)) {
+      continue;
+    }
+
     for (const violation of findViolationsInText(piece.text)) {
       violations.push({
         file: fileName,

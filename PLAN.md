@@ -34,14 +34,14 @@ diperbarui 17 Oktober 2026.
 | ---- | ----------------------------------- | ------- | ----- |
 | 0    | Fondasi repo dan aturan main        | 11      | 11    |
 | 1    | Kerangka aplikasi dan sistem desain | 9       | 9     |
-| 2    | Basis data dan lapisan data         | 3       | 8     |
+| 2    | Basis data dan lapisan data         | 4       | 8     |
 | 3    | Tool layer                          | 0       | 12    |
 | 4    | Lapisan AI dan context lock         | 0       | 10    |
 | 5    | Permukaan aplikasi                  | 0       | 32    |
 | 6    | Pematangan dan bukti                | 0       | 7     |
-|      | Jumlah                              | 23      | 89    |
+|      | Jumlah                              | 24      | 89    |
 
-Fokus berikutnya: T2.4.
+Fokus berikutnya: T2.5.
 
 Pelacak kedua adalah riwayat git. Setiap commit memuat baris `Refs:` yang
 menunjuk ID tugas, sehingga `git log` dapat dipakai untuk menelusuri kapan
@@ -119,7 +119,7 @@ Tujuan: seluruh data scope punya tempat tinggal, dan bisa diisi data demo.
 | T2.1 | Definisi skema lengkap                        | Semua tabel di `docs/ARCHITECTURE.md` bagian 4                    | `[x]`  |
 | T2.2 | Pemilih driver PGlite dan Postgres            | Satu kode, dua driver, dipilih dari lingkungan                    | `[x]`  |
 | T2.3 | Migrasi dan perintah penerapannya             | `npm run db:migrate`                                              | `[x]`  |
-| T2.4 | Enkripsi nama dan nomor telepon pelanggan     | Data disimpan terenkripsi, butir privasi proposal                 | `[ ]`  |
+| T2.4 | Enkripsi nama dan nomor telepon pelanggan     | Data disimpan terenkripsi, butir privasi proposal                 | `[x]`  |
 | T2.5 | Lapisan akses data untuk tiap entitas         | `src/lib/data/`, satu pintu, semua query memuat `business_id`     | `[ ]`  |
 | T2.6 | Perhitungan stok terkini dari pergerakan stok | Stok konsisten, setiap perubahan meninggalkan jejak               | `[ ]`  |
 | T2.7 | Skrip seed data demo                          | Satu warung, sekitar 20 produk, riwayat transaksi beberapa minggu | `[ ]`  |

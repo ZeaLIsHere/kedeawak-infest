@@ -80,7 +80,8 @@ Skrip `src/scripts/lint-ui-copy.ts` memindai berkas di `src/`, termasuk
 `src/lib/db/seed.ts`, untuk:
 
 1. Karakter emoji dan simbol unicode dekoratif.
-2. Karakter dash pada string yang terdeteksi sebagai teks antarmuka.
+2. Karakter dash pada string yang tidak dilewati oleh penyaringan di bawah
+   ini, bukan hanya string yang tampil di antarmuka.
 3. Kata terlarang: `lorem`, `ipsum`, `TODO`, `placeholder`, `Coming soon`.
 
 Cara kerja deteksinya:
@@ -93,6 +94,22 @@ Cara kerja deteksinya:
 3. Laporkan berkas, nomor baris, potongan teks, dan aturan yang dilanggar.
 4. Berkas yang gagal diurai dilaporkan sebagai kegagalan, bukan dilewati diam
    diam.
+
+Sebagian nama berasal dari luar dan memang memuat tanda hubung, misalnya nama
+algoritma penyandian milik OpenSSL. Untuk kasus seperti itu, barisnya diberi
+penanda beserta alasan tertulis:
+
+```ts
+const ALGORITHM = "aes-256-gcm"; // lint-ui-ignore: nama algoritma milik OpenSSL
+```
+
+Aturan pemakaian penanda:
+
+1. Penanda hanya berlaku pada barisnya sendiri, bukan seluruh berkas.
+2. Penanda wajib disertai alasan setelah tanda titik dua. Penanda tanpa alasan
+   tidak mengecualikan apa pun, sehingga pelanggarannya tetap dilaporkan.
+3. Penanda tidak boleh dipakai untuk teks yang dilihat pengguna. Teks seperti
+   itu harus diperbaiki, bukan dikecualikan.
 
 Yang tidak ikut diperiksa: `src/lib/ui-copy/rules.ts` karena memuat daftar
 karakter dan kata terlarang, `src/scripts/` karena berisi teks perkakas

@@ -122,6 +122,37 @@ describe("scanSource", () => {
     expect(scanSource(code, "src/contoh.tsx")).toEqual([]);
   });
 
+  it("melewati baris yang bertanda pengecualian beserta alasannya", () => {
+    const violations = scanSource(
+      'export const algoritma = "aes-256-gcm"; // lint-ui-ignore: nama dari OpenSSL',
+      "src/contoh.ts",
+    );
+
+    expect(violations).toEqual([]);
+  });
+
+  it("tetap melaporkan baris bertanda pengecualian tanpa alasan", () => {
+    const violations = scanSource(
+      'export const algoritma = "aes-256-gcm"; // lint-ui-ignore:',
+      "src/contoh.ts",
+    );
+
+    expect(violations).toHaveLength(1);
+    expect(violations[0].rule).toBe("dash");
+  });
+
+  it("hanya mengecualikan baris yang bertanda, bukan seluruh berkas", () => {
+    const code = [
+      'export const algoritma = "aes-256-gcm"; // lint-ui-ignore: nama dari OpenSSL',
+      'export const pesan = "Rp15.000-20.000";',
+    ].join("\n");
+
+    const violations = scanSource(code, "src/contoh.ts");
+
+    expect(violations).toHaveLength(1);
+    expect(violations[0].line).toBe(2);
+  });
+
   it("melempar galat pada berkas yang gagal diurai", () => {
     expect(() =>
       scanSource('export const rusak = "tanpa penutup;', "src/rusak.ts"),
