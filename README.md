@@ -11,8 +11,8 @@ Universitas Sumatera Utara, 2026.
 
 ## Status
 
-Proyek sedang pada tahap penyusunan fondasi. Belum ada kode aplikasi.
-Lihat `PLAN.md` untuk urutan pekerjaan.
+Proyek sedang pada tahap fondasi. Kerangka aplikasi sudah berjalan, tetapi
+fitur belum ada. Lihat `PLAN.md` untuk urutan pekerjaan.
 
 ## Masalah yang diselesaikan
 
@@ -33,7 +33,7 @@ Enam permukaan aplikasi, sesuai `docs/SCOPE.md`:
 | --- | --- |
 | Dasbor | Statistik penjualan, pengeluaran, laba, order, alert stok |
 | Percakapan dengan Agen AI | Mencatat transaksi lewat teks, suara, dan foto struk |
-| Integrasi WhatsApp | Chat pelanggan, orderan, bukti pembayaran |
+| Integrasi WhatsApp | Status koneksi WhatsApp, orderan, bukti pembayaran, status verifikasi |
 | Laporan Keuangan | Laporan harian dan mingguan |
 | Stok dan Produk | Produk, stok, ambang minimum, alert, prediksi restok |
 | Persetujuan | Antrean aksi menunggu persetujuan, misalnya draft PO |
@@ -53,7 +53,22 @@ Enam permukaan aplikasi, sesuai `docs/SCOPE.md`:
 
 ## Menjalankan
 
-Belum tersedia. Akan diisi pada fase 1 di `PLAN.md`.
+```bash
+npm install
+npm run dev
+```
+
+Buka http://localhost:3000.
+
+Perintah lain:
+
+| Perintah | Fungsi |
+| --- | --- |
+| `npm run build` | Bangun aplikasi untuk produksi |
+| `npm run lint` | Periksa aturan kode |
+| `npm start` | Jalankan hasil bangun produksi |
+
+Persyaratan: Node.js 24 atau lebih baru.
 
 ## Aturan yang mengikat
 

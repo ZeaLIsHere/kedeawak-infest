@@ -216,3 +216,7 @@ Detail lengkap ada di `docs/CONVENTIONS.md`. Ringkasnya:
 - Semua akses data lewat satu lapisan (`src/lib/data/`), bukan langsung dari
   komponen ke database.
 - Semua penggunaan AI lewat satu lapisan (`src/lib/ai/`), bukan tersebar.
+- **Next.js di proyek ini versi 16, yang punya perubahan besar dibanding versi
+  lama.** Sebelum menulis kode Next.js, baca dulu panduan yang sesuai topiknya
+  di `node_modules/next/dist/docs/`. Jangan mengandalkan ingatan pada versi
+  Next.js yang lain.

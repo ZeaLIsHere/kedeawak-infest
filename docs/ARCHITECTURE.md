@@ -340,8 +340,16 @@ langsung dari dokumentasi resmi. Tanggal: 17 Oktober 2026.
 | A6 | Identitas git dan autentikasi push | Nama `ZeaLIsHere`, email noreply GitHub, kredensial Windows Credential Manager | Push sudah terverifikasi berhasil |
 | A7 | Akses skill desain | Belum diputuskan, akan dipakai saat fase 1 | Data skill dibaca lewat Node selama Python belum terpasang |
 | A8 | Penyedia kanal WhatsApp | **Belum diputuskan.** Meta Cloud API, Fonnte, atau n8n sebagai perantara | User menunda keputusan. Rincian pertimbangan ada di bagian 11 |
+| A9 | Versi dan opsi bawaan Next.js | Next.js 16.4.2, React 19.3.0, Tailwind 4, `cacheComponents` aktif, `partialPrefetching` aktif | Keluaran `create-next-app`. Lihat catatan di bawah tabel |
+| A10 | Penulisan otomatis blok aturan Next.js ke `AGENTS.md` | Dimatikan, memakai `agentRules: false` pada `next.config.ts` | `AGENTS.md` dikelola tim. Panduan Next.js 16 dibaca dari `node_modules/next/dist/docs/` |
 
-### 11. Penyedia kanal WhatsApp yang belum diputuskan
+Catatan A9: `cacheComponents` aktif berarti halaman yang membaca data saat
+berjalan wajib dibungkus `Suspense` atau memakai arahan `"use cache"`.
+Peraturan ini harus dipatuhi mulai fase 2, saat lapisan data dipasang. Bila
+ternyata terlalu menyulitkan untuk tempo lomba, opsi ini dapat dimatikan, dan
+keputusan itu dicatat ulang di tabel ini.
+
+## 11. Penyedia kanal WhatsApp yang belum diputuskan
 
 Permukaan S3 memuat aksi Hubungkan ke WhatsApp beserta tata caranya. Isi tata
 cara itu bergantung pada penyedia yang dipilih, sehingga bagian ini sengaja

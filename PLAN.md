@@ -71,7 +71,7 @@ terkunci.
 
 | ID | Tugas | Hasil | Status |
 | --- | --- | --- | --- |
-| T1.1 | Inisialisasi Next.js dengan TypeScript strict | Aplikasi berjalan di `npm run dev` | `[ ]` |
+| T1.1 | Inisialisasi Next.js dengan TypeScript strict | Aplikasi berjalan di `npm run dev` | `[x]` |
 | T1.2 | Pasang Tailwind, shadcn/ui, dan lucide-react | Komponen dasar tersedia, ikon memakai SVG | `[ ]` |
 | T1.3 | Susun token desain tiga lapis | Warna, jarak, ukuran huruf dari token, tanpa nilai langsung | `[ ]` |
 | T1.4 | Kunci arah visual sesuai proposal | Clean, minimalis, rata. Gaya chat first. Dibuktikan lewat `DESIGN.md` | `[ ]` |
