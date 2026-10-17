@@ -79,7 +79,7 @@ terkunci.
 | T1.6 | Buat skrip `lint:ui`                           | Menolak emoji dan tanda hubung pada teks UI                           | `[x]`  |
 | T1.7 | Pasang ESLint, Prettier, dan skrip `typecheck` | `npm run lint`, `npm run typecheck` berjalan                          | `[x]`  |
 | T1.8 | Pasang Vitest dan Playwright                   | `npm test` dan `npm run test:e2e` berjalan                            | `[x]`  |
-| T1.9 | Siapkan `.env.example`                         | Semua nama variabel tercatat, tanpa nilai rahasia                     | `[ ]`  |
+| T1.9 | Siapkan `.env.example`                         | Semua nama variabel tercatat, tanpa nilai rahasia                     | `[x]`  |
 
 Kriteria selesai fase 1: `npm run build`, `npm run lint`, dan `npm run lint:ui`
 lulus pada aplikasi kosong yang sudah bernavigasi.
