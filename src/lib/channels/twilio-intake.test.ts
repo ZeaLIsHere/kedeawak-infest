@@ -4,6 +4,7 @@ import { createProduct } from "../data/products";
 import { recordStockMovement } from "../data/stock";
 import { updateBusinessChannel } from "../data/business";
 import { getChannelOverview, processChannelEvent } from "../data/channel-intake";
+import { findConversationByPhone, listMessages } from "../data/conversations";
 import { listOrders } from "../data/orders";
 import { listCustomers } from "../data/customers";
 import type { AIProvider } from "../ai/provider";
@@ -101,5 +102,14 @@ describe("pesan Twilio sampai data aplikasi", () => {
   expect(order?.reply).toContain("Pesanan tercatat");
   const duplicate = await receiveTwilioMessage(test.db,test.business.id,input,config,{provider:orderProvider});
   expect(duplicate.duplicate).toBe(true);
+ });
+ it("pertanyaan teks dibalas AI dan hanya satu balasan agen", async () => {
+  const provider: AIProvider = {complete:vi.fn(async()=>({reply:"Beras Uji tersedia 28 kilogram, harga Rp15.000."}))};
+  const input = message("textquestion","6281200000007","Apakah beras tersedia?");
+  const result = await receiveTwilioMessage(test.db,test.business.id,input,config,{provider});
+  expect(result.reply).toContain("Beras Uji tersedia");
+  const conversation = await findConversationByPhone(test.db,test.business.id,"6281200000007");
+  const saved = await listMessages(test.db,test.business.id,conversation?.id ?? "");
+  expect(saved.filter(item=>item.sender==="agent").map(item=>item.body)).toEqual([result.reply]);
  });
 });

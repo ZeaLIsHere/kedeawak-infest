@@ -36,6 +36,8 @@ const MEDIA_TYPES = new Set([
   "audio/ogg",
   "audio/mpeg",
   "audio/mp4",
+  "audio/aac",
+  "audio/amr",
   "audio/wav",
   "audio/x-wav", // lint-ui-ignore: MIME resmi audio WAV
   "audio/webm",
@@ -123,8 +125,6 @@ function initialMediaUrl(value: string, config: TwilioConfig): URL {
   const suffix = url.pathname.slice(prefix.length);
   if (
     url.hostname !== "api.twilio.com" ||
-    url.search ||
-    value.includes("?") ||
     value !== url.href ||
     !url.pathname.startsWith(prefix) ||
     !/^(?:SM|MM)[\da-fA-F]{32}\/Media\/ME[\da-fA-F]{32}$/.test(suffix)
@@ -252,6 +252,14 @@ function matchesMagic(bytes: Uint8Array, contentType: string): boolean {
       );
     case "audio/mp4":
       return bytes.length >= 12 && ascii(4, "ftyp");
+    case "audio/aac":
+      return (
+        bytes.length >= 2 &&
+        bytes[0] === 0xff &&
+        ((bytes[1]! & 0xf6) === 0xf0 || (bytes[1]! & 0xf6) === 0xf4)
+      );
+    case "audio/amr":
+      return ascii(0, "#!AMR");
     case "audio/wav":
     case "audio/x-wav": // lint-ui-ignore: MIME resmi audio WAV
       return ascii(0, "RIFF") && ascii(8, "WAVE");

@@ -47,9 +47,12 @@ async function processMessage(
     if (result && !result.duplicate) {
       for (const path of PATHS) revalidatePath(path);
     }
-  } catch {
+  } catch (error) {
     // Kegagalan pemrosesan latar tidak boleh membocorkan kredensial ke respons.
-    console.error("Pemrosesan pesan WhatsApp belum berhasil");
+    console.error(
+      "Pemrosesan pesan WhatsApp belum berhasil",
+      error instanceof Error ? error.message : "Kesalahan tidak dikenal",
+    );
   }
 }
 
@@ -82,7 +85,15 @@ export async function POST(request: Request): Promise<Response> {
   let message: TwilioMessage;
   try {
     message = parseTwilioMessage(params, config);
-  } catch {
+  } catch (error) {
+    console.error(
+      "Pesan Twilio ditolak",
+      error instanceof Error ? error.message : "Kesalahan tidak dikenal",
+      "media",
+      params.NumMedia ?? "0",
+      "tipe",
+      params.MediaContentType0 ?? "tidak ada",
+    );
     return textResponse("Pesan belum sesuai", 400);
   }
 

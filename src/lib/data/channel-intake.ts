@@ -22,7 +22,7 @@ export type ChannelEvent = {
   readonly items?:readonly {productId:string;quantity:number}[];
   readonly payment?:{orderId:string;readAmount?:number;confidence:number;proofUrl?:string};
 };
-export type ChannelEventResult={duplicate:boolean;orderId?:string;paymentStatus?:"menunggu"|"cocok"|"tidak_cocok";reply:string};
+export type ChannelEventResult={duplicate:boolean;conversationId?:string;orderId?:string;paymentStatus?:"menunggu"|"cocok"|"tidak_cocok";reply:string};
 async function prior(db:Database,businessId:string,eventId:string) {
   const [row]=await db.select().from(messages).where(and(eq(messages.businessId,businessId),eq(messages.externalId,eventId))).limit(1);
   return row;
@@ -35,7 +35,7 @@ export async function listPendingChannelOrders(db:Database,businessId:string,pho
   if(!customer)return [];
   return (await listOrders(db,businessId)).filter(order=>order.customerId===customer.id&&order.conversationId!==null&&order.status!=="selesai");
 }
-export async function processChannelEvent(db:Database,businessId:string,event:ChannelEvent):Promise<ChannelEventResult> {
+export async function processChannelEvent(db:Database,businessId:string,event:ChannelEvent,options:{appendReply?:boolean}={}):Promise<ChannelEventResult> {
   if (await prior(db,businessId,event.eventId)) return {duplicate:true,reply:"Pesan ini sudah tercatat"};
   try {
     return await db.transaction(async tx=>{
@@ -47,10 +47,10 @@ export async function processChannelEvent(db:Database,businessId:string,event:Ch
       }
       const incoming=await recordInboundMessage(tx,businessId,{channel:"whatsapp",phoneNumber:event.phoneNumber,customerName:event.customerName,body:event.body,kind:event.kind ?? (event.payment?.proofUrl ? "image" : "text"),mediaUrl:event.image ?? event.payment?.proofUrl});
       await tx.update(messages).set({externalId:event.eventId}).where(and(eq(messages.businessId,businessId),eq(messages.id,incoming.message.id)));
-      let result:ChannelEventResult={duplicate:false,reply:"Pesan pelanggan sudah tercatat"};
+      let result:ChannelEventResult={duplicate:false,conversationId:incoming.conversation.id,reply:"Pesan pelanggan sudah tercatat"};
       if (itemInputs.length) {
         const made=await createOrder(tx,businessId,{customerId:incoming.customer.id,conversationId:incoming.conversation.id,items:itemInputs});
-        result={duplicate:false,orderId:made.order.id,reply:"Pesanan tercatat dengan total "+formatRupiah(made.order.total)+". Kode pesanan "+made.order.id.replaceAll("-","")+". Kirim bukti pembayaran untuk diperiksa."}; // lint-ui-ignore: pemisah kode pesanan, bukan teks antarmuka
+        result={...result,orderId:made.order.id,reply:"Pesanan tercatat dengan total "+formatRupiah(made.order.total)+". Kode pesanan "+made.order.id.replaceAll("-","")+". Kirim bukti pembayaran untuk diperiksa."}; // lint-ui-ignore: pemisah kode pesanan, bukan teks antarmuka
       } else if (event.payment) {
         const {payment}=event;
         const found=await findOrderWithItems(tx,businessId,payment.orderId);
@@ -65,7 +65,7 @@ export async function processChannelEvent(db:Database,businessId:string,event:Ch
             await tx.insert(transactions).values({businessId,customerId:incoming.customer.id,orderId:found.order.id,kind:"sale",description:"Penjualan dari pesan pelanggan",amount:found.order.total,source:"whatsapp",method:"transfer",proofUrl:payment.proofUrl ?? null,confidence:Math.round(payment.confidence * 100)});
           }
         }
-        result={duplicate:false,orderId:found.order.id,paymentStatus:status,reply:status==="cocok" ? "Nominal bukti cocok. Penjualan tercatat dan stok sudah diperbarui." : status==="tidak_cocok" ? "Nominal bukti berbeda dari total pesanan. Kirim bukti yang sesuai." : "Bukti belum cukup jelas. Periksa nominal lalu kirim bukti yang terbaca."};
+        result={...result,orderId:found.order.id,paymentStatus:status,reply:status==="cocok" ? "Nominal bukti cocok. Penjualan tercatat dan stok sudah diperbarui." : status==="tidak_cocok" ? "Nominal bukti berbeda dari total pesanan. Kirim bukti yang sesuai." : "Bukti belum cukup jelas. Periksa nominal lalu kirim bukti yang terbaca."};
       } else if (event.reply) {
         result.reply=event.reply;
       } else {
@@ -74,7 +74,9 @@ export async function processChannelEvent(db:Database,businessId:string,event:Ch
         const business=await findBusiness(tx,businessId);
         result.reply=product ? product.name+" tersedia "+formatNumber(product.stock)+" "+product.unit+", harga "+formatRupiah(product.salePrice)+"." : /jam|buka/i.test(event.body) && business?.opensAt && business.closesAt ? "Warung buka pukul "+business.opensAt.slice(0,5).replace(":",".")+" sampai "+business.closesAt.slice(0,5).replace(":",".") : "Pesan sudah diterima. Sebutkan nama produk untuk memeriksa harga dan stok.";
       }
-      await appendMessage(tx,businessId,incoming.conversation.id,{sender:"agent",kind:"text",body:result.reply});
+      if (options.appendReply !== false) {
+        await appendMessage(tx,businessId,incoming.conversation.id,{sender:"agent",kind:"text",body:result.reply});
+      }
       return result;
     });
   } catch(error) {

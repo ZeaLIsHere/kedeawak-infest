@@ -112,6 +112,8 @@ describe("pesan masuk Twilio", () => {
     "audio/ogg; codecs=opus",
     "audio/mpeg",
     "audio/mp4",
+    "audio/aac",
+    "audio/amr",
     "audio/wav",
     "audio/x-wav",
     "audio/webm",
@@ -182,32 +184,41 @@ describe("pesan masuk Twilio", () => {
   });
 });
 
-describe("lampiran AAC", () => {
-  it("menolak AAC pada pesan masuk karena belum ada konversi audio", () => {
-    expect(() =>
-      parseTwilioMessage(
-        {
-          ...params,
-          Body: "",
-          NumMedia: "1",
-          MediaUrl0: mediaUrl,
-          MediaContentType0: "audio/aac",
-        },
-        config,
-      ),
-    ).toThrow("Format lampiran belum didukung");
+describe("lampiran AAC dan AMR", () => {
+  it.each(["audio/aac", "audio/amr"])("menerima %s pada pesan masuk", (contentType) => {
+    const result = parseTwilioMessage(
+      {
+        ...params,
+        Body: "",
+        NumMedia: "1",
+        MediaUrl0: mediaUrl,
+        MediaContentType0: contentType,
+      },
+      config,
+    );
+    expect(result.media).toEqual({ url: mediaUrl, contentType });
   });
 
-  it("menolak unduhan AAC sebelum mengirim permintaan termasuk octet stream", async () => {
-    const fetcher = vi
-      .fn<typeof fetch>()
-      .mockResolvedValue(
-        mediaResponse(new Uint8Array([255, 241, 0, 0]), "application/octet-stream"),
-      );
+  it("menerima unduhan AAC dan AMR dengan magic header", async () => {
     await expect(
-      downloadTwilioMedia({ ...media, contentType: "audio/aac" }, config, fetcher),
-    ).rejects.toThrow("Format lampiran belum didukung");
-    expect(fetcher).not.toHaveBeenCalled();
+      downloadTwilioMedia(
+        { ...media, contentType: "audio/aac" },
+        config,
+        async () =>
+          mediaResponse(new Uint8Array([255, 241, 0, 0]), "application/octet-stream"),
+      ),
+    ).resolves.toMatchObject({ contentType: "audio/aac" });
+    await expect(
+      downloadTwilioMedia(
+        { ...media, contentType: "audio/amr" },
+        config,
+        async () =>
+          mediaResponse(
+            new TextEncoder().encode("#!AMRdata"),
+            "application/octet-stream",
+          ),
+      ),
+    ).resolves.toMatchObject({ contentType: "audio/amr" });
   });
 });
 
@@ -232,7 +243,6 @@ describe("unduhan media Twilio", () => {
     mediaUrl.replace("api.twilio.com", "api.twilio.com:444"),
     mediaUrl.replace("api.twilio.com", "user:secret@api.twilio.com"),
     mediaUrl.replace(config.accountSid, "AC" + "d".repeat(32)),
-    mediaUrl + "?redirect=https://evil.example",
     mediaUrl + "#fragment",
     mediaUrl.replace("/Media/", "/Media/../Media/"),
     mediaUrl.replace("/Media/", "/%4dedia/"),
@@ -242,6 +252,17 @@ describe("unduhan media Twilio", () => {
       downloadTwilioMedia({ ...media, url }, config, fetcher),
     ).rejects.toThrow();
     expect(fetcher).not.toHaveBeenCalled();
+  });
+
+  it("menerima query string pada URL media Twilio", async () => {
+    const url = mediaUrl + "?download=1";
+    const fetcher = vi.fn<typeof fetch>().mockImplementation(async (requested) => {
+      expect(String(requested)).toBe(url);
+      return mediaResponse();
+    });
+    await expect(downloadTwilioMedia({ ...media, url }, config, fetcher)).resolves.toEqual(
+      { bytes: png, contentType: "image/png" },
+    );
   });
 
   it.each(["media.twiliocdn.com", "mms.twiliocdn.com", "media.us1.twilio.com"])(
