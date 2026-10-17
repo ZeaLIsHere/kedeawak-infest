@@ -158,6 +158,11 @@ Perintah: `npm run lint:ui`.
    ukuran terkecil lebih dulu.
 5. Sasaran sentuh minimal 44 kali 44 piksel, sesuai aturan aksesibilitas.
 6. Dilarang menyembunyikan fokus papan tik.
+7. Nama kelas digabung lewat `cn` dari `src/lib/utils.ts`, bukan langsung dari
+   paket `cn`. Berkas itu memperluas pengenal ukuran huruf proyek, sehingga
+   `text-body` dan `text-caption` tidak terbuang saat digabung dengan kelas
+   warna teks. Komponen baru dari perkakas shadcn/ui perlu diubah dulu
+   impornya. Lihat keputusan A14 di `docs/ARCHITECTURE.md`.
 
 ## 8. Keadaan di antarmuka
 

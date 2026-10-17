@@ -351,6 +351,7 @@ langsung dari dokumentasi resmi. Tanggal: 17 Oktober 2026.
 | A11 | Pustaka primitif dan preset shadcn/ui | Pustaka primitif `radix`, preset `nova`, warna dasar `neutral`, ikon `lucide` | Radix paling matang dan sudah tertulis di rencana. Preset nova memakai Lucide, sejalan dengan aturan ikon SVG dan larangan emoji |
 | A12 | Arah warna dan susunan token | Warna utama hijau `#059669`, susunan tiga lapis di `src/styles/tokens/`, pemetaan ke utilitas Tailwind lewat `@theme inline` di `src/app/globals.css` | Pilihan user: hijau warung, karena pintu masuk aplikasi adalah WhatsApp. Sumber palet: data skill `ui-ux-pro-max`, profil Grocery dan E-commerce |
 | A13 | Mode gelap | Tidak dikerjakan | Tidak ada di `docs/SCOPE.md`. Variabel `dark` tetap dideklarasikan tanpa pernah dipasang, supaya kelas `dark:` bawaan shadcn/ui tidak mengikuti pengaturan sistem operasi pengguna |
+| A14 | Penggabung nama kelas | `cn` diambil dari `src/lib/utils.ts`, bukan langsung dari paket `cn` | Mesin bawaan paket `cn` hanya mengenal ukuran huruf bawaan Tailwind. Tanpa perluasan, `text-body` dan `text-caption` dianggap warna teks dan terbuang saat digabung dengan kelas warna, sehingga ukuran huruf token tidak terpakai. Komponen baru dari perkakas shadcn/ui harus diubah dulu impornya. Bila token `--text-` bertambah di `src/app/globals.css`, daftar di `src/lib/utils.ts` harus ikut bertambah |
 
 Catatan A9: `cacheComponents` aktif berarti halaman yang membaca data saat
 berjalan wajib dibungkus `Suspense` atau memakai arahan `"use cache"`.
