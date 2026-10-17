@@ -59,6 +59,47 @@ export async function findBusiness(
   return business;
 }
 
+/** Data pokok warung baru. */
+export type BusinessInput = {
+  readonly name: string;
+  readonly opensAt?: string | null;
+  readonly closesAt?: string | null;
+};
+
+/** Membuat warung baru. Keadaan kanal WhatsApp mulai dari belum diatur. */
+export async function createBusiness(
+  db: Database,
+  input: BusinessInput,
+): Promise<Business> {
+  const [business] = await db
+    .insert(businesses)
+    .values({
+      name: input.name,
+      opensAt: input.opensAt ?? null,
+      closesAt: input.closesAt ?? null,
+    })
+    .returning();
+
+  if (business === undefined) {
+    throw new Error("Warung gagal dibuat");
+  }
+
+  return business;
+}
+
+/**
+ * Menghapus seluruh warung beserta datanya.
+ *
+ * Dipakai oleh penyiapan data demo, supaya keadaan awal selalu sama setiap
+ * `npm run db:seed` dijalankan. Baris pada tabel lain ikut terhapus lewat
+ * kunci asing bertingkat yang menunjuk ke `businesses.id`.
+ */
+export async function deleteAllBusinesses(db: Database): Promise<number> {
+  const removed = await db.delete(businesses).returning();
+
+  return removed.length;
+}
+
 /** Mengubah nama dan jam buka warung. */
 export async function updateBusinessProfile(
   db: Database,

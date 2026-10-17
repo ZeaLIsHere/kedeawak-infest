@@ -14,6 +14,7 @@
     "test:e2e": "playwright test",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx src/scripts/db-migrate.ts",
+    "db:seed": "tsx src/scripts/db-seed.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },

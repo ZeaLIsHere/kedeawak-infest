@@ -2,6 +2,7 @@ import { sql } from "drizzle-orm";
 
 import { createDatabase, type DatabaseHandle } from "../lib/db/client";
 import { runMigrations } from "../lib/db/migrate";
+import { loadScriptEnv } from "./load-env";
 
 const COUNT_TABLES = sql`select count(*)::int as total
   from information_schema.tables
@@ -16,6 +17,8 @@ async function countPublicTables(handle: DatabaseHandle): Promise<number> {
 
 /** Titik masuk `npm run db:migrate`. */
 async function main(): Promise<void> {
+  loadScriptEnv();
+
   const handle = createDatabase();
 
   try {

@@ -6,11 +6,14 @@ import {
   type TestDatabase,
 } from "../db/testing";
 import {
+  createBusiness,
+  deleteAllBusinesses,
   findBusiness,
   getCurrentBusiness,
   updateBusinessChannel,
   updateBusinessProfile,
 } from "./business";
+import { createProduct, listProducts } from "./products";
 
 let test: TestDatabase;
 let otherBusinessId: string;
@@ -94,5 +97,36 @@ describe("data warung", () => {
     expect(updated?.channelConnectedAt).toBeNull();
     expect(updated?.channelPackage).toBeNull();
     expect(updated?.channelQuota).toBeNull();
+  });
+
+  it("membuat warung baru dengan keadaan kanal belum diatur", async () => {
+    const created = await createBusiness(test.db, {
+      name: "Warung Baru",
+      opensAt: "07:00:00",
+      closesAt: "20:00:00",
+    });
+
+    expect(created.name).toBe("Warung Baru");
+    expect(created.opensAt).toBe("07:00:00");
+    expect(created.closesAt).toBe("20:00:00");
+    expect(created.channelStatus).toBe("belum_diatur");
+    expect((await findBusiness(test.db, created.id))?.name).toBe("Warung Baru");
+  });
+
+  it("menghapus seluruh warung beserta datanya", async () => {
+    await createProduct(test.db, test.business.id, {
+      name: "Beras",
+      unit: "kilogram",
+      salePrice: 15000,
+      purchasePrice: 13800,
+      minimumStock: 10,
+    });
+
+    const removed = await deleteAllBusinesses(test.db);
+
+    expect(removed).toBe(3);
+    expect(await getCurrentBusiness(test.db)).toBeUndefined();
+    expect(await findBusiness(test.db, test.business.id)).toBeUndefined();
+    expect(await listProducts(test.db, test.business.id)).toEqual([]);
   });
 });

@@ -30,6 +30,8 @@ export type StockMovementInput = {
   readonly kind: StockMovement["kind"];
   readonly quantityChange: number;
   readonly reason: string;
+  /** Waktu pergerakan. Dipakai saat menyiapkan data demo yang beriwayat. */
+  readonly createdAt?: Date;
 };
 
 /** Jejak pergerakan stok, terbaru lebih dulu. Dapat disaring menurut produk. */
@@ -163,6 +165,7 @@ export async function applyStockMovement(
       kind: input.kind,
       quantityChange: input.quantityChange,
       reason: input.reason,
+      ...(input.createdAt === undefined ? {} : { createdAt: input.createdAt }),
     })
     .returning();
 

@@ -34,14 +34,14 @@ diperbarui 17 Oktober 2026.
 | ---- | ----------------------------------- | ------- | ----- |
 | 0    | Fondasi repo dan aturan main        | 11      | 11    |
 | 1    | Kerangka aplikasi dan sistem desain | 9       | 9     |
-| 2    | Basis data dan lapisan data         | 6       | 8     |
+| 2    | Basis data dan lapisan data         | 7       | 8     |
 | 3    | Tool layer                          | 0       | 12    |
 | 4    | Lapisan AI dan context lock         | 0       | 10    |
 | 5    | Permukaan aplikasi                  | 0       | 32    |
 | 6    | Pematangan dan bukti                | 0       | 7     |
-|      | Jumlah                              | 26      | 89    |
+|      | Jumlah                              | 27      | 89    |
 
-Fokus berikutnya: T2.7.
+Fokus berikutnya: T2.8.
 
 Pelacak kedua adalah riwayat git. Setiap commit memuat baris `Refs:` yang
 menunjuk ID tugas, sehingga `git log` dapat dipakai untuk menelusuri kapan
@@ -122,7 +122,7 @@ Tujuan: seluruh data scope punya tempat tinggal, dan bisa diisi data demo.
 | T2.4 | Enkripsi nama dan nomor telepon pelanggan     | Data disimpan terenkripsi, butir privasi proposal                 | `[x]`  |
 | T2.5 | Lapisan akses data untuk tiap entitas         | `src/lib/data/`, satu pintu, semua query memuat `business_id`     | `[x]`  |
 | T2.6 | Perhitungan stok terkini dari pergerakan stok | Stok konsisten, setiap perubahan meninggalkan jejak               | `[x]`  |
-| T2.7 | Skrip seed data demo                          | Satu warung, sekitar 20 produk, riwayat transaksi beberapa minggu | `[ ]`  |
+| T2.7 | Skrip seed data demo                          | Satu warung, sekitar 20 produk, riwayat transaksi beberapa minggu | `[x]`  |
 | T2.8 | Pengujian lapisan data                        | Uji lulus untuk query dan perhitungan stok                        | `[ ]`  |
 
 Kriteria selesai fase 2: `npm run db:migrate` dan `npm run db:seed` berjalan

@@ -249,6 +249,16 @@ perintah `drizzle-kit migrate`. Alasannya, perintah itu hanya dapat menyambung
 ke Postgres lewat jaringan, sedangkan demo memakai PGlite yang berjalan di
 dalam proses. Dengan cara ini migrasi yang sama diterapkan pada kedua driver.
 
+Data demo disiapkan oleh `npm run db:seed`, yang memanggil
+`src/lib/db/seed.ts`. Seluruh penulisannya lewat `src/lib/data/`, sesuai aturan
+struktur nomor 2 di atas, sehingga data demo mengalir lewat alur aplikasi yang
+sebenarnya. Data lama dihapus lebih dulu, supaya keadaan awalnya selalu sama,
+dan `npm run db:seed` boleh dijalankan berulang kali. Riwayat transaksinya
+mundur dua puluh satu hari menurut Waktu Indonesia Barat, dengan angka acak
+yang tetap, sehingga jumlah transaksi dan totalnya sama pada setiap penyiapan.
+Keadaan kanal WhatsApp dibiarkan belum diatur, karena menyambungkan nomor
+adalah langkah demo, bukan data awal.
+
 ## 5. Antarmuka penyedia AI
 
 Tiga antarmuka, satu implementasi nyata, satu pengganti lokal untuk masing

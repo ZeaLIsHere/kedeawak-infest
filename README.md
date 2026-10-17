@@ -56,18 +56,34 @@ Enam permukaan aplikasi, sesuai `docs/SCOPE.md`:
 
 ```bash
 npm install
+Copy-Item .env.example .env.local
+```
+
+Isi `DEEPSEEK_API_KEY` pada `.env.local`, dan buat `FIELD_ENCRYPTION_KEY` dengan
+perintah yang tertulis di dalam berkas contoh. Lalu siapkan basis datanya:
+
+```bash
+npm run db:migrate
+npm run db:seed
 npm run dev
 ```
 
 Buka http://localhost:3000.
 
+`npm run db:migrate` membuat tabel, dan `npm run db:seed` mengisi satu warung
+contoh beserta riwayat transaksi beberapa minggu. Kedua perintah membaca
+`.env.local` seperti Next.js, dan `db:seed` dapat dijalankan ulang kapan saja
+untuk mengembalikan data demo ke keadaan awal.
+
 Perintah lain:
 
-| Perintah        | Fungsi                         |
-| --------------- | ------------------------------ |
-| `npm run build` | Bangun aplikasi untuk produksi |
-| `npm run lint`  | Periksa aturan kode            |
-| `npm start`     | Jalankan hasil bangun produksi |
+| Perintah          | Fungsi                         |
+| ----------------- | ------------------------------ |
+| `npm run build`   | Bangun aplikasi untuk produksi |
+| `npm run lint`    | Periksa aturan kode            |
+| `npm run lint:ui` | Periksa teks antarmuka         |
+| `npm test`        | Jalankan pengujian             |
+| `npm start`       | Jalankan hasil bangun produksi |
 
 Persyaratan: Node.js 24 atau lebih baru.
 
