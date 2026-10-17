@@ -20,5 +20,12 @@ export default defineConfig({
      */
     include: ["src/**/*.test.ts", "src/**/*.test.tsx"],
     environment: "node",
+    /*
+     * PGlite adalah PostgreSQL di dalam proses, dan penyiapannya memakan waktu
+     * yang berbeda beda. Batas bawaan lima detik terbukti terlampaui saat
+     * beberapa berkas uji berjalan bersamaan, sehingga batasnya dinaikkan.
+     */
+    testTimeout: 30_000,
+    hookTimeout: 30_000,
   },
 });

@@ -100,5 +100,5 @@ describe("pemilih driver basis data", () => {
       await handle.close();
       rmSync(root, { recursive: true, force: true });
     }
-  }, 60_000);
+  });
 });

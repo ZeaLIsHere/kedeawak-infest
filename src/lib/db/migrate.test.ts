@@ -33,7 +33,7 @@ beforeAll(async () => {
   handle = createDatabase({ PGLITE_DATA_DIR: "memory://" });
 
   await runMigrations(handle);
-}, 60_000);
+});
 
 afterAll(async () => {
   await handle?.close();
