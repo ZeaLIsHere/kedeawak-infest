@@ -80,6 +80,9 @@ TWILIO_ACCOUNT_SID=GANTI_DENGAN_ACCOUNT_SID
 TWILIO_AUTH_TOKEN=GANTI_DENGAN_AUTH_TOKEN
 TWILIO_WHATSAPP_FROM=whatsapp:+GANTI_DENGAN_NOMOR_SANDBOX
 WEBHOOK_URL=https://GANTI_DENGAN_DOMAIN_NGROK/api/channels/whatsapp
+
+# Opsional. Jalur balasan cadangan bila kuota Twilio trial habis.
+FONNTE_TOKEN=GANTI_DENGAN_TOKEN_FONNTE
 ```
 
 Target pemilihan model: override `DEEPSEEK_CHAT_MODEL` atau
@@ -88,7 +91,9 @@ Dukungan `DEEPSEEK_MODEL` sudah diimplementasikan di `provider.ts`; override
 gambar tetap harus mampu menerima gambar. Pemilihan model ini belum diuji
 dengan panggilan DeepSeek nyata.
 `FONNTE_TOKEN` dan `CHANNEL_WEBHOOK_SECRET` adalah konfigurasi historis, bukan
-autentikasi webhook Twilio; gunakan tanda tangan resmi Twilio.
+autentikasi webhook Twilio; gunakan tanda tangan resmi Twilio. `FONNTE_TOKEN`
+kini dapat dipakai sebagai jalur balasan cadangan bila kuota Twilio trial habis,
+tetapi pesan masuk tetap melalui webhook Twilio.
 
 **Format kunci sudah diperiksa pada `src/lib/crypto/field-encryption.ts`:**
 cipher AES-256-GCM menerima 32 byte dalam **64 karakter hex**, bukan base64.

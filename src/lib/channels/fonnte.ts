@@ -54,3 +54,40 @@ export async function readFonnteProfile(token: string, fetcher: typeof fetch = f
     throw new Error("Koneksi WhatsApp belum dapat diperiksa");
   }
 }
+
+function fonnteTarget(value: string): string {
+  const digits = value.trim().replace(/^\+/, "");
+  if (!/^\d{8,15}$/.test(digits)) throw new Error("Nomor WhatsApp tujuan belum sesuai");
+  return digits.startsWith("0") ? "62" + digits.slice(1) : digits;
+}
+
+/** Mengirim balasan melalui Fonnte sebagai jalur cadangan saat Twilio menolak kirim. */
+export async function sendFonnteReply(
+  token: string,
+  target: string,
+  text: string,
+  fetcher: typeof fetch = fetch,
+): Promise<void> {
+  if (!token.trim()) throw new Error("Token Fonnte belum diisi");
+  const to = fonnteTarget(target);
+  if (!text.trim() || text.length > 4000) {
+    throw new Error("Isi balasan wajib diisi dan maksimal 4000 karakter");
+  }
+  try {
+    const response = await fetcher("https://api.fonnte.com/send", {
+      method: "POST",
+      headers: { Authorization: token },
+      body: new URLSearchParams({ target: to, message: text }).toString(),
+      redirect: "error",
+      signal: AbortSignal.timeout(20_000),
+    });
+    if (!response.ok) {
+      void response.body?.cancel().catch(() => {});
+      throw new Error("Gagal");
+    }
+    const result = record(await response.json());
+    if (result.status !== true && result.status !== "true") throw new Error("Gagal");
+  } catch {
+    throw new Error("Balasan WhatsApp lewat Fonnte belum dapat dikirim");
+  }
+}

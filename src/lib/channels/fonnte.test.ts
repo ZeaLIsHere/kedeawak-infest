@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
-import { parseChannelEvent, readFonnteProfile } from "./fonnte";
+import { describe, expect, it, vi } from "vitest";
+import { parseChannelEvent, readFonnteProfile, sendFonnteReply } from "./fonnte";
 
 describe("penerjemah kanal WhatsApp", () => {
   it("memeriksa payload dan menormalkan nomor", () => {
@@ -24,5 +24,63 @@ describe("penerjemah kanal WhatsApp", () => {
   it("menolak respons yang tidak sesuai skema", async () => {
     await expect(readFonnteProfile("rahasia", async ()=>Response.json({status:false,reason:"token invalid"}))).rejects.toThrow("Koneksi WhatsApp belum dapat diperiksa");
     await expect(readFonnteProfile("rahasia", async ()=>Response.json({status:true,device_status:"connect",device:42}))).rejects.toThrow();
+  });
+});
+
+describe("pengiriman balasan Fonnte", () => {
+  it("mengirim target dan pesan dengan token perangkat", async () => {
+    await expect(
+      sendFonnteReply("rahasia", "081200000001", "Pesanan diterima", async (url, init) => {
+        expect(url).toBe("https://api.fonnte.com/send");
+        expect(init?.method).toBe("POST");
+        expect(new Headers(init?.headers).get("Authorization")).toBe("rahasia");
+        expect(init?.redirect).toBe("error");
+        expect([...new URLSearchParams(String(init?.body)).entries()]).toEqual([
+          ["target", "6281200000001"],
+          ["message", "Pesanan diterima"],
+        ]);
+        return Response.json({ status: true, detail: "success" });
+      }),
+    ).resolves.toBeUndefined();
+  });
+
+  it.each(["", "  ", "0812", "whatsapp:+6281200000001", "62812 0000001"])(
+    "menolak tujuan tidak sah %s tanpa mengirim",
+    async (target) => {
+      const fetcher = vi.fn<typeof fetch>();
+      await expect(sendFonnteReply("rahasia", target, "Pesan", fetcher)).rejects.toThrow(
+        "Nomor WhatsApp tujuan belum sesuai",
+      );
+      expect(fetcher).not.toHaveBeenCalled();
+    },
+  );
+
+  it("menolak token dan isi pesan kosong tanpa mengirim", async () => {
+    const fetcher = vi.fn<typeof fetch>();
+    await expect(sendFonnteReply(" ", "6281200000001", "Pesan", fetcher)).rejects.toThrow(
+      "Token Fonnte belum diisi",
+    );
+    await expect(sendFonnteReply("rahasia", "6281200000001", " ", fetcher)).rejects.toThrow(
+      "Isi balasan wajib diisi",
+    );
+    expect(fetcher).not.toHaveBeenCalled();
+  });
+
+  it("menyamarkan kegagalan HTTP, status, dan jaringan", async () => {
+    await expect(
+      sendFonnteReply("rahasia", "6281200000001", "Pesan", async () =>
+        new Response("rahasia", { status: 401 }),
+      ),
+    ).rejects.toThrow(/^Balasan WhatsApp lewat Fonnte belum dapat dikirim$/);
+    await expect(
+      sendFonnteReply("rahasia", "6281200000001", "Pesan", async () =>
+        Response.json({ status: false, reason: "token invalid" }),
+      ),
+    ).rejects.toThrow(/^Balasan WhatsApp lewat Fonnte belum dapat dikirim$/);
+    await expect(
+      sendFonnteReply("rahasia", "6281200000001", "Pesan", async () => {
+        throw new Error("rahasia");
+      }),
+    ).rejects.toThrow(/^Balasan WhatsApp lewat Fonnte belum dapat dikirim$/);
   });
 });

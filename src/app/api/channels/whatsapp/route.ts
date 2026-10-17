@@ -11,7 +11,7 @@ import {
   type TwilioMessage,
 } from "@/lib/channels/twilio";
 import { receiveTwilioMessage } from "@/lib/channels/twilio-intake";
-import { safeChannelText } from "@/lib/channels/fonnte";
+import { safeChannelText, sendFonnteReply } from "@/lib/channels/fonnte";
 
 const PATHS = ["/whatsapp", "/", "/stok", "/laporan"];
 
@@ -31,6 +31,23 @@ function readParams(form: FormData): Record<string, string> | undefined {
   return params;
 }
 
+async function sendReply(
+  config: TwilioConfig,
+  message: TwilioMessage,
+  text: string,
+): Promise<void> {
+  const fonnteToken = process.env.FONNTE_TOKEN?.trim();
+  if (fonnteToken) {
+    try {
+      await sendFonnteReply(fonnteToken, message.phoneNumber, text);
+      return;
+    } catch {
+      // Fonnte dicoba lebih dulu karena kuota Twilio trial dapat habis.
+    }
+  }
+  await sendTwilioReply(config, message.phoneNumber, text);
+}
+
 async function processMessage(
   config: TwilioConfig,
   message: TwilioMessage,
@@ -40,7 +57,7 @@ async function processMessage(
       const outcome = await receiveTwilioMessage(db, businessId, message, config);
       // Pesan ulang tidak dibalas lagi supaya retry Twilio tidak menggandakan balasan.
       if (!outcome.duplicate) {
-        await sendTwilioReply(config, message.phoneNumber, safeChannelText(outcome.reply));
+        await sendReply(config, message, safeChannelText(outcome.reply));
       }
       return outcome;
     });
