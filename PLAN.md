@@ -21,11 +21,11 @@ di commit dan di push, sesuai `docs/WORKFLOW.md`.
 
 **Ketergantungan saat ini:** keputusan K1 sampai K4 dan K6 sampai K9 sudah
 ditetapkan. Kunci DeepSeek sudah diisi pemilik pada 18 Oktober 2026. K5 tetap
-terbuka dan tidak menghambat. Keputusan kanal diperbarui dengan persetujuan
-user pada 18 Oktober 2026: Twilio Sandbox menggantikan Fonnte, termasuk balasan
-nyata ke peserta opt in dan voice note otomatis menjadi teks lalu orderan.
-Kredensial Twilio/Groq dan alur provider nyata masih perlu diverifikasi;
-panel simulasi tetap tidak bergantung pada layanan luar.
+terbuka dan tidak menghambat. Keputusan kanal diperbarui dengan keputusan
+user pada 18 Oktober 2026: Fonnte menggantikan Twilio Sandbox sebagai penyedia
+kanal WhatsApp, termasuk balasan nyata dari DeepSeek dan voice note otomatis
+menjadi teks lalu orderan. Kredensial Fonnte/Groq dan alur provider nyata masih
+perlu diverifikasi; panel simulasi tetap tidak bergantung pada layanan luar.
 
 ---
 
@@ -98,6 +98,41 @@ bukan verifikasi bank. Groq dipilih tim untuk audio, bukan permintaan penyedia
 spesifik dari user. `docs/PRODUCT.md` tidak diubah, tidak ada berkas env ditulis,
 dan tidak ada commit dalam tugas dokumentasi ini.
 
+## Titik penghentian sesi 18 Oktober 2026 (migrasi Fonnte)
+
+Pengembangan dihentikan atas permintaan pemilik pada 18 Oktober 2026 setelah
+migrasi kanal WhatsApp dari Twilio Sandbox ke Fonnte. Seluruh perubahan sudah
+diperiksa pada mesin ini: `npm run typecheck`, `npm run lint`,
+`npx tsx src/scripts/lint-ui-copy.ts` (115 berkas, tanpa pelanggaran),
+`npm test` (506 uji lulus), dan `npm run build` dengan `NEXT_DIST_DIR` terpisah.
+
+Yang sudah berjalan dan terbukti:
+
+- Halaman `/whatsapp` memuat daftar pesanan WhatsApp di atas daftar percakapan.
+  Balasan agen tetap tidak ditampilkan, sesuai aturan bagian 11.2 butir 5.
+- Tombol Hubungkan WhatsApp pada panel koneksi memakai Fonnte dan berhasil
+  mengubah status menjadi terhubung saat diuji di peramban.
+- Webhook `POST /api/channels/fonnte` terverifikasi lewat terowongan publik:
+  permintaan tanpa kunci ditolak 401, payload tidak sesuai ditolak 400, dan
+  pesan grup diabaikan. Uji integrasi baru membuktikan alur pesan sampai
+  orderan, balasan DeepSeek, dan pengiriman lewat Fonnte `/send`, termasuk
+  penolakan pesan ulang.
+- Kode Twilio Sandbox disimpan sebagai cadangan dan tidak ditampilkan lagi di
+  antarmuka.
+
+Yang masih terbuka:
+
+- Belum ada bukti pesan WhatsApp nyata dari ponsel kedua sampai balasan
+  diterima. Kirim pesan ke nomor warung untuk menguji ujung ke ujung.
+- URL webhook perangkat Fonnte bergantung pada terowongan cepat Cloudflare.
+  Bila terowongan dijalankan ulang, URL berubah dan harus diperbarui di dasbor
+  Fonnte.
+- Bersihkan `.next-build` dan `.pglite/build` setelah membangun. `tsconfig.json`
+  sempat ditambahi jalur `.next-build` oleh `next typegen`; nilainya
+  dikembalikan sebelum commit.
+- Tidak ada kredensial baru yang diminta atau ditambahkan. `FONNTE_TOKEN`,
+  `FONNTE_WEBHOOK_SECRET`, dan `DEEPSEEK_API_KEY` sudah ada di `.env.local`.
+
 ## Titik penghentian sesi sebelumnya (historis, sebelum Twilio)
 
 Catatan historis: pengembangan dihentikan atas permintaan pemilik pada
@@ -149,7 +184,7 @@ Jangan menjalankan `db:seed` pada data yang ingin dipertahankan.
 | K6  | Konfirmasi daftar fitur di `docs/SCOPE.md`           | Ditanyakan               | **Dikonfirmasi user.** Tujuh permukaan, termasuk S7 Kasir yang ditambahkan 18 Oktober 2026                                                                                                                                                                                                                                                                           |
 | K7  | Pemakaian PGlite untuk demo, bukan Postgres terpisah | **Ditetapkan.**          | PGlite dipilih setelah dipastikan mendukung CRUD penuh dan transaksi. Pencarian vektor tidak dipakai, jadi pgvector tidak diperlukan.                                                                                                                                                                                                                                |
 | K8  | Transkripsi voice note                               | Pilihan implementasi tim | **Diperbarui 18 Oktober 2026.** Groq Whisper untuk berkas audio WhatsApp, termasuk OGG, memakai `GROQ_API_KEY` dan `GROQ_TRANSCRIPTION_MODEL=whisper-large-v3-turbo`, lalu DeepSeek menafsirkan transkrip menjadi orderan. User menyetujui alur otomatis, bukan secara khusus memilih Groq. Web Speech API tetap untuk mikrofon peramban                             |
-| K9  | Penyedia kanal WhatsApp                              | Twilio Sandbox           | **Disetujui user 18 Oktober 2026, menggantikan Fonnte.** Pesan teks, foto bukti, voice note otomatis dan balasan nyata ke peserta yang sudah join/opt in masuk scope demo. Panel simulasi tetap tersedia sebagai jalur lokal. Webhook Next.js dan UI memakai server port 3100 yang sama; keamanan dan keterbatasan `after()` ada di `docs/ARCHITECTURE.md` bagian 11 |
+| K9  | Penyedia kanal WhatsApp                              | Fonnte                   | **Diputuskan user 18 Oktober 2026, menggantikan Twilio Sandbox.** Pesan pelanggan ke nomor warung diproses webhook Next.js lalu dibalas DeepSeek lewat perangkat Fonnte. Teks, foto bukti dan voice note otomatis masuk scope demo. Panel simulasi tetap tersedia sebagai jalur lokal dan tidak ditampilkan pada permukaan WhatsApp. Kode Twilio disimpan sebagai cadangan. Webhook dan UI memakai server port 3100 yang sama; keamanan dan keterbatasan `after()` ada di `docs/ARCHITECTURE.md` bagian 11 |
 
 ---
 
@@ -294,16 +329,18 @@ Tujuan: tujuh permukaan berfungsi penuh, sesuai `docs/SCOPE.md` bagian 2.
 | ----- | ---------------------------------------------------------------------------------------------------- | ------ |
 | T5.11 | Status koneksi nomor WhatsApp                                                                        | `[~]`  |
 | T5.12 | Tata cara dan aksi Hubungkan ke WhatsApp sampai berstatus terhubung, beserta aksi memutuskan koneksi | `[~]`  |
-| T5.13 | Orderan WhatsApp dari teks dan transkrip voice note Twilio                                           | `[~]`  |
+| T5.13 | Orderan WhatsApp dari teks dan transkrip voice note Fonnte                                          | `[~]`  |
 | T5.14 | Foto bukti pada orderan sendiri yang tidak ambigu, pencocokan nominal bukan verifikasi bank          | `[~]`  |
-| T5.15 | Panel pengirim pesan tiruan sebagai pelanggan                                                        | `[x]`  |
-| T5.16 | Balasan otomatis tercatat dan dikirim nyata melalui Twilio ke peserta opt in                         | `[~]`  |
+| T5.15 | Panel pengirim pesan tiruan sebagai pelanggan, permukaan WhatsApp kini memuat daftar pesanan         | `[x]`  |
+| T5.16 | Balasan otomatis tercatat dan dikirim nyata melalui Fonnte                                           | `[~]`  |
 | T5.17 | Penghapusan data pelanggan dari antarmuka                                                            | `[x]`  |
 
-Catatan terkini: Twilio Sandbox menggantikan Fonnte berdasarkan persetujuan
-user. Status parsial mencakup migrasi kanal, media dan balasan nyata yang belum
-memiliki bukti penerimaan lengkap. Tata cara dan batas demo ada di
-`docs/ARCHITECTURE.md` bagian 11 dan `docs/plans/2026-10-18-twilio.md`.
+Catatan terkini: Fonnte menggantikan Twilio Sandbox berdasarkan keputusan
+user. Permukaan WhatsApp menampilkan daftar pesanan dari pesan masuk di atas
+daftar percakapan; balasan agen tetap tidak ditampilkan. Status parsial
+mencakup migrasi kanal, media dan balasan nyata yang belum memiliki bukti
+penerimaan lengkap. Tata cara dan batas demo ada di `docs/ARCHITECTURE.md`
+bagian 11.
 
 ### S4 Laporan Keuangan
 

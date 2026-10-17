@@ -49,7 +49,7 @@ export async function readFonnteProfile(token: string, fetcher: typeof fetch = f
     const input=record(await response.json());
     if (input.status !== true || typeof input.device !== "string" || !/^\d{8,15}$/.test(input.device) || !["connect","disconnect"].includes(String(input.device_status))) throw new Error("Gagal");
     const quota=Number(input.quota);
-    return {status: input.device_status === "connect" ? "terhubung" : "terputus",phoneNumber:input.device,connectedAt:input.device_status === "connect" ? new Date() : null,packageName:typeof input.package === "string" ? safeChannelText(input.package) : null,quota:Number.isSafeInteger(quota) && quota >= 0 ? quota : null,checkedAt:new Date()};
+    return {status: input.device_status === "connect" ? "terhubung" : "terputus",phoneNumber:input.device,connectedAt:input.device_status === "connect" ? new Date() : null,packageName:"Fonnte",quota:Number.isSafeInteger(quota) && quota >= 0 ? quota : null,checkedAt:new Date()};
   } catch {
     throw new Error("Koneksi WhatsApp belum dapat diperiksa");
   }
@@ -67,6 +67,7 @@ export async function sendFonnteReply(
   target: string,
   text: string,
   fetcher: typeof fetch = fetch,
+  inboxId?: string | number,
 ): Promise<void> {
   if (!token.trim()) throw new Error("Token Fonnte belum diisi");
   const to = fonnteTarget(target);
@@ -74,10 +75,14 @@ export async function sendFonnteReply(
     throw new Error("Isi balasan wajib diisi dan maksimal 4000 karakter");
   }
   try {
+    const body = new URLSearchParams({ target: to, message: text });
+    if (inboxId !== undefined && String(inboxId).trim() !== "") {
+      body.set("inboxid", String(inboxId));
+    }
     const response = await fetcher("https://api.fonnte.com/send", {
       method: "POST",
       headers: { Authorization: token },
-      body: new URLSearchParams({ target: to, message: text }).toString(),
+      body: body.toString(),
       redirect: "error",
       signal: AbortSignal.timeout(20_000),
     });

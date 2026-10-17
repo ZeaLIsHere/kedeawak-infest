@@ -49,9 +49,10 @@ Catatan penyimpangan dari proposal, disengaja dan dicatat:
    WhatsApp, termasuk OGG, tim memilih Groq Whisper karena DeepSeek tidak
    menyediakan transkripsi audio. Ini menambah kunci, biaya dan ketergantungan
    jaringan; kegagalan harus dilaporkan, bukan diganti transkrip rekaan.
-4. User menyetujui penggantian Fonnte dengan Twilio Sandbox pada 18 Oktober
-   2026, termasuk balasan nyata ke peserta opt in. Rincian bagian 11; bukan
-   integrasi produksi. `docs/PRODUCT.md` tetap tidak diubah.
+4. User memutuskan migrasi kanal WhatsApp ke Fonnte pada 18 Oktober 2026,
+   menggantikan Twilio Sandbox, termasuk balasan nyata dari model DeepSeek.
+   Rincian bagian 11; bukan integrasi produksi. `docs/PRODUCT.md` tetap tidak
+   diubah.
 
 ## 3. Struktur direktori
 
@@ -503,7 +504,7 @@ provider nyata; status implementasi/verifikasi mengikuti `PLAN.md`.
 | A5    | Pengambilan konteks bisnis                            | Query SQL terstruktur, tanpa pgvector                                                                                                                           | DeepSeek tidak menyediakan endpoint embedding, sehingga kolom vektor tidak dapat diisi data nyata. Data warung juga berupa data terstruktur, sehingga query lebih tepat daripada kemiripan vektor. PGlite tetap dipakai sesuai K7                                                                                                                                                                                                                                                                                                        |
 | A6    | Identitas git dan autentikasi push                    | Nama `ZeaLIsHere`, email noreply GitHub, kredensial Windows Credential Manager                                                                                  | Push sudah terverifikasi berhasil                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | A7    | Akses skill desain                                    | Dipakai sebagian; data skill dibaca langsung dari berkasnya, tanpa `scripts/search.py` karena Python belum terpasang                                            | Token dan aturan desain disusun dari `DESIGN.md` serta bacaan berkas data skill                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| A8    | Penyedia kanal WhatsApp                               | **Twilio Sandbox**, menggantikan Fonnte, tanpa n8n                                                                                                              | User menyetujui 18 Oktober 2026: media dan balasan nyata ke peserta opt in; webhook Next pada port UI 3100, lihat bagian 11                                                                                                                                                                                                                                                                                                                                                                                                              |
+| A8    | Penyedia kanal WhatsApp                               | **Fonnte**, menggantikan Twilio Sandbox sebagai jalur utama, kode Twilio disimpan tetapi tidak ditampilkan, tanpa n8n                                                                                                              | User memutuskan migrasi ke Fonnte 18 Oktober 2026: pesan pelanggan ke nomor warung diproses webhook Next pada port UI 3100 lalu dibalas DeepSeek lewat perangkat Fonnte, lihat bagian 11                                                                                                                                                                                                                                                                                                                                                                                                              |
 | A9    | Versi dan opsi bawaan Next.js                         | Next.js 16.4.2, React 19.3.0, Tailwind 4, `cacheComponents` aktif, `partialPrefetching` aktif                                                                   | Keluaran `create-next-app`. Lihat catatan di bawah tabel                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | A10   | Penulisan otomatis blok aturan Next.js ke `AGENTS.md` | Dimatikan, memakai `agentRules: false` pada `next.config.ts`                                                                                                    | `AGENTS.md` dikelola tim. Panduan Next.js 16 dibaca dari `node_modules/next/dist/docs/`                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | A11   | Pustaka primitif dan preset shadcn/ui                 | Pustaka primitif `radix`, preset `nova`, warna dasar `neutral`, ikon `lucide`                                                                                   | Radix paling matang dan sudah tertulis di rencana. Preset nova memakai Lucide, sejalan dengan aturan ikon SVG dan larangan emoji                                                                                                                                                                                                                                                                                                                                                                                                         |
@@ -523,75 +524,73 @@ keputusan itu dicatat ulang di tabel ini.
 
 ## 11. Penyedia kanal WhatsApp
 
-**Keputusan terkini, disetujui user 18 Oktober 2026:** Twilio WhatsApp Sandbox
-menggantikan Fonnte, termasuk balasan nyata kepada peserta opt in dan voice
-note otomatis menjadi teks lalu orderan. Rancangan ini belum merupakan bukti
-penerimaan provider nyata. Tidak ada server terpisah atau n8n.
+**Keputusan terkini, disetujui user 18 Oktober 2026:** Fonnte adalah penyedia
+kanal WhatsApp yang dipakai, menggantikan Twilio Sandbox. Kode Twilio Sandbox
+disimpan sebagai cadangan tetapi tidak ditampilkan di antarmuka. Rancangan ini
+belum merupakan bukti penerimaan provider nyata. Tidak ada server terpisah atau
+n8n.
 
 ### 11.1 Setup, koneksi dan endpoint
 
 1. Pasang dependensi dengan `npm ci` dan gunakan Node 24. Contoh konfigurasi
    lengkap, format kunci, migrasi dan peringatan reset seed ada di `README.md`.
-   `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN` dan `TWILIO_WHATSAPP_FROM`
-   hanya di server. Nomor pengirim memakai awalan `whatsapp:` sesuai Sandbox.
-2. Jalankan Next/UI dengan `npm run dev -- --port 3100` dan `ngrok http 3100`.
-   Route Handler adalah **`POST /api/channels/whatsapp`**, bukan `/whatsapp`.
+   `FONNTE_TOKEN` dan `FONNTE_WEBHOOK_SECRET` hanya di server. Token perangkat
+   dibaca dari dasbor Fonnte dan tidak pernah disimpan di basis data atau
+   browser.
+2. Jalankan Next/UI dengan `npm run dev -- --port 3100`, lalu buka terowongan
+   HTTPS publik, misalnya `cloudflared tunnel --url http://localhost:3100`.
+   Route Handler adalah **`POST /api/channels/fonnte`**, bukan `/whatsapp`.
    `/whatsapp` hanya UI. Tidak ada port 3101 atau webhook server tambahan.
-3. Isi `WEBHOOK_URL` dengan URL HTTPS publik lengkap ngrok, termasuk path
-   `/api/channels/whatsapp` dan query bila dipakai. Pasang URL persis itu pada
-   **When a message comes in**, metode **POST**, di Twilio Sandbox. Perubahan
-   domain memerlukan pembaruan kedua konfigurasi dan restart pembaca env.
-4. Peserta mengirim kode join yang diberikan Twilio ke nomor Sandbox.
-   Pemilik mengaktifkan Hubungkan di S3. Status konfigurasi aplikasi bukan
-   bukti peserta sudah join atau pengiriman nyata berhasil. Terapkan batas
-   Sandbox/jendela pesan; jangan mengirim ke peserta yang belum opt in.
-5. Putuskan menghentikan pemrosesan lokal, bukan menutup akun Twilio atau
-   mengeluarkan peserta dari Sandbox. Simpan hanya status/metadata yang
-   diperlukan; jangan menyimpan auth token dalam database atau browser.
+3. Pasang URL HTTPS publik lengkap pada webhook perangkat Fonnte, termasuk path
+   `/api/channels/fonnte` dan parameter `key` berisi `FONNTE_WEBHOOK_SECRET`.
+   Perubahan domain terowongan memerlukan pembaruan URL webhook di dasbor
+   Fonnte.
+4. Aktifkan Autoread pada perangkat Fonnte. Biarkan Personal dan Group mati agar
+   balasan hanya dikirim melalui aplikasi ini.
+5. Pemilik mengaktifkan Hubungkan WhatsApp di S3. Status konfigurasi aplikasi
+   bukan bukti pengiriman nyata berhasil. Kuota dan batas paket Fonnte tetap
+   berlaku; lampiran hanya tersedia pada paket yang mengirim URL media.
 
 ### 11.2 Webhook dan pemrosesan latar
 
-1. Parse **seluruh parameter** `application/x-www-form-urlencoded` Twilio,
-   bukan hanya field yang dikenal. Validasi `X-Twilio-Signature` memakai
-   validator SDK resmi Twilio, auth token server dan `WEBHOOK_URL` persis.
-   URL localhost hasil proxy tidak cocok sebagai pengganti URL publik.
-   Header Bearer/parameter key lama bukan autentikasi Twilio.
-2. Setelah validasi, normalisasi `MessageSid`, `From`, `To`, `Body`,
-   `NumMedia` dan field media. `Body` boleh kosong jika ada media. Periksa
-   tujuan Sandbox, koneksi aplikasi, pengirim, `business_id` dan deduplikasi
-   SID sebelum perubahan domain. Pesan ulang tidak boleh menggandakan stok.
-3. Segera kembalikan HTTP sukses dengan **TwiML kosong** (`<Response/>`).
-   Jangan menunggu unduh/transkripsi/DeepSeek di jalur respons. Next.js
-   **`after()`** menjalankan proses domain dan balasan lewat **REST Twilio**;
-   bukan TwiML berisi pesan. Catat hasil/gagal kirim tanpa membocorkan rahasia.
+1. Autentikasi webhook memakai parameter `key` yang dibandingkan dengan
+   `FONNTE_WEBHOOK_SECRET` memakai perbandingan waktu tetap. Permintaan tanpa
+   kunci yang sah ditolak.
+2. Setelah validasi, normalisasi payload Fonnte: `device`, `sender`, `message`
+   atau `text`, `url`, `extension`, `name`, `inboxid` dan `timestamp`. Periksa
+   tujuan perangkat, koneksi aplikasi, `business_id` dan deduplikasi `eventId`
+   sebelum perubahan domain. Pesan ulang tidak boleh menggandakan stok. Pesan
+   dari grup ditolak.
+3. Segera kembalikan HTTP sukses. Next.js **`after()`** menjalankan proses
+   domain dan balasan lewat **REST Fonnte** `/send`, bukan menunggu DeepSeek di
+   jalur respons. Catat hasil/gagal kirim tanpa membocorkan rahasia.
 4. Teks diproses menjadi orderan; audio melewati Groq Whisper lalu DeepSeek.
    Transkrip disimpan sebagai pesan asal. Balasan nyata dicatat pada konteks
    orderan, tanpa menambah halaman obrolan pelanggan.
 5. UI memuat ulang otomatis setiap 15 detik dan menyediakan tombol Perbarui,
-   supaya pesan baru muncul setelah proses latar selesai. Panel kanan hanya
-   menampilkan pesan pelanggan; balasan agen tidak ditampilkan di aplikasi.
+   supaya pesan baru muncul setelah proses latar selesai. Daftar pesanan
+   menampilkan orderan beserta rincian item dan keadaan pembayaran; daftar
+   percakapan hanya menampilkan pesan pelanggan; balasan agen tidak ditampilkan
+   di aplikasi.
 
 **Batas demo yang wajib disampaikan:** `after()` bukan antrean atau durable
 worker. Stop server/redeploy sebelum selesai dapat kehilangan pemrosesan
-meskipun Twilio sudah menerima respons sukses. Tidak ada janji retry otomatis
-Twilio untuk pesan yang sudah diakui. Biarkan server hidup; bila tidak mendapat
-balasan, kirim ulang sebagai pesan baru, bukan mengandalkan replay SID lama.
-Antrean tahan restart dan pemulihan produksi bukan bagian pekerjaan ini.
+meskipun Fonnte sudah menerima respons sukses. Tidak ada janji retry otomatis
+Fonnte untuk pesan yang sudah diakui. Biarkan server hidup; bila tidak mendapat
+balasan, kirim ulang sebagai pesan baru, bukan mengandalkan replay `eventId`
+lama. Antrean tahan restart dan pemulihan produksi bukan bagian pekerjaan ini.
 
 ### 11.3 Media, bukti dan keamanan unduhan
 
-- Maksimal satu media per pesan. Gambar: JPEG, PNG, WebP <= 3 MiB. Audio:
-  OGG, MP3, MP4, WAV, WebM, FLAC <= 16 MiB. MP4/WebM hanya audio. Validasi
+- Lampiran hanya tersedia bila paket Fonnte mengirim URL media. Maksimal satu
+  media per pesan. Gambar: JPEG, PNG, WebP <= 3 MiB. Audio:
+  OGG, MP3, MP4, WAV, WebM, FLAC <= 16 MiB. Validasi
   MIME yang dinormalisasi, ukuran aktual streaming, jumlah media dan timeout;
   jangan mempercayai nama berkas atau Content-Length saja.
-- URL awal media wajib HTTPS dengan host **`api.twilio.com`** dan tanpa
-  kredensial URL. Gunakan **Basic Auth** account SID/auth token hanya untuk
-  unduhan awal tersebut. Tangani redirect secara manual dengan batas hop:
-  setiap target wajib HTTPS dan host CDN masuk allowlist eksplisit, bukan
-  kecocokan substring/sufiks bebas. **Jangan meneruskan Authorization** pada
-  redirect. Tolak host tak dikenal dan tujuan lokal/internal. Daftar host CDN
-  yang diperlukan harus ditetapkan dan diuji pada implementasi, bukan
-  membuka semua URL agar unduhan berhasil.
+- Unduh lampiran hanya bila URL valid, HTTPS, host dikenal dan tanpa kredensial
+  URL. Tangani redirect secara manual dengan batas hop, jangan meneruskan
+  kredensial pada redirect, dan tolak host tak dikenal serta tujuan
+  lokal/internal.
 - Audio dikirim ke Groq memakai konfigurasi bagian 5.2, bukan ke DeepSeek.
   DeepSeek menerima teks dan gambar. Gagal unduh/AI meminta ketik atau kirim
   ulang, tidak menghasilkan bukti/orderan rekaan.
@@ -605,20 +604,20 @@ Antrean tahan restart dan pemulihan produksi bukan bagian pekerjaan ini.
 
 ### 11.4 Privasi, pengujian dan riwayat
 
-Twilio menerima pesan, Groq menerima audio, DeepSeek menerima transkrip/foto.
+Fonnte menerima pesan, Groq menerima audio, DeepSeek menerima transkrip/foto.
 Jelaskan persetujuan, retensi pihak ketiga, biaya pesan/transkripsi/token dan
 kuota. Penghapusan lokal tidak otomatis membuktikan penghapusan di penyedia.
 Panel simulasi tetap jalur lokal tanpa provider, bukan bukti penerimaan live.
-Uji keamanan, integrasi dan validasi mengikuti
-`docs/plans/2026-10-18-twilio.md` dan status parsial di `PLAN.md`.
+Status implementasi dan verifikasi mengikuti `PLAN.md`.
 
 **Historis, tidak berlaku sebagai keputusan terkini:** pada 17 Oktober Fonnte
-gratis dipilih karena nomor sudah terhubung. Catatan dokumentasi saat itu
-menyebut lampiran memerlukan paket `all feature` dan audio hanya MP3, sehingga
-OGG/foto demo mengandalkan simulasi. Balasan lama hanya disimpan, bukan dikirim.
-Keputusan dan batas itu diganti Twilio; checkpoint lama tidak membuktikan
-Twilio/Groq/DeepSeek nyata pernah diuji. Bagian 13 merekam keadaan sebelum
-persetujuan ini dan bukan kontrak webhook yang baru.
+gratis dipilih karena nomor sudah terhubung. Pada 18 Oktober user sempat
+menyetujui Twilio Sandbox menggantikan Fonnte, lalu memutuskan migrasi kembali
+ke Fonnte pada hari yang sama. Kode Twilio Sandbox, yaitu adapter, intake dan
+route `/api/channels/whatsapp`, disimpan sebagai cadangan dan tidak ditampilkan
+di antarmuka. Checkpoint lama tidak membuktikan Fonnte/Groq/DeepSeek nyata
+pernah diuji. Bagian 13 merekam keadaan lama dan bukan kontrak webhook yang
+berlaku.
 
 ## 12. Kemampuan PGlite yang sudah dipastikan
 

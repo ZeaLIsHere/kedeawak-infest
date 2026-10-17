@@ -119,7 +119,7 @@ export function WhatsAppInbox({
               <div className="px-3 py-8 text-center">
                 <p className="font-medium">Belum ada percakapan</p>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Kirim pesan dari nomor yang sudah bergabung ke Sandbox Twilio.
+                  Kirim pesan dari nomor yang sudah tersambung ke perangkat Fonnte.
                 </p>
               </div>
             ) : (

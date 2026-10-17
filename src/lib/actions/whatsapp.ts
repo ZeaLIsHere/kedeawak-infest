@@ -4,21 +4,25 @@ import { withCurrentBusiness } from "../data/server";
 import { updateBusinessChannel } from "../data/business";
 import { deleteCustomerData } from "../data/customers";
 import { receiveChannelEvent } from "../channels/intake";
+import { readFonnteProfile } from "../channels/fonnte";
 import { readTwilioProfile } from "../channels/twilio";
 
 type Result={ok:true;message:string}|{ok:false;error:string};
 function refresh(){for(const path of ["/whatsapp","/","/stok","/laporan"]) revalidatePath(path);}
-export async function connectChannelAction(mode:"simulasi"|"twilio"):Promise<Result>{
- if(mode!=="simulasi"&&mode!=="twilio")return {ok:false,error:"Pilihan koneksi belum sesuai"};
+export async function connectChannelAction(mode:"simulasi"|"twilio"|"fonnte"):Promise<Result>{
+ if(mode!=="simulasi"&&mode!=="twilio"&&mode!=="fonnte")return {ok:false,error:"Pilihan koneksi belum sesuai"};
  try{
   const result=await withCurrentBusiness(async(db,id)=>{
-   const profile=mode==="simulasi" ? {status:"terhubung" as const,phoneNumber:null,connectedAt:new Date(),packageName:"Simulasi web",quota:null,checkedAt:new Date()} : await readTwilioProfile();
+   const profile=mode==="simulasi" ? {status:"terhubung" as const,phoneNumber:null,connectedAt:new Date(),packageName:"Simulasi web",quota:null,checkedAt:new Date()} : mode==="twilio" ? await readTwilioProfile() : await readFonnteProfile(process.env.FONNTE_TOKEN?.trim() ?? "");
    await updateBusinessChannel(db,id,profile);
    return profile.status;
   });
   if(!result)return {ok:false,error:"Data warung belum tersedia"};
-  refresh();return {ok:true,message:result==="terhubung"?"Koneksi Twilio Sandbox sudah terhubung":"Nomor Twilio belum aktif. Periksa akun Sandbox."};
- }catch{return {ok:false,error:"Koneksi Twilio belum dapat diperiksa. Periksa kredensial dan jaringan, atau gunakan simulasi."};}
+  refresh();
+  if(mode==="simulasi")return {ok:true,message:"Simulasi web sudah terhubung"};
+  if(mode==="twilio")return {ok:true,message:result==="terhubung"?"Koneksi Twilio Sandbox sudah terhubung":"Nomor Twilio belum aktif. Periksa akun Sandbox."};
+  return {ok:true,message:result==="terhubung"?"Koneksi Fonnte sudah terhubung":"Perangkat Fonnte belum terhubung. Pindai kode QR pada dasbor Fonnte lalu sambungkan lagi."};
+ }catch{return {ok:false,error:"Koneksi belum dapat diperiksa. Periksa kredensial dan jaringan, atau gunakan simulasi."};}
 }
 export async function disconnectChannelAction():Promise<Result>{
  try{

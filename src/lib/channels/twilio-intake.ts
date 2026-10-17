@@ -7,13 +7,12 @@ import {
   type ChannelEvent,
   type ChannelEventResult,
 } from "../data/channel-intake";
-import { appendMessage } from "../data/conversations";
 import { listProducts } from "../data/products";
-import { composeCustomerReply } from "../ai/customer-reply";
 import { getAIProvider, type AIProvider } from "../ai/provider";
 import { parseSaleTranscript } from "../ai/transcript";
 import { parseReceipt } from "../ai/receipt";
 import { transcribeAudio } from "../ai/speech";
+import { finalizeChannelReply } from "./finalize-reply";
 import { safeChannelText } from "./fonnte";
 import { downloadTwilioMedia, type TwilioConfig, type TwilioMessage } from "./twilio";
 
@@ -22,41 +21,6 @@ type IntakeOptions = {
   transcribe?: typeof transcribeAudio;
   provider?: AIProvider;
 };
-
-async function finalizeReply(
-  db: Database,
-  businessId: string,
-  event: ChannelEvent,
-  result: ChannelEventResult,
-  provider: AIProvider | undefined,
-): Promise<ChannelEventResult> {
-  if (result.duplicate || result.conversationId === undefined) {
-    return { ...result, reply: safeChannelText(result.reply) };
-  }
-
-  let reply = result.reply;
-  if (result.orderId === undefined && result.paymentStatus === undefined) {
-    const aiReply = await composeCustomerReply(
-      db,
-      businessId,
-      result.conversationId,
-      event.body,
-      provider,
-    );
-    if (aiReply !== undefined) reply = aiReply;
-  }
-
-  const text = safeChannelText(reply);
-  if (text) {
-    await appendMessage(db, businessId, result.conversationId, {
-      sender: "agent",
-      kind: "text",
-      body: text,
-    });
-  }
-
-  return { ...result, reply: text };
-}
 
 /** T5.13, T5.14: normalisasi media sebelum memakai alur pesanan yang sama. */
 export async function receiveTwilioMessage(
@@ -145,5 +109,5 @@ export async function receiveTwilioMessage(
     event = { ...event, reply: "Pesan sudah tercatat tetapi pesanan belum dapat dipahami. Ketik nama produk dan jumlah dengan jelas." };
   }
   const result = await processChannelEvent(db, businessId, event, { appendReply: false });
-  return finalizeReply(db, businessId, event, result, provider);
+  return finalizeChannelReply(db, businessId, event, result, provider);
 }
