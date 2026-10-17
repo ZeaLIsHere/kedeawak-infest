@@ -81,6 +81,12 @@ src/
     reports/                      Komponen khusus laporan
     stock/                        Komponen khusus stok
     approvals/                    Komponen khusus persetujuan
+  styles/
+    tokens/
+      primitives.css              Lapis 1: nilai mentah
+      semantic.css                Lapis 2: makna
+      components.css              Lapis 3: keperluan komponen
+      index.css                   Mengimpor ketiga lapis
   lib/
     db/
       schema.ts                   Definisi tabel Drizzle
@@ -343,6 +349,8 @@ langsung dari dokumentasi resmi. Tanggal: 17 Oktober 2026.
 | A9 | Versi dan opsi bawaan Next.js | Next.js 16.4.2, React 19.3.0, Tailwind 4, `cacheComponents` aktif, `partialPrefetching` aktif | Keluaran `create-next-app`. Lihat catatan di bawah tabel |
 | A10 | Penulisan otomatis blok aturan Next.js ke `AGENTS.md` | Dimatikan, memakai `agentRules: false` pada `next.config.ts` | `AGENTS.md` dikelola tim. Panduan Next.js 16 dibaca dari `node_modules/next/dist/docs/` |
 | A11 | Pustaka primitif dan preset shadcn/ui | Pustaka primitif `radix`, preset `nova`, warna dasar `neutral`, ikon `lucide` | Radix paling matang dan sudah tertulis di rencana. Preset nova memakai Lucide, sejalan dengan aturan ikon SVG dan larangan emoji |
+| A12 | Arah warna dan susunan token | Warna utama hijau `#059669`, susunan tiga lapis di `src/styles/tokens/`, pemetaan ke utilitas Tailwind lewat `@theme inline` di `src/app/globals.css` | Pilihan user: hijau warung, karena pintu masuk aplikasi adalah WhatsApp. Sumber palet: data skill `ui-ux-pro-max`, profil Grocery dan E-commerce |
+| A13 | Mode gelap | Tidak dikerjakan | Tidak ada di `docs/SCOPE.md`. Variabel `dark` tetap dideklarasikan tanpa pernah dipasang, supaya kelas `dark:` bawaan shadcn/ui tidak mengikuti pengaturan sistem operasi pengguna |
 
 Catatan A9: `cacheComponents` aktif berarti halaman yang membaca data saat
 berjalan wajib dibungkus `Suspense` atau memakai arahan `"use cache"`.

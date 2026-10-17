@@ -1,0 +1,56 @@
+/**
+ * Lapis 3 dari 3: token komponen.
+ *
+ * Dipakai oleh komponen yang kita tulis sendiri, dan oleh komponen bawaan
+ * shadcn/ui yang sudah menunjuk ke nama token di sini, yaitu `--radius`.
+ *
+ * Catatan jujur: komponen bawaan shadcn/ui menyatakan ukurannya lewat kelas
+ * utilitas Tailwind, bukan lewat variabel. Karena itu lapis ini hanya
+ * mengikat hal yang memang dapat diikat, yaitu sudut lengkung, bayangan
+ * atau ketinggian, tinggi kendali, ukuran kerangka, dan gerak.
+ */
+
+:root {
+  /* Sudut lengkung. `--radius` dibaca langsung oleh komponen shadcn/ui. */
+  --radius: var(--primitive-radius-md);
+  --radius-control: var(--primitive-radius-sm);
+  --radius-surface: var(--primitive-radius-lg);
+  --radius-pill: var(--primitive-radius-full);
+
+  /* Ketinggian permukaan */
+  --elevation-card: var(--primitive-shadow-xs);
+  --elevation-raised: var(--primitive-shadow-md);
+  --elevation-overlay: var(--primitive-shadow-lg);
+
+  /* Cincin fokus, dipakai bersama mode fokus papan ketik */
+  --focus-ring-width: 2px;
+  --focus-ring-offset: 2px;
+
+  /* Tinggi kendali masukan dan tombol */
+  --control-height-sm: 2rem;
+  --control-height-md: 2.5rem;
+  --control-height-lg: 2.75rem;
+
+  /*
+   * Sasaran sentuh minimum. Proposal menyebut pemilik warung memakai
+   * telepon genggam, jadi ukuran ini tidak boleh diturunkan.
+   */
+  --touch-target-min: var(--primitive-space-12);
+
+  /* Jarak dalam dan luar komponen */
+  --card-padding: var(--primitive-space-5);
+  --button-padding-x: var(--primitive-space-4);
+  --button-padding-y: var(--primitive-space-2);
+  --field-gap: var(--primitive-space-2);
+
+  /* Ukuran kerangka aplikasi */
+  --sidebar-width: 15.5rem;
+  --header-height: 3.5rem;
+  --content-max-width: 80rem;
+  --bottom-nav-height: 4rem;
+
+  /* Gerak */
+  --motion-fast: var(--primitive-duration-fast);
+  --motion-normal: var(--primitive-duration-normal);
+  --motion-slow: var(--primitive-duration-slow);
+}

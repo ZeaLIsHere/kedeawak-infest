@@ -3,7 +3,7 @@ import "./globals.css";
 import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+const geist = Geist({ subsets: ["latin"], variable: "--font-geist-sans" });
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={cn("font-sans", geist.variable)}>
+    <html lang="en" className={cn(geist.variable)}>
       <body>{children}</body>
     </html>
   );

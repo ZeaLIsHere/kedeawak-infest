@@ -1,0 +1,14 @@
+/**
+ * Kumpulan token desain, tiga lapis.
+ *
+ * Urutan impor penting: lapis berikutnya boleh menunjuk lapis sebelumnya,
+ * jadi primitif harus lebih dulu.
+ *
+ *   1. primitives.css  nilai mentah
+ *   2. semantic.css    makna
+ *   3. components.css  keperluan komponen
+ */
+
+@import "./primitives.css";
+@import "./semantic.css";
+@import "./components.css";

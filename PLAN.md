@@ -73,7 +73,7 @@ terkunci.
 | --- | --- | --- | --- |
 | T1.1 | Inisialisasi Next.js dengan TypeScript strict | Aplikasi berjalan di `npm run dev` | `[x]` |
 | T1.2 | Pasang Tailwind, shadcn/ui, dan lucide-react | Komponen dasar tersedia, ikon memakai SVG | `[x]` |
-| T1.3 | Susun token desain tiga lapis | Warna, jarak, ukuran huruf dari token, tanpa nilai langsung | `[ ]` |
+| T1.3 | Susun token desain tiga lapis | Warna, jarak, ukuran huruf dari token, tanpa nilai langsung | `[x]` |
 | T1.4 | Kunci arah visual sesuai proposal | Clean, minimalis, rata. Gaya chat first. Dibuktikan lewat `DESIGN.md` | `[ ]` |
 | T1.5 | Buat kerangka aplikasi dan navigasi | Navigasi menuju enam permukaan, sasaran sentuh memadai | `[ ]` |
 | T1.6 | Buat skrip `lint:ui` | Menolak emoji dan tanda hubung pada teks UI | `[ ]` |

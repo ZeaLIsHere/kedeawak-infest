@@ -1,0 +1,100 @@
+/**
+ * Lapis 2 dari 3: token semantik.
+ *
+ * Tugasnya memberi makna pada token primitif. Semuanya menunjuk ke lapis
+ * primitif, tidak ada nilai mentah di sini. Komponen memakai lapis ini.
+ *
+ * Nama warna permukaan dasar mengikuti konvensi shadcn/ui, yaitu
+ * `--background`, `--card`, `--primary`, dan seterusnya, supaya komponen
+ * bawaan shadcn bekerja tanpa disesuaikan.
+ *
+ * Aturan penamaan: nama di lapis ini tidak boleh bertabrakan dengan ruang
+ * nama tema Tailwind, yaitu `--color-`, `--font-`, `--text-`, `--spacing-`,
+ * `--radius-`, `--shadow-`, `--ease-`, dan sejenisnya. Kalau bertabrakan,
+ * pemetaan di globals.css akan membuat variabel merujuk dirinya sendiri.
+ * Karena itu jarak memakai awalan `--space-` dan ukuran huruf `--type-`.
+ */
+
+:root {
+  /* Permukaan dan teks */
+  --background: var(--primitive-slate-50);
+  --foreground: var(--primitive-slate-900);
+  --card: var(--primitive-white);
+  --card-foreground: var(--primitive-slate-900);
+  --popover: var(--primitive-white);
+  --popover-foreground: var(--primitive-slate-900);
+
+  /* Warna merek */
+  --primary: var(--primitive-emerald-600);
+  --primary-foreground: var(--primitive-white);
+  --primary-hover: var(--primitive-emerald-700);
+  --secondary: var(--primitive-slate-100);
+  --secondary-foreground: var(--primitive-slate-900);
+  --muted: var(--primitive-slate-100);
+  --muted-foreground: var(--primitive-slate-500);
+  --accent: var(--primitive-emerald-50);
+  --accent-foreground: var(--primitive-emerald-800);
+
+  /* Keadaan merugikan */
+  --destructive: var(--primitive-red-600);
+  --destructive-foreground: var(--primitive-white);
+  --destructive-surface: var(--primitive-red-50);
+
+  /* Garis dan fokus */
+  --border: var(--primitive-slate-200);
+  --border-strong: var(--primitive-slate-300);
+  --input: var(--primitive-slate-300);
+  --ring: var(--primitive-emerald-600);
+
+  /* Makna keuangan. Dipakai di dasbor dan laporan. */
+  --income: var(--primitive-emerald-600);
+  --income-foreground: var(--primitive-emerald-800);
+  --income-surface: var(--primitive-emerald-50);
+  --expense: var(--primitive-red-600);
+  --expense-foreground: var(--primitive-red-700);
+  --expense-surface: var(--primitive-red-50);
+  --profit: var(--primitive-emerald-700);
+  --profit-foreground: var(--primitive-emerald-900);
+  --profit-surface: var(--primitive-emerald-100);
+
+  /* Makna status. Dipakai di lencana, alert, dan status verifikasi. */
+  --success: var(--primitive-emerald-600);
+  --success-foreground: var(--primitive-emerald-800);
+  --success-surface: var(--primitive-emerald-50);
+  --warning: var(--primitive-amber-600);
+  --warning-foreground: var(--primitive-amber-800);
+  --warning-surface: var(--primitive-amber-50);
+  --info: var(--primitive-blue-600);
+  --info-foreground: var(--primitive-blue-700);
+  --info-surface: var(--primitive-blue-50);
+
+  /* Warna grafik laporan. Urutannya dipilih agar saling mudah dibedakan. */
+  --chart-1: var(--primitive-emerald-600);
+  --chart-2: var(--primitive-red-500);
+  --chart-3: var(--primitive-blue-600);
+  --chart-4: var(--primitive-amber-500);
+  --chart-5: var(--primitive-slate-500);
+
+  /* Sisi navigasi */
+  --sidebar: var(--primitive-white);
+  --sidebar-foreground: var(--primitive-slate-700);
+  --sidebar-primary: var(--primitive-emerald-600);
+  --sidebar-primary-foreground: var(--primitive-white);
+  --sidebar-accent: var(--primitive-emerald-50);
+  --sidebar-accent-foreground: var(--primitive-emerald-800);
+  --sidebar-border: var(--primitive-slate-200);
+  --sidebar-ring: var(--primitive-emerald-600);
+
+  /* Jarak menurut peran, bukan menurut angka */
+  --space-page: var(--primitive-space-6);
+  --space-section: var(--primitive-space-8);
+  --space-gutter: var(--primitive-space-4);
+
+  /* Ukuran huruf menurut peran */
+  --type-page-title: var(--primitive-font-size-2xl);
+  --type-section-title: var(--primitive-font-size-lg);
+  --type-metric: var(--primitive-font-size-3xl);
+  --type-metric-label: var(--primitive-font-size-sm);
+  --type-body: var(--primitive-font-size-base);
+  --type-caption: var(--primitive-font-size-xs);
+}
