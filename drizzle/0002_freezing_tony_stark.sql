@@ -1,0 +1,1 @@
+ALTER TABLE "agent_sessions" ADD COLUMN "context" jsonb DEFAULT '{}'::jsonb NOT NULL;

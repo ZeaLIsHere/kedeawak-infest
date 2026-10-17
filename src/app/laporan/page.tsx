@@ -1,4 +1,5 @@
-import { Suspense } from "react";
+﻿import { Suspense } from "react";
+import { PaymentMethodSummary } from "@/components/reports/payment-method-summary";
 import { connection } from "next/server";
 
 import {
@@ -26,7 +27,7 @@ import {
   startOfWeek,
   toDateKey,
 } from "@/lib/data/period";
-import { summarizeDay, summarizeWeek } from "@/lib/data/reports";
+import { summarizePayments, summarizeDay, summarizeWeek } from "@/lib/data/reports";
 import { withCurrentBusiness } from "@/lib/data/server";
 import { listTransactions } from "@/lib/data/transactions";
 import { formatDateRange, formatDateWithDay } from "@/lib/format/date";
@@ -107,7 +108,8 @@ async function LaporanContent({
         : await summarizeWeek(db, businessId, anchor);
     const transactions = await listTransactions(db, businessId, period);
 
-    return { summary, transactions };
+    const payments = await summarizePayments(db, businessId, period);
+    return { summary, transactions, payments };
   });
 
   if (data === undefined) {
@@ -144,6 +146,9 @@ async function LaporanContent({
         <PeriodSummary summary={data.summary} />
       </SectionCard>
 
+      <SectionCard title="Uang masuk per jenis pembayaran">
+        <PaymentMethodSummary summary={data.payments} />
+      </SectionCard>
       <SectionCard title={JUDUL_RINCIAN} description={DESKRIPSI_RINCIAN}>
         <TransactionList transactions={data.transactions} />
       </SectionCard>

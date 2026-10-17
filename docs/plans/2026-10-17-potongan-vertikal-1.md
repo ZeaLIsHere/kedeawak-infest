@@ -1,5 +1,10 @@
 # Potongan Vertikal 1 Implementation Plan
 
+Catatan arsip 18 Oktober 2026: potongan ini ditutup pada commit de6e34c.
+Kotak langkah di bawah adalah naskah rencana historis, bukan status terkini.
+Status berlaku hanya di PLAN.md. Beberapa halaman keterangan dalam rencana
+ini sudah digantikan implementasi pada sesi 18 Oktober 2026.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Membuat satu alur vertikal utuh dari data demo sampai layar, yaitu seed, Dasbor, Laporan, dan Stok, sehingga tiga permukaan aplikasi benar benar berfungsi dengan data nyata.

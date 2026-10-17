@@ -1,4 +1,5 @@
-import {
+﻿import {
+  ShoppingBasket,
   Bot,
   Boxes,
   ChartColumn,
@@ -21,6 +22,7 @@ export type NavItem = {
  */
 export const surfaceNavItems: readonly NavItem[] = [
   { href: "/", label: "Dasbor", icon: LayoutDashboard },
+  { href: "/kasir", label: "Kasir", icon: ShoppingBasket },
   { href: "/percakapan", label: "Agen AI", icon: Bot },
   { href: "/whatsapp", label: "WhatsApp", icon: MessageCircle },
   { href: "/laporan", label: "Laporan", icon: ChartColumn },
@@ -42,7 +44,7 @@ export const settingsNavItem: NavItem = {
 const bottomBarHrefs: ReadonlySet<string> = new Set([
   "/",
   "/percakapan",
-  "/whatsapp",
+  "/kasir",
   "/laporan",
 ]);
 

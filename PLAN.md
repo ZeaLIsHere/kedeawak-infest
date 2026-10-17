@@ -19,56 +19,89 @@ Rencana kerja induk KedeAwak. Ini satu satunya daftar pekerjaan yang dikerjakan.
 berikutnya sebelum tugas yang menghambat selesai. Setiap tugas selesai langsung
 di commit dan di push, sesuai `docs/WORKFLOW.md`.
 
-**Blocker saat ini:** tidak ada. K1 sampai K4 dan K6 sampai K9 sudah
-ditetapkan. K5 masih terbuka dan tidak menghambat apa pun. T5.11 dan T5.12
-yang tadinya menunggu keputusan K9 sudah dapat dikerjakan.
+**Ketergantungan saat ini:** keputusan K1 sampai K4 dan K6 sampai K9 sudah
+ditetapkan. Kunci DeepSeek sudah diisi pemilik pada 18 Oktober 2026. K5 tetap
+terbuka dan tidak menghambat. Token Fonnte perlu diperiksa saat integrasi nyata
+diuji; panel simulasi tidak bergantung padanya.
 
 ---
 
 ## Kemajuan
 
 Angka di bawah dihitung dari tanda status pada tabel tiap fase. Terakhir
-diperbarui 17 Oktober 2026.
+diperbarui 18 Oktober 2026.
 
 | Fase | Isi                                 | Selesai | Total |
 | ---- | ----------------------------------- | ------- | ----- |
-| 0    | Fondasi repo dan aturan main        | 11      | 11    |
-| 1    | Kerangka aplikasi dan sistem desain | 9       | 9     |
-| 2    | Basis data dan lapisan data         | 8       | 8     |
-| 3    | Tool layer                          | 0       | 12    |
-| 4    | Lapisan AI dan context lock         | 0       | 10    |
-| 5    | Permukaan aplikasi                  | 10      | 32    |
-| 6    | Pematangan dan bukti                | 0       | 7     |
-|      | Jumlah                              | 38      | 89    |
+| 0 | Fondasi repo dan aturan main        | 11 | 11 |
+| 1 | Kerangka aplikasi dan sistem desain | 9 | 9 |
+| 2 | Basis data dan lapisan data         | 8 | 8 |
+| 3 | Tool layer                          | 12 | 12 |
+| 4 | Lapisan AI dan context lock         | 5 | 10 |
+| 5 | Permukaan aplikasi                  | 37 | 46 |
+| 6 | Pematangan dan bukti                | 2 | 7 |
+| | Jumlah | 84 | 103 |
 
-Fokus berikutnya: T5.27.
+Pengembangan dihentikan atas permintaan pemilik. Tugas terbuka dan alasan
+verifikasinya dicatat pada bagian Titik penghentian sesi.
 
 Pelacak kedua adalah riwayat git. Setiap commit memuat baris `Refs:` yang
 menunjuk ID tugas, sehingga `git log` dapat dipakai untuk menelusuri kapan
 sebuah tugas dikerjakan dan apa buktinya. Lihat `docs/WORKFLOW.md` bagian 5.
 
-### Urutan kerja yang berlaku sekarang
+### Urutan kerja dan kondisi sekarang
 
-Atas persetujuan pemilik proyek, satu potongan vertikal dari Fase 5 dikerjakan
-lebih dulu, yaitu permukaan S1 Dasbor, S4 Laporan Keuangan, dan S5 Stok, supaya
-ada satu alur yang berfungsi penuh dan dapat didemokan sebelum lapisan yang
-lain selesai. Fase 3 (tool layer) dan Fase 4 (lapisan AI dan context lock)
-menyusul sesudahnya, dan tidak ada tugas pada kedua fase itu yang dibatalkan.
-Rincian rancangan potongan itu ada di
-`docs/plans/2026-10-17-potongan-vertikal-1.md`. Sisa tugas Fase 5 dikerjakan
-setelah Fase 3 dan Fase 4, sesuai urutan aslinya.
+Potongan pembacaan data pertama selesai pada 17 Oktober 2026.
+Pada 18 Oktober 2026 pemilik menyetujui urutan Kasir, kelola produk, lalu
+Persetujuan. Implementasi dilanjutkan sampai titik penghentian sesi di bawah;
+percakapan dan panel WhatsApp juga sudah memiliki alur nyata di basis data.
 
-Potongan pertama itu selesai pada 17 Oktober 2026. S1 Dasbor, S4 Laporan
-Keuangan, dan S5 Stok sudah berjalan dari data demo sampai layar, dan tiga
-permukaan lain yang belum dibangun tampil dengan keterangan terus terang bahwa
-halamannya belum berfungsi. Dua catatan untuk pekerjaan berikutnya. Pertama,
-data demo sudah memuat satu aksi menunggu persetujuan, dan aksi itu belum
-terlihat di mana pun sampai S6 dibangun, padahal alur alert stok menuju draft
-orderan pembelian lalu disetujui adalah butir penerimaan 8 dan 9 pada
-`docs/SCOPE.md` bagian 7. Karena itu S6 Persetujuan, yaitu T5.27 sampai T5.30,
-disarankan dikerjakan berikutnya. Kedua, `DEEPSEEK_API_KEY` dan `FONNTE_TOKEN`
-pada `.env.local` masih kosong, sehingga Fase 3 dan Fase 4 belum dapat diuji
-sampai pemilik proyek mengisinya.
+Rancangan: `docs/specs/2026-10-17-kasir-kelola-produk-design.md`.
+Rencana pelaksanaan: `docs/plans/2026-10-18-penyelesaian-web.md`.
+Seluruh status tugas hanya dilacak pada tabel di berkas ini.
+
+`DEEPSEEK_API_KEY` sudah diisi pemilik di `.env.local`, dikonfirmasi
+18 Oktober 2026. Nilainya tidak ditulis dalam dokumen, keluaran, atau git.
+Kunci tersedia tidak berarti seluruh integrasi sudah diverifikasi.
+Token dan layanan Fonnte nyata belum diperiksa; simulasi tidak bergantung
+padanya. S2, S3, dan context lock tetap masuk cakupan, tanpa pembatalan fitur.
+
+
+## Titik penghentian sesi
+
+Pengembangan dihentikan atas permintaan pemilik pada 18 Oktober 2026.
+Kode yang sudah dibuat disimpan bersama pembaruan dokumen, pemeriksaan, commit,
+dan push. Tidak ada fitur lanjutan yang ditambahkan setelah permintaan itu.
+
+Kasir, formulir produk, arsip, laporan pembayaran, Persetujuan, panel simulasi
+WhatsApp, penghapusan pelanggan, dan halaman privasi sudah tersambung.
+Percakapan teks dan riwayat, mode lokal, sepuluh tool, kuota, context lock,
+serta parser DeepSeek dan struk sudah memiliki implementasi serta uji unit
+atau integrasi. Pengujian otomatis penyedia AI memakai penyedia uji yang
+disuntikkan; itu tidak membuktikan layanan DeepSeek nyata sudah diuji ulang.
+
+Status `[~]` berarti implementasi atau verifikasi masih belum lengkap.
+Pekerjaan tidak sedang dilanjutkan setelah titik ini. Tugas tersebut tetap
+terbuka untuk sesi berikutnya, tanpa mengubah cakupan produk.
+
+| Bagian terbuka | Kondisi sebenarnya |
+| --- | --- |
+| T4.1, T4.3, T4.5, T4.9, T5.7, T5.8 | Adapter, orkestrator, unggah foto, dan tinjau bacaan ada; uji API nyata serta alur foto di peramban belum lengkap |
+| T4.2, T5.6 | Pengenalan mikrofon Web Speech API dan jalur ketik ada; mikrofon nyata belum diuji, unggah berkas voice note belum dibuat |
+| T5.11, T5.12 | Profil Fonnte dan aksi koneksi aplikasi ada; token, nomor, dan webhook penyedia nyata belum diuji |
+| T5.14 | Nominal bukti simulasi diuji; pembacaan foto bukti nyata masih memerlukan uji layanan AI |
+| T5.26 | Tool prediksi stok ada dan diuji; kartu prediksi pada halaman Stok belum dibuat |
+| T5.38, T5.43 | Formulir ketikan, suara, parser, serta dialog tinjau ada; penafsiran DeepSeek dan mikrofon nyata belum diuji ulang |
+| T6.1 | Alur otomatis baru mencakup bagian yang tersedia, belum seluruh sepuluh langkah penerimaan |
+| T6.2, T6.3 | Uji dua lebar layar tersedia; audit menyeluruh aksesibilitas dan desain belum dijalankan |
+| T6.6 | Mode lokal membaca data tanpa AI; simulasi tidak memakai Fonnte, tetapi uji jaringan terputus menyeluruh belum dijalankan |
+| T6.7 | Belum ada rekaman demonstrasi lengkap; bukti pemeriksaan dicatat dalam laporan sesi |
+
+Data lokal pemilik tidak dimigrasi atau disiapkan ulang selama sesi ini.
+Migrasi 0001 sampai 0003 dan seed hanya dijalankan pada direktori pengujian
+`.pglite/test-completion-20261018`. Sebelum memakai kode baru pada data lokal,
+hentikan server yang mengakses PGlite lalu jalankan `npm run db:migrate`.
+Jangan menjalankan `db:seed` pada data yang ingin dipertahankan.
 
 ---
 
@@ -79,9 +112,9 @@ sampai pemilik proyek mengisinya.
 | K1  | Nama dan email untuk identitas git                                          | Perlu dari user  | Selesai. Nama `ZeaLIsHere`, email memakai alamat noreply GitHub `180758619+ZeaLIsHere@users.noreply.github.com`. Ganti bila ingin memakai email lain                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | K2  | Cara autentikasi push ke GitHub                                             | Perlu dari user  | Selesai. Kredensial `ZeaLIsHere` sudah tersimpan di Windows Credential Manager, push terverifikasi berhasil                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | K3  | Penyedia model bahasa untuk demo                                            | Ditanyakan       | **Ditetapkan.** DeepSeek, model `deepseek-flash`, karena token sudah tersedia dari user                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| K4  | Apakah kunci API sudah tersedia                                             | Ditanyakan       | **Ditetapkan.** Token DeepSeek tersedia. Disimpan di `.env.local` sebagai `DEEPSEEK_API_KEY`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| K4  | Apakah kunci API sudah tersedia                                             | Ditanyakan       | **Ditetapkan.** Kunci DeepSeek sudah diisi pemilik di `.env.local` sebagai `DEEPSEEK_API_KEY`, dikonfirmasi 18 Oktober 2026                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
 | K5  | Pemasangan Python untuk data skill desain                                   | Ditanyakan       | Belum dijawab. Tidak menghambat, data CSV dibaca lewat Node sampai diputuskan                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
-| K6  | Konfirmasi daftar fitur di `docs/SCOPE.md`                                  | Ditanyakan       | **Dikonfirmasi user.** Enam permukaan sesuai `docs/SCOPE.md`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| K6  | Konfirmasi daftar fitur di `docs/SCOPE.md`                                  | Ditanyakan       | **Dikonfirmasi user.** Tujuh permukaan, termasuk S7 Kasir yang ditambahkan 18 Oktober 2026                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
 | K7  | Pemakaian PGlite untuk demo, bukan Postgres terpisah                        | **Ditetapkan.**  | PGlite dipilih setelah dipastikan mendukung CRUD penuh dan transaksi. Pencarian vektor tidak dipakai, jadi pgvector tidak diperlukan.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | K8  | Transkripsi voice note                                                      | Diusulkan        | **Ditetapkan.** Web Speech API peramban, karena DeepSeek tidak punya endpoint audio dan proposal menyebut Google STT                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | K9  | Penyedia kanal WhatsApp: Meta Cloud API, Fonnte, atau n8n sebagai perantara | Fonnte           | **Ditetapkan user: Fonnte, dengan paket gratis lebih dulu.** Nomor user sudah terhubung dan chat teks berjalan, sehingga demo punya kanal WhatsApp nyata tanpa menunggu verifikasi bisnis Meta. Batasan yang sudah dipastikan dari dokumentasi resmi Fonnte: lampiran hanya diterima perangkat berpakat `all feature`, dan berkas audio yang diterima hanya `mp3` sedangkan voice note WhatsApp berformat `ogg`, sehingga voice note pelanggan tidak pernah masuk walaupun paket dinaikkan. Karena itu orderan dan bukti transfer pada demo tetap lewat panel pengirim tiruan yang sudah masuk cakupan `docs/SCOPE.md` bagian 2, dan pesan teks nyata lewat Fonnte menjadi nilai tambah. Tata cara dan akibatnya ada di `docs/ARCHITECTURE.md` bagian 11 |
@@ -159,18 +192,18 @@ Tujuan: sepuluh tool proposal ada, berfungsi, dan teruji.
 
 | ID    | Tugas                                    | Hasil                                                                | Status |
 | ----- | ---------------------------------------- | -------------------------------------------------------------------- | ------ |
-| T3.1  | Kerangka tool dan pencatatan jejak audit | Setiap pemanggilan tercatat di `tool_invocations`                    | `[ ]`  |
-| T3.2  | `check_stock`                            | Membaca stok terkini                                                 | `[ ]`  |
-| T3.3  | `create_sale`                            | Menulis penjualan, memperbarui stok                                  | `[ ]`  |
-| T3.4  | `create_expense`                         | Menulis pengeluaran                                                  | `[ ]`  |
-| T3.5  | `create_debt`                            | Menulis hutang pelanggan                                             | `[ ]`  |
-| T3.6  | `create_purchase_order`                  | Membuat draft PO, bukan langsung menulis, masuk antrean persetujuan  | `[ ]`  |
-| T3.7  | `send_whatsapp`                          | Menulis balasan pada konteks pesan pelanggan, tidak mengirim ke luar | `[ ]`  |
-| T3.8  | `verify_payment`                         | Mencocokkan bukti transfer dengan nominal harapan                    | `[ ]`  |
-| T3.9  | `get_report`                             | Ringkasan harian dan mingguan                                        | `[ ]`  |
-| T3.10 | `forecast_stock`                         | Rata rata bergerak dengan safety stock                               | `[ ]`  |
-| T3.11 | `business_strategy`                      | Rekomendasi dari data transaksi yang ada                             | `[ ]`  |
-| T3.12 | Pengujian seluruh tool                   | Uji lulus untuk sepuluh tool, termasuk jalur gagal                   | `[ ]`  |
+| T3.1  | Kerangka tool dan pencatatan jejak audit | Setiap pemanggilan tercatat di `tool_invocations`                    | `[x]`  |
+| T3.2  | `check_stock`                            | Membaca stok terkini                                                 | `[x]`  |
+| T3.3  | `create_sale`                            | Menulis penjualan, memperbarui stok                                  | `[x]`  |
+| T3.4  | `create_expense`                         | Menulis pengeluaran                                                  | `[x]`  |
+| T3.5  | `create_debt`                            | Menulis hutang pelanggan                                             | `[x]`  |
+| T3.6  | `create_purchase_order`                  | Membuat draft PO, bukan langsung menulis, masuk antrean persetujuan  | `[x]`  |
+| T3.7  | `send_whatsapp`                          | Menulis balasan pada konteks pesan pelanggan, tidak mengirim ke luar | `[x]`  |
+| T3.8  | `verify_payment`                         | Mencocokkan bukti transfer dengan nominal harapan                    | `[x]`  |
+| T3.9  | `get_report`                             | Ringkasan harian dan mingguan                                        | `[x]`  |
+| T3.10 | `forecast_stock`                         | Rata rata bergerak dengan safety stock                               | `[x]`  |
+| T3.11 | `business_strategy`                      | Rekomendasi dari data transaksi yang ada                             | `[x]`  |
+| T3.12 | Pengujian seluruh tool                   | Uji lulus untuk sepuluh tool, termasuk jalur gagal                   | `[x]`  |
 
 Kriteria selesai fase 3: sepuluh tool lulus uji, dan tidak ada tool yang
 mengubah stok tanpa meninggalkan jejak.
@@ -183,16 +216,16 @@ Tujuan: percakapan bahasa alami menjadi aksi yang tercatat, dengan pengaman.
 
 | ID    | Tugas                                                  | Hasil                                                                      | Status |
 | ----- | ------------------------------------------------------ | -------------------------------------------------------------------------- | ------ |
-| T4.1  | Antarmuka penyedia model bahasa                        | Satu kontrak, implementasi nyata dan pengganti lokal                       | `[ ]`  |
-| T4.2  | Antarmuka speech to text lewat Web Speech API peramban | Voice note menjadi teks, dengan fallback isian manual                      | `[ ]`  |
-| T4.3  | Antarmuka pembacaan struk lewat `deepseek-flash`       | Foto struk menjadi data terstruktur, memakai skema keluaran ketat          | `[ ]`  |
-| T4.4  | Pengganti lokal yang deterministik                     | Berjalan tanpa kunci API, tidak mengarang hasil                            | `[ ]`  |
-| T4.5  | Orkestrator: pemahaman maksud dan pemilihan tool       | Pesan masuk dipetakan ke pemanggilan tool, argumen divalidasi dengan skema | `[ ]`  |
-| T4.6  | RAG konteks bisnis dengan query terstruktur            | Jawaban memakai data warung yang nyata                                     | `[ ]`  |
-| T4.7  | Context lock saat menunggu persetujuan                 | Pesan lanjutan tidak dianggap transaksi baru                               | `[ ]`  |
-| T4.8  | Pembatas pemakaian harian                              | Kuota harian tercatat dan ditegakkan                                       | `[ ]`  |
-| T4.9  | Fallback tiga lapis pembacaan struk                    | Confidence di bawah 70 persen memicu konfirmasi, lalu minta input manual   | `[ ]`  |
-| T4.10 | Pengujian orkestrasi dan context lock                  | Uji lulus untuk jalur normal dan jalur gagal                               | `[ ]`  |
+| T4.1  | Antarmuka penyedia model bahasa                        | Satu kontrak, implementasi nyata dan pengganti lokal                       | `[~]`  |
+| T4.2  | Antarmuka speech to text lewat Web Speech API peramban | Voice note menjadi teks, dengan fallback isian manual                      | `[~]`  |
+| T4.3  | Antarmuka pembacaan struk lewat `deepseek-flash`       | Foto struk menjadi data terstruktur, memakai skema keluaran ketat          | `[~]`  |
+| T4.4  | Pengganti lokal yang deterministik                     | Berjalan tanpa kunci API, tidak mengarang hasil                            | `[x]`  |
+| T4.5  | Orkestrator: pemahaman maksud dan pemilihan tool       | Pesan masuk dipetakan ke pemanggilan tool, argumen divalidasi dengan skema | `[~]`  |
+| T4.6  | RAG konteks bisnis dengan query terstruktur            | Jawaban memakai data warung yang nyata                                     | `[x]`  |
+| T4.7  | Context lock saat menunggu persetujuan                 | Pesan lanjutan tidak dianggap transaksi baru                               | `[x]`  |
+| T4.8  | Pembatas pemakaian harian                              | Kuota harian tercatat dan ditegakkan                                       | `[x]`  |
+| T4.9  | Fallback tiga lapis pembacaan struk                    | Confidence di bawah 70 persen memicu konfirmasi, lalu minta input manual   | `[~]`  |
+| T4.10 | Pengujian orkestrasi dan context lock                  | Uji lulus untuk jalur normal dan jalur gagal                               | `[x]`  |
 
 Kriteria selesai fase 4: satu pesan bahasa alami dapat menghasilkan catatan
 transaksi yang benar, dan aksi berisiko selalu berhenti di antrean persetujuan.
@@ -201,7 +234,7 @@ transaksi yang benar, dan aksi berisiko selalu berhenti di antrean persetujuan.
 
 ## Fase 5: Permukaan aplikasi
 
-Tujuan: enam permukaan berfungsi penuh, sesuai `docs/SCOPE.md` bagian 2.
+Tujuan: tujuh permukaan berfungsi penuh, sesuai `docs/SCOPE.md` bagian 2.
 
 ### S1 Dasbor
 
@@ -216,24 +249,24 @@ Tujuan: enam permukaan berfungsi penuh, sesuai `docs/SCOPE.md` bagian 2.
 
 | ID    | Tugas                                                 | Status |
 | ----- | ----------------------------------------------------- | ------ |
-| T5.5  | Percakapan teks dengan agen, dengan riwayat           | `[ ]`  |
-| T5.6  | Input voice note, perekaman dan unggah                | `[ ]`  |
-| T5.7  | Input foto struk                                      | `[ ]`  |
-| T5.8  | Kartu konfirmasi saat confidence rendah               | `[ ]`  |
-| T5.9  | Pemberitahuan terus terang saat pengganti lokal aktif | `[ ]`  |
-| T5.10 | Permintaan laporan bahasa alami dari percakapan       | `[ ]`  |
+| T5.5  | Percakapan teks dengan agen, dengan riwayat           | `[x]`  |
+| T5.6  | Input voice note, perekaman dan unggah                | `[~]`  |
+| T5.7  | Input foto struk                                      | `[~]`  |
+| T5.8  | Kartu konfirmasi saat confidence rendah               | `[~]`  |
+| T5.9  | Pemberitahuan terus terang saat pengganti lokal aktif | `[x]`  |
+| T5.10 | Permintaan laporan bahasa alami dari percakapan       | `[x]`  |
 
 ### S3 Integrasi WhatsApp
 
 | ID    | Tugas                                                                                                | Status |
 | ----- | ---------------------------------------------------------------------------------------------------- | ------ |
-| T5.11 | Status koneksi nomor WhatsApp                                                                        | `[ ]`  |
-| T5.12 | Tata cara dan aksi Hubungkan ke WhatsApp sampai berstatus terhubung, beserta aksi memutuskan koneksi | `[ ]`  |
-| T5.13 | Orderan yang masuk dari kanal WhatsApp                                                               | `[ ]`  |
-| T5.14 | Bukti pembayaran dan status verifikasi                                                               | `[ ]`  |
-| T5.15 | Panel pengirim pesan tiruan sebagai pelanggan                                                        | `[ ]`  |
-| T5.16 | Balasan otomatis agen tercatat pada konteks orderan                                                  | `[ ]`  |
-| T5.17 | Penghapusan data pelanggan dari antarmuka                                                            | `[ ]`  |
+| T5.11 | Status koneksi nomor WhatsApp                                                                        | `[~]`  |
+| T5.12 | Tata cara dan aksi Hubungkan ke WhatsApp sampai berstatus terhubung, beserta aksi memutuskan koneksi | `[~]`  |
+| T5.13 | Orderan yang masuk dari kanal WhatsApp                                                               | `[x]`  |
+| T5.14 | Bukti pembayaran dan status verifikasi                                                               | `[~]`  |
+| T5.15 | Panel pengirim pesan tiruan sebagai pelanggan                                                        | `[x]`  |
+| T5.16 | Balasan otomatis agen tercatat pada konteks orderan                                                  | `[x]`  |
+| T5.17 | Penghapusan data pelanggan dari antarmuka                                                            | `[x]`  |
 
 Catatan: penyedia kanal WhatsApp sudah ditetapkan, yaitu Fonnte. Tata cara
 menghubungkan, batasan lampiran, dan akibatnya pada rancangan ada di
@@ -253,33 +286,56 @@ menghubungkan, batasan lampiran, dan akibatnya pada rancangan ada di
 | ID    | Tugas                                 | Status |
 | ----- | ------------------------------------- | ------ |
 | T5.22 | Daftar produk dengan harga dan stok   | `[x]`  |
-| T5.23 | Pengaturan ambang minimum per produk  | `[ ]`  |
+| T5.23 | Pengaturan ambang minimum per produk  | `[x]`  |
 | T5.24 | Daftar alert stok menipis             | `[x]`  |
-| T5.25 | Penyesuaian stok manual dengan alasan | `[ ]`  |
-| T5.26 | Prediksi stok dan rekomendasi restok  | `[ ]`  |
+| T5.25 | Penyesuaian stok manual dengan alasan | `[x]`  |
+| T5.26 | Prediksi stok dan rekomendasi restok  | `[~]`  |
 
-Catatan: T5.23, T5.25, dan T5.26 belum dikerjakan karena mengubah data dan
-memerlukan formulir serta lapisan aksi yang belum ada. Ketiganya menunggu
-potongan berikutnya. Daftar produk pada T5.22 sudah menampilkan ambang minimum
-tiap produk, hanya belum dapat diubah dari halaman ini.
+Catatan: formulir ambang dan penyesuaian stok sudah tersedia. Tool forecast_stock
+sudah dibuat dan diuji; T5.26 tetap terbuka karena tampilan prediksi belum ada.
+Tambah, ubah, arsip, dan asisten produk dilacak pada T5.41 sampai T5.44.
 
 ### S6 Persetujuan
 
 | ID    | Tugas                                                           | Status |
 | ----- | --------------------------------------------------------------- | ------ |
-| T5.27 | Antrean aksi menunggu persetujuan                               | `[ ]`  |
-| T5.28 | Rincian draft PO sebelum disetujui                              | `[ ]`  |
-| T5.29 | Aksi setujui dan tolak, dengan pembaruan stok setelah disetujui | `[ ]`  |
-| T5.30 | Jejak audit aksi yang sudah diputuskan                          | `[ ]`  |
+| T5.27 | Antrean aksi menunggu persetujuan                               | `[x]`  |
+| T5.28 | Rincian draft PO sebelum disetujui                              | `[x]`  |
+| T5.29 | Aksi setujui dan tolak, dengan pembaruan stok setelah disetujui | `[x]`  |
+| T5.30 | Jejak audit aksi yang sudah diputuskan                          | `[x]`  |
+
+### S7 Kasir
+
+| ID | Tugas | Status |
+| --- | --- | --- |
+| T5.33 | Skema dan migrasi jenis pembayaran beserta data demo | `[x]` |
+| T5.34 | Penyimpanan penjualan, orderan, item, dan pergerakan stok secara atomik | `[x]` |
+| T5.35 | Daftar produk, pencarian, keranjang, dan pembatas jumlah menurut stok | `[x]` |
+| T5.36 | Pilihan tunai, transfer, QRIS, uang diterima, dan kembalian | `[x]` |
+| T5.37 | Simpan penjualan dan perbarui Kasir, Stok, Dasbor, serta Laporan | `[x]` |
+| T5.38 | Pesanan lewat suara atau ketikan dengan penafsiran DeepSeek | `[~]` |
+| T5.39 | Ringkasan uang masuk per jenis pembayaran dan rincian transaksi | `[x]` |
+| T5.40 | Uji Kasir sampai stok dan laporan berubah pada dua lebar layar | `[x]` |
+
+### Kelengkapan kelola produk dan alur persetujuan
+
+| ID | Tugas | Status |
+| --- | --- | --- |
+| T5.41 | Tambah dan ubah produk dengan pencatatan stok awal | `[x]` |
+| T5.42 | Arsip dan aktifkan kembali produk tanpa menghapus riwayat | `[x]` |
+| T5.43 | Tambah produk lewat asisten dengan dialog tinjau sebelum simpan | `[~]` |
+| T5.44 | Uji kelola produk, ambang, stok, dan arsip pada dua lebar layar | `[x]` |
+| T5.45 | Buat draft pesanan dari alert stok dan cegah draft rangkap yang menunggu | `[x]` |
+| T5.46 | Uji setujui, tolak, riwayat, dan perubahan stok pada dua lebar layar | `[x]` |
 
 ### Halaman pengaturan
 
 | ID    | Tugas                                                           | Status |
 | ----- | --------------------------------------------------------------- | ------ |
-| T5.31 | Keterangan opt in dan persetujuan pemilik atas pemrosesan pesan | `[ ]`  |
-| T5.32 | Keterangan privasi data sesuai butir proposal                   | `[ ]`  |
+| T5.31 | Keterangan opt in dan persetujuan pemilik atas pemrosesan pesan | `[x]`  |
+| T5.32 | Keterangan privasi data sesuai butir proposal                   | `[x]`  |
 
-Kriteria selesai fase 5: keenam permukaan dan halaman pengaturan dapat dipakai
+Kriteria selesai fase 5: ketujuh permukaan dan halaman pengaturan dapat dipakai
 dari awal sampai akhir tanpa langkah manual di luar aplikasi.
 
 ---
@@ -290,15 +346,15 @@ Tujuan: kualitas, keandalan, dan bukti demo.
 
 | ID   | Tugas                                                     | Status |
 | ---- | --------------------------------------------------------- | ------ |
-| T6.1 | Uji ujung ke ujung delapan langkah kriteria demo          | `[ ]`  |
-| T6.2 | Audit aksesibilitas dan responsif                         | `[ ]`  |
-| T6.3 | Pemeriksaan akhir kualitas desain                         | `[ ]`  |
-| T6.4 | Selaraskan semua dokumen dengan kenyataan kode            | `[ ]`  |
-| T6.5 | `README` berisi cara menjalankan dan catatan keterbatasan | `[ ]`  |
-| T6.6 | Jalur mundur bila demo kehilangan jaringan                | `[ ]`  |
+| T6.1 | Uji ujung ke ujung sepuluh langkah kriteria demo          | `[~]`  |
+| T6.2 | Audit aksesibilitas dan responsif                         | `[~]`  |
+| T6.3 | Pemeriksaan akhir kualitas desain                         | `[~]`  |
+| T6.4 | Selaraskan semua dokumen dengan kenyataan kode            | `[x]`  |
+| T6.5 | `README` berisi cara menjalankan dan catatan keterbatasan | `[x]`  |
+| T6.6 | Jalur mundur bila demo kehilangan jaringan                | `[~]`  |
 | T6.7 | Rekaman langkah demo dan ringkasan bukti                  | `[ ]`  |
 
-Kriteria selesai fase 6: delapan langkah kriteria demo di `docs/SCOPE.md`
+Kriteria selesai fase 6: sepuluh langkah kriteria demo di `docs/SCOPE.md`
 bagian 7 lulus otomatis, dan semua dokumen sesuai kenyataan.
 
 ---

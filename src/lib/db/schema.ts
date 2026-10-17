@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import {
   boolean,
   index,
@@ -67,6 +68,8 @@ export const paymentStatusEnum = pgEnum("payment_status", [
   "cocok",
   "tidak_cocok",
 ]);
+
+export const paymentMethodEnum = pgEnum("payment_method", ["tunai", "transfer", "qris"]);
 
 /** Jenis transaksi keuangan. */
 export const transactionKindEnum = pgEnum("transaction_kind", [
@@ -158,11 +161,14 @@ export const products = pgTable(
     purchasePrice: integer("purchase_price").notNull(),
     stock: integer("stock").notNull().default(0),
     minimumStock: integer("minimum_stock").notNull().default(0),
+    archivedAt: timestamp("archived_at", { withTimezone: true }),
     createdAt,
     updatedAt,
   },
   (table) => [
-    uniqueIndex("products_business_name_key").on(table.businessId, table.name),
+    uniqueIndex("products_business_name_key")
+      .on(table.businessId, sql`lower(${table.name})`)
+      .where(sql`${table.archivedAt} is null`),
     index("products_business_stock_idx").on(table.businessId, table.stock),
   ],
 );
@@ -240,6 +246,7 @@ export const messages = pgTable(
     conversationId: uuid("conversation_id")
       .notNull()
       .references(() => conversations.id, { onDelete: "cascade" }),
+    externalId: text("external_id"),
     sender: messageSenderEnum("sender").notNull(),
     kind: messageKindEnum("kind").notNull().default("text"),
     body: text("body"),
@@ -247,6 +254,7 @@ export const messages = pgTable(
     createdAt,
   },
   (table) => [
+    uniqueIndex("messages_business_external_idx").on(table.businessId, table.externalId),
     index("messages_conversation_created_idx").on(table.conversationId, table.createdAt),
   ],
 );
@@ -265,12 +273,16 @@ export const orders = pgTable(
     customerId: uuid("customer_id").references(() => customers.id, {
       onDelete: "set null",
     }),
+    requestId: uuid("request_id"),
     total: integer("total").notNull().default(0),
     status: orderStatusEnum("status").notNull().default("baru"),
     createdAt,
     updatedAt,
   },
-  (table) => [index("orders_business_created_idx").on(table.businessId, table.createdAt)],
+  (table) => [
+    index("orders_business_created_idx").on(table.businessId, table.createdAt),
+    uniqueIndex("orders_business_request_key").on(table.businessId, table.requestId),
+  ],
 );
 
 /** Rincian item sebuah orderan. */
@@ -310,6 +322,8 @@ export const transactions = pgTable(
     customerId: uuid("customer_id").references(() => customers.id, {
       onDelete: "set null",
     }),
+    method: paymentMethodEnum("method"),
+    orderId: uuid("order_id").references(() => orders.id, { onDelete: "set null" }),
     kind: transactionKindEnum("kind").notNull(),
     description: text("description").notNull(),
     amount: integer("amount").notNull(),
@@ -472,6 +486,7 @@ export const agentSessions = pgTable(
     conversationId: uuid("conversation_id").references(() => conversations.id, {
       onDelete: "cascade",
     }),
+    context: jsonb("context").notNull().default({}),
     lockStatus: sessionLockStatusEnum("lock_status").notNull().default("bebas"),
     pendingApprovalId: uuid("pending_approval_id").references(() => approvals.id, {
       onDelete: "set null",

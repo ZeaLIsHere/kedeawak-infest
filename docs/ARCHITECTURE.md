@@ -156,7 +156,7 @@ Aturan struktur:
 4. `src/components/` tidak boleh mengimpor dari `src/lib/db/`.
 5. Tidak ada fungsi yang dipanggil dari dua tempat berbeda tanpa diletakkan di
    `src/lib/`.
-6. `src/lib/channel/` adalah satu satunya tempat yang membaca bentuk payload
+6. `src/lib/channels/` adalah satu satunya tempat yang membaca bentuk payload
    penyedia kanal WhatsApp. Logika bisnis tidak pernah menyentuh bentuk payload
    penyedia.
 
@@ -373,9 +373,11 @@ mengisi nilai keyakinan antara 0 dan 1 beserta alasan singkatnya.
    sebagai jawaban atas pertanyaan persetujuan, bukan transaksi baru.
 4. Bila tidak terkunci, orchestrator menentukan maksud lalu memilih tool.
 5. Setiap pemanggilan tool dicatat di `tool_invocations`.
-6. Tool yang mengubah data penting, yaitu stok dan pembuatan PO, tidak
-   dijalankan langsung. Tool tersebut membuat baris di `approvals`, lalu sesi
-   dikunci. Data baru berubah setelah pemilik menyetujui.
+6. Draft pesanan pembelian dan restok lewat agen membuat baris di
+   `approvals`, lalu sesi dikunci. Stok masuk baru berlaku setelah keputusan
+   pemilik. Penjualan yang diminta eksplisit pemilik, simpan penjualan di
+   Kasir, dan penyesuaian stok dengan alasan merupakan persetujuan langsung
+   pemilik atas aksi tersebut, sesuai rancangan tambahan yang disetujui.
 
 Ini yang dimaksud human in the loop pada proposal, dan wajib.
 
@@ -546,7 +548,7 @@ Diambil dari dokumentasi resmi Fonnte pada 17 Oktober 2026.
    pesan tiruan menulis ke fungsi pemrosesan pesan masuk yang sama dengan
    webhook penyedia, sehingga seluruh langkah kriteria demo tetap berjalan
    ketika jaringan bermasalah atau kuota Fonnte habis.
-2. Penerjemah payload penyedia berada di `src/lib/channel/`, sesuai aturan
+2. Penerjemah payload penyedia berada di `src/lib/channels/`, sesuai aturan
    struktur butir 6.
 3. Nama paket dan sisa kuota ditampilkan pada halaman Pengaturan apa adanya,
    termasuk keterangan bahwa lampiran masuk belum aktif pada paket gratis.
@@ -588,3 +590,98 @@ di skrip Node. Dua hal yang ditemukan saat pengujian, beserta penanganannya:
    build, karena isinya akan terbekukan pada saat build dan tidak berubah saat
    pemilik memakai aplikasi. Mekanisme pencegahannya ditetapkan pada T5.1,
    dengan memperhatikan `cacheComponents` yang aktif.
+
+## 13. Titik implementasi 18 Oktober 2026
+
+Bagian struktur dan rancangan di atas memuat sasaran sistem. Kondisi yang
+sudah diimplementasikan sampai pemilik menghentikan sesi dicatat di sini;
+status penerimaan dan pekerjaan terbuka tetap mengikuti PLAN.md.
+
+### 13.1 Mutasi dan konsistensi data
+
+Server Action berada pada src/lib/actions/. Penjualan memanggil
+src/lib/data/sales.ts, mengambil harga dari produk aktif, dan menyimpan
+orderan selesai, item, transaksi, serta pergerakan stok dalam satu transaksi.
+orders.request_id berindeks unik per warung; pengulangan permintaan yang sama
+mengembalikan penjualan terdahulu, dan muatan berbeda dengan kunci yang sama
+ditolak. Penguncian baris warung menserialisasi penjualan bersamaan.
+
+products.archived_at menyimpan waktu arsip. Indeks unik nama hanya berlaku
+pada produk aktif. Daftar aktif, pencocokan nama, dan alert menyaring produk
+arsip; riwayat orderan tetap mengacu ke barisnya. Stok awal dan penyesuaian
+selalu memakai stock_movements. Alasan wajib saat stok produk lama berubah.
+
+transactions.method menyimpan tunai, transfer, atau qris dan boleh kosong
+untuk riwayat lama. transactions.order_id mengaitkan transaksi ke orderan.
+Ringkasan jenis pembayaran memakai rentang setengah terbuka yang sama dengan
+laporan. Pembayaran ini pencatatan, bukan pemrosesan uang.
+
+### 13.2 Persetujuan dan sesi
+
+Antrean dan riwayat berasal dari approvals dan purchase_orders.
+Keputusan setujui menambah stok dalam transaksi yang sama; tolak tidak
+mengubah stok. Keputusan ulang tidak menerapkan stok lagi. Alert ditutup
+hanya jika stok mencapai ambang minimum. Draft yang masih menunggu
+dideduplikasi. Sesi yang menunjuk keputusan itu dilepas setelah diputuskan.
+
+agent_sessions.context menyimpan bacaan struk yang belum disetujui.
+Percakapan dikunci saat memproses pesan dan kuota harian dikonsumsi secara
+atomik. Selama persetujuan atau bacaan struk menunggu, pesan berikutnya
+diproses dalam konteks itu. Konfirmasi bacaan hanya dapat diterapkan sekali.
+
+### 13.3 AI dan tool
+
+src/lib/ai/provider.ts memanggil endpoint chat completions yang dikonfigurasi
+melalui lingkungan. Pengujian menyuntikkan penyedia uji pada batas ini.
+transcript.ts memvalidasi usulan produk dan baris keranjang terhadap produk
+aktif. receipt.ts memvalidasi foto data URL, nominal, tanggal, dan confidence;
+hasil di bawah 70 persen meminta konfirmasi. UI meninjau setiap bacaan
+sebelum menyimpan pengeluaran.
+
+src/lib/tools/index.ts menyediakan sepuluh tool dan mencatat sukses atau
+gagal melalui tool_invocations. RAG memakai query basis data lewat lapisan
+data. Prediksi tersedia sebagai tool berbasis histori tujuh hari; kartu
+prediksi pada halaman Stok belum dibuat. Pengenalan mikrofon memakai
+Web Speech API dengan jalur ketik; unggah berkas voice note belum dibuat.
+
+Mode lokal pada percakapan deterministik dan dinyatakan pada layar.
+Kasir dan tambah produk tidak memakai parser lokal pengganti DeepSeek;
+formulir manual menjadi jalur saat parser tidak tersedia. Panggilan DeepSeek
+serta mikrofon nyata belum diuji ulang dalam sesi ini.
+
+### 13.4 Kanal dan privasi
+
+Implementasi penerjemah berada di src/lib/channels/, dan persistensi pada
+src/lib/data/channel-intake.ts. Panel simulasi serta webhook menggunakan
+receiveChannelEvent dan processChannelEvent yang sama.
+messages.external_id berindeks unik per warung untuk deduplikasi.
+Orderan baru belum mengubah stok. Bukti yang nominalnya cocok dan confidence
+memadai menyelesaikan orderan lalu mencatat transaksi serta stok sekali.
+Nominal simulasi diisi pemilik sebagai data uji; foto memakai parser vision.
+
+Webhook /api/channels/whatsapp memerlukan CHANNEL_WEBHOOK_SECRET melalui
+Authorization Bearer atau parameter key. Pesan hanya diproses ketika koneksi
+aplikasi berstatus terhubung. Payload penyedia tanpa id pesan tidak membuat
+pesanan otomatis. Respons webhook bukan format balasan penyedia, sehingga
+tidak memicu pengiriman pesan ke pelanggan.
+
+Profil Fonnte dibaca dari https://api.fonnte.com/device sesuai
+[dokumentasi profil perangkat](https://docs.fonnte.com/language/en/page/4/).
+Token tetap di server. Pemutusan koneksi aplikasi menghentikan pemrosesan
+lokal; tidak memutus perangkat di dasbor Fonnte. Integrasi nyata belum diuji.
+
+Penghapusan pelanggan membuang identitas terenkripsi, mengosongkan isi dan
+lampiran pesan terkait, serta menghapus lampiran bukti dan keterangan
+transaksi yang terkait identitas. Nilai serta riwayat transaksi tetap
+dipertahankan dengan rujukan pelanggan kosong.
+
+### 13.5 Migrasi dan pengujian terpisah
+
+Migrasi 0001 menambah arsip, jenis pembayaran, hubungan orderan, dan identitas
+pesan. Migrasi 0002 menambah konteks sesi. Migrasi 0003 menambah identitas
+permintaan penjualan. Seed kini memuat 20 produk aktif dan satu produk arsip.
+
+Hanya basis data .pglite/test-completion-20261018 yang dimigrasi pada sesi ini.
+NEXT_DIST_DIR memisahkan keluaran server pengujian dari server pemilik.
+PLAYWRIGHT_BASE_URL menunjuk server khusus port 3100. Nilai bawaan aplikasi
+tetap direktori .next dan port 3000.

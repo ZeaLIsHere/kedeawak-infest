@@ -53,3 +53,7 @@ Thumbs.db
 # berkas sementara hasil unggahan pengguna dan media demo
 /uploads/
 /public/uploads/
+
+# keluaran server verifikasi terpisah
+.next-test-completion/
+.next-build-completion/

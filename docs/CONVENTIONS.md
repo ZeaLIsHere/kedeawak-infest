@@ -231,3 +231,18 @@ Setiap daftar, tabel, dan kartu data wajib menangani:
 | Menyimpan uang sebagai bilangan desimal          | Bilangan bulat rupiah                |
 | Menambah fitur di luar scope                     | Tanyakan dulu                        |
 | Menyatakan selesai tanpa menjalankan pemeriksaan | Jalankan `docs/WORKFLOW.md` bagian 4 |
+
+## 11. Mutasi, formulir, dan konfirmasi
+
+Berkas Server Action berada pada src/lib/actions/ dan memakai nama
+penjualan.ts, produk.ts, persetujuan.ts, percakapan.ts, serta whatsapp.ts.
+Formulir memvalidasi masukan di server dan mengembalikan hasil terstruktur
+dengan pesan Indonesia, tanpa membocorkan galat SQL atau token.
+
+Harga dan stok diperiksa ulang di lapisan data. requestId penjualan tetap
+sama selama pengulangan penyimpanan yang sama, lalu diganti setelah berhasil.
+Setiap aksi yang mengubah data merevalidasi halaman yang terkait.
+Arsip produk, penghapusan pelanggan, dan tinjau usulan asisten memerlukan
+konfirmasi. Dialog memakai komponen aksesibel di src/components/ui/dialog.tsx.
+Teks AI yang ditampilkan harus mengikuti aturan teks UI, termasuk penghapusan
+emoji dan tanda hubung dari balasan dinamis; identifier teknis tidak diubah.

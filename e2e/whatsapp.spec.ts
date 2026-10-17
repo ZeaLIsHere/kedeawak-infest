@@ -1,0 +1,37 @@
+import {test,expect} from "@playwright/test";
+test("pesanan dan bukti simulasi mengubah status serta dapat dihapus datanya",async({page},testInfo)=>{
+  const phone=testInfo.project.name==="layar-sempit"?"081200000101":"081200000102";
+  const customer="Pelanggan Uji "+testInfo.project.name.replaceAll("-"," ");
+  await page.goto("/whatsapp");
+  await page.getByRole("button",{name:"Hubungkan simulasi"}).click();
+  await expect(page.getByText("Simulasi terhubung",{exact:true})).toBeVisible();
+  await page.getByLabel("Nomor pelanggan").fill(phone);
+  await page.getByLabel("Nama pelanggan").fill(customer);
+  await page.getByLabel("Pesan pelanggan").fill("Pesanan uji beras");
+  await page.getByLabel("Jumlah pesanan").fill("1");
+  const option=page.getByLabel("Produk pesanan").locator("option").first();
+  await page.getByLabel("Produk pesanan").selectOption(await option.getAttribute("value") ?? "");
+  await page.getByRole("button",{name:"Kirim pesan simulasi"}).click();
+  await expect(page.getByRole("status").filter({hasText:"Pesanan tercatat"})).toBeVisible();
+  const card=page.getByTestId("channel-order").filter({hasText:customer}).first();
+  await expect(card).toBeVisible();
+  const total=await card.getAttribute("data-total");
+  await page.getByLabel("Jenis pesan").selectOption("payment");
+  await page.getByLabel("Orderan pembayaran").selectOption(await card.getAttribute("data-order-id") ?? "");
+  await page.getByLabel("Nominal bukti simulasi").fill(total ?? "0");
+  await page.getByLabel("Pesan pelanggan").fill("Bukti pembayaran uji");
+  await page.getByRole("button",{name:"Kirim pesan simulasi"}).click();
+  await expect(card.getByText("Nominal cocok",{exact:true})).toBeVisible();
+  await expect(card.getByText("Selesai",{exact:true})).toBeVisible();
+  await page.getByRole("button",{name:"Hapus data "+customer,exact:true}).click();
+  await page.getByRole("button",{name:"Konfirmasi hapus",exact:true}).click();
+  await expect(page.getByRole("status").filter({hasText:"Data pelanggan sudah dihapus"})).toBeVisible();
+  await expect(page.getByText(customer,{exact:true})).toHaveCount(0);
+  const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth);
+  expect(overflow).toBe(false);
+});
+test("pengaturan menjelaskan persetujuan dan privasi",async({page})=>{
+ await page.goto("/pengaturan");
+ await expect(page.getByRole("heading",{name:"Persetujuan pemrosesan pesan"})).toBeVisible();
+ await expect(page.getByRole("heading",{name:"Privasi data pelanggan"})).toBeVisible();
+});

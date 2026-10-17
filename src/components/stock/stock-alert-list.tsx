@@ -1,3 +1,4 @@
+﻿import { DraftFromAlert } from "./draft-from-alert";
 import { CircleCheck } from "lucide-react";
 import { connection } from "next/server";
 
@@ -71,6 +72,7 @@ export async function StockAlertList() {
       {alerts.map(({ alert, product }) => (
         <li
           key={alert.id}
+          data-testid="stock-alert"
           className="flex flex-col gap-2 border-b border-border pb-3 last:border-b-0 last:pb-0"
         >
           <div className="flex flex-wrap items-center gap-2">
@@ -98,6 +100,7 @@ export async function StockAlertList() {
               </dd>
             </div>
           </dl>
+          <DraftFromAlert productId={product.id} />
         </li>
       ))}
     </ul>

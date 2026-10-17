@@ -5,7 +5,10 @@ const nextConfig: NextConfig = {
   // Penulisan otomatis blok aturan Next.js dimatikan agar tidak menimpa isinya.
   // Panduan Next.js 16 dibaca dari node_modules/next/dist/docs/.
   agentRules: false,
+  // Folder terpisah agar verifikasi tidak memakai keluaran server pemilik.
+  distDir: process.env.NEXT_DIST_DIR ?? ".next",
   cacheComponents: true,
+  experimental: { serverActions: { bodySizeLimit: "5mb" } },
   partialPrefetching: true,
   /*
    * PGlite memuat berkas runtime miliknya sendiri dari cakram. Bila paket ini

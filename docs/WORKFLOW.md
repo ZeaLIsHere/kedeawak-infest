@@ -7,35 +7,16 @@ di commit dan di push.
 
 ---
 
-## 1. Pengaturan awal yang belum selesai
+## 1. Pengaturan git yang sudah ditetapkan
 
-Tiga hal ini harus dibereskan sebelum commit pertama bisa dikirim.
+Remote origin memakai https://github.com/ZeaLIsHere/kedeawak-infest.git dan
+cabang kerja main. Identitas mengikuti keputusan K1 pada PLAN.md.
+Autentikasi memakai Windows Credential Manager sesuai K2; push sebelumnya
+sudah berhasil. Setiap sesi tetap memeriksa status cabang dan hasil push,
+tanpa menampilkan kredensial.
 
-| Hal                                         | Status       | Yang dibutuhkan                                                             |
-| ------------------------------------------- | ------------ | --------------------------------------------------------------------------- |
-| Remote `origin`                             | Belum diatur | Sudah ditentukan: https://github.com/ZeaLIsHere/kedeawak-infest.git         |
-| Identitas git: `user.name` dan `user.email` | Kosong       | Nilai dari user                                                             |
-| Autentikasi push                            | Belum ada    | Kredensial GitHub, karena `gh` tidak terpasang dan helper kredensial kosong |
-
-Perintah yang akan dijalankan setelah nilainya diberikan:
-
-```bash
-git remote add origin https://github.com/ZeaLIsHere/kedeawak-infest.git
-git config user.name "<nama>"
-git config user.email "<email>"
-git branch -M main
-```
-
-Untuk autentikasi, pilihan yang tersedia di mesin ini:
-
-1. **Personal access token disimpan di helper kredensial.** Sekali kirim,
-   tersimpan permanen di Windows Credential Manager.
-2. **Kredensial yang sudah ada.** Bila GitHub Desktop atau klien lain pernah
-   dipakai, kredensialnya mungkin sudah tersimpan.
-3. **SSH key.** Perlu mengubah remote menjadi bentuk SSH.
-
-Kalau tidak ditemukan cara yang bersih, tanyakan ke user. Jangan menulis token
-ke dalam file apa pun di dalam repo.
+Jangan menulis token dalam repo. Jika autentikasi gagal, ikuti bagian 7.
+Jangan mengulang inisialisasi remote atau mengganti identitas tanpa alasan.
 
 ---
 

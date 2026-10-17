@@ -1,4 +1,4 @@
-import { Receipt } from "lucide-react";
+﻿import { Receipt } from "lucide-react";
 
 import { Skeleton } from "@/components/shell/skeleton";
 import { StateBlock } from "@/components/shell/state-block";
@@ -68,6 +68,17 @@ export function TransactionList({
               {formatDate(transaction.occurredAt)}, {formatTime(transaction.occurredAt)}
             </span>
             <Badge variant="outline">{transactionKindLabel(transaction.kind)}</Badge>
+            {transaction.kind === "sale" && (
+              <span className="text-caption text-muted-foreground">
+                {transaction.method === "tunai"
+                  ? "Tunai"
+                  : transaction.method === "transfer"
+                    ? "Transfer"
+                    : transaction.method === "qris"
+                      ? "QRIS"
+                      : "Pembayaran belum diketahui"}
+              </span>
+            )}
           </div>
         </li>
       ))}

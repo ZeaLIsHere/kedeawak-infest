@@ -22,16 +22,38 @@ Aturan induk dari user:
 
 ## 2. Permukaan aplikasi yang dibangun
 
-Enam permukaan. Semuanya mengacu ke bagian mockup dan fitur utama proposal.
+Tujuh permukaan. Enam di antaranya mengacu ke bagian mockup dan fitur utama
+proposal. Yang ketujuh, Kasir, ditambahkan atas permintaan pemilik proyek.
 
 | ID  | Permukaan                 | Isi                                                                                                                            | Status   |
 | --- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------ | -------- |
 | S1  | Dasbor                    | Statistik penjualan, pengeluaran, laba, jumlah order, produk terlaris, alert stok terbaru                                      | MASUK    |
 | S2  | Percakapan dengan Agen AI | Obrolan dengan AI untuk mencatat transaksi lewat teks, voice note, dan foto struk, termasuk konfirmasi dan persetujuan aksi    | MASUK    |
 | S3  | Integrasi WhatsApp        | Status koneksi nomor, aksi Hubungkan ke WhatsApp beserta tata caranya, orderan yang masuk, bukti pembayaran, status verifikasi | SIMULASI |
-| S4  | Laporan Keuangan          | Laporan harian dan mingguan: penjualan, pengeluaran, laba, rincian transaksi, ekspor                                           | MASUK    |
-| S5  | Stok dan Produk           | Daftar produk, harga, stok, ambang minimum, alert stok menipis, penyesuaian stok                                               | MASUK    |
+| S4  | Laporan Keuangan          | Laporan harian dan mingguan: penjualan, pengeluaran, laba, rincian transaksi                                           | MASUK    |
+| S5  | Stok dan Produk           | Daftar, tambah, ubah, dan arsip produk, stok, ambang minimum, alert, penyesuaian beralasan, asisten dengan dialog tinjau                                               | MASUK    |
 | S6  | Persetujuan               | Antrean aksi yang menunggu persetujuan pemilik, contohnya draft PO ke supplier, dengan aksi setujui atau tolak                 | MASUK    |
+| S7  | Kasir                     | Daftar produk yang dapat ditekan, keranjang, jenis pembayaran tunai atau transfer atau QRIS, pesanan lewat suara               | MASUK    |
+
+Catatan S7. Kasir tidak diambil dari proposal, melainkan permintaan langsung
+pemilik proyek pada 18 Oktober 2026, supaya penjualan di warung dapat dicatat
+dari dalam aplikasi dan datanya ikut berubah. Kasir tidak menggantikan atau
+mengurangi satu pun permukaan lain. Rancangannya ada di
+`docs/specs/2026-10-17-kasir-kelola-produk-design.md`, dan tugasnya ada di
+`PLAN.md` bagian S7.
+
+## 2.1 Status implementasi
+
+Diperbarui 18 Oktober 2026 pada titik penghentian yang diminta pemilik.
+S1 dan S4 membaca data; S7 menyimpan penjualan; S5 dapat mengelola produk
+dan stok; S6 menampilkan serta memutus draft. S2 mempunyai percakapan,
+mode lokal, dan alur tinjau struk. S3 mempunyai simulasi pelanggan dan
+pemeriksaan profil Fonnte. Pengaturan memuat persetujuan serta privasi.
+
+Uji layanan AI, mikrofon, dan Fonnte nyata belum lengkap. Unggah berkas
+voice note serta tampilan prediksi stok belum dibuat. Status MASUK atau
+SIMULASI adalah keputusan cakupan, bukan bukti seluruh alurnya selesai.
+Status tugas dan batas verifikasi mengikuti PLAN.md.
 
 ## 3. Fitur utama proposal dan statusnya
 

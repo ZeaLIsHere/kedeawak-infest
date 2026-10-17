@@ -1,0 +1,28 @@
+﻿import {beforeAll,afterAll,describe,it,expect} from "vitest";
+import {createTestDatabase,type TestDatabase} from "../db/testing";
+import {createProduct,findProduct} from "../data/products";
+import {recordStockMovement} from "../data/stock";
+import {recordInboundMessage,listMessages} from "../data/conversations";
+import {listToolInvocations} from "../data/tool-invocations";
+import {listApprovals} from "../data/approvals";
+import {executeTool} from "./index";
+let t:TestDatabase;let productId:string;let conversationId:string;let customerId:string;
+beforeAll(async()=>{t=await createTestDatabase();const p=await createProduct(t.db,t.business.id,{name:"Beras",unit:"kg",salePrice:15000,purchasePrice:12000,minimumStock:4});productId=p.id;await recordStockMovement(t.db,t.business.id,{productId,kind:"masuk",quantityChange:20,reason:"Stok awal"});const c=await recordInboundMessage(t.db,t.business.id,{channel:"whatsapp",phoneNumber:"081234567890",body:"Ada beras"});conversationId=c.conversation.id;customerId=c.customer.id;},60000);
+afterAll(async()=>{await t.close();});
+const run=(name:string,args:unknown,context={})=>executeTool(t.db,t.business.id,name,args,context);
+describe("sepuluh tool agen",()=>{
+ it("membaca stok warung",async()=>{expect(await run("check_stock",{product_id:productId})).toMatchObject({ok:true,data:{stock:20}});});
+ it("mencatat penjualan dan mengurangi stok",async()=>{expect(await run("create_sale",{items:[{productId,quantity:2}],total:30000})).toMatchObject({ok:true,data:{total:30000}});expect((await findProduct(t.db,t.business.id,productId))?.stock).toBe(18);});
+ it("mencatat pengeluaran",async()=>{expect(await run("create_expense",{description:"Beli kantong",amount:2000})).toMatchObject({ok:true,data:{amount:2000,kind:"expense"}});});
+ it("mencatat hutang pelanggan terikat warung",async()=>{expect(await run("create_debt",{customer:customerId,amount:5000})).toMatchObject({ok:true,data:{amount:5000,kind:"debt"}});});
+ it("draft pesanan menunggu persetujuan tanpa mengubah stok",async()=>{expect(await run("create_purchase_order",{supplier:"Pemasok Beras",items:[{productId,quantity:5}]})).toMatchObject({ok:true,data:{approvalId:expect.any(String)}});expect((await listApprovals(t.db,t.business.id,"menunggu"))).toHaveLength(1);expect((await findProduct(t.db,t.business.id,productId))?.stock).toBe(18);});
+ it("balasan WhatsApp ditulis tanpa mengirim keluar",async()=>{expect(await run("send_whatsapp",{phone:"081234567890",message:"Beras tersedia"},{conversationId})).toMatchObject({ok:true});expect((await listMessages(t.db,t.business.id,conversationId)).at(-1)?.body).toBe("Beras tersedia");});
+ it("verifikasi pembayaran membandingkan nominal tanpa mencatat penjualan",async()=>{expect(await run("verify_payment",{image_url:"data:image/png;base64,YQ==",expected_amount:15000},{provider:{complete:async()=>({description:"Transfer",amount:15000,date:"2026-10-18",confidence:0.9})}})).toMatchObject({ok:true,data:{matches:true,amount:15000}});});
+ it("laporan memakai transaksi nyata",async()=>{expect(await run("get_report",{period:"harian"})).toMatchObject({ok:true,data:{sales:30000,expenses:2000}});});
+ it("prediksi mengukur penjualan tujuh hari dengan stok pengaman",async()=>{expect(await run("forecast_stock",{product_id:productId})).toMatchObject({ok:true,data:{dailyAverage:2/7,safetyStock:4}});});
+ it("strategi memakai ringkasan dan stok warung",async()=>{expect(await run("business_strategy",{})).toMatchObject({ok:true,data:{summary:{sales:30000}}});});
+ it("argumen tidak sah tercatat gagal tanpa mutasi",async()=>{const before=(await findProduct(t.db,t.business.id,productId))?.stock;expect(await run("create_sale",{items:[{productId,quantity:-1}],total:0})).toMatchObject({ok:false});expect((await findProduct(t.db,t.business.id,productId))?.stock).toBe(before);expect((await listToolInvocations(t.db,t.business.id)).some(i=>i.toolName==="create_sale"&&i.failed)).toBe(true);});
+ it("penjualan menolak total model yang salah",async()=>{expect(await run("create_sale",{items:[{productId,quantity:1}],total:1})).toMatchObject({ok:false});});
+ it("menolak balasan pada nomor percakapan lain",async()=>{expect(await run("send_whatsapp",{phone:"089999999999",message:"Beras"},{conversationId})).toMatchObject({ok:false});});
+ it.each(["check_stock","create_sale","create_expense","create_debt","create_purchase_order","send_whatsapp","verify_payment","get_report","forecast_stock","business_strategy"])("menolak argumen kosong untuk %s",async(name)=>{if(name==="business_strategy")expect(await run(name,{extra:true})).toMatchObject({ok:false});else expect(await run(name,{})).toMatchObject({ok:false});});
+});

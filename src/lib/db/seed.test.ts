@@ -4,7 +4,7 @@ import { decideApproval, listApprovals, readPurchaseOrderId } from "../data/appr
 import { findBusiness } from "../data/business";
 import { listCustomers, readCustomerName, readCustomerPhone } from "../data/customers";
 import { listOrders } from "../data/orders";
-import { findProduct, listProducts } from "../data/products";
+import { findProduct, listProducts, listArchivedProducts } from "../data/products";
 import { findPurchaseOrder, findPurchaseOrderWithItems } from "../data/purchase-orders";
 import { listStockAlerts, listStockMovements } from "../data/stock";
 import { listTransactions } from "../data/transactions";
@@ -28,6 +28,16 @@ afterAll(async () => {
 });
 
 describe("data demo", () => {
+  it("menyediakan produk arsip dan tiga jenis pembayaran nyata", async () => {
+    const archived = await listArchivedProducts(test.db, seeded.businessId);
+    expect(archived).toHaveLength(1);
+    const sales = (await listTransactions(test.db, seeded.businessId)).filter(
+      (row) => row.kind === "sale",
+    );
+    expect(new Set(sales.map((row) => row.method))).toEqual(
+      new Set(["tunai", "transfer", "qris"]),
+    );
+  });
   it("menyiapkan satu warung dengan isi yang lengkap", async () => {
     const rows = await test.db.select().from(businesses);
 

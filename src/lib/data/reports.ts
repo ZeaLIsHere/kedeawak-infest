@@ -134,3 +134,35 @@ export async function listTopProducts(
     .orderBy(desc(sql`sum(${orderItems.quantity})`))
     .limit(limit);
 }
+
+export type PaymentSummary = {
+  readonly tunai: number;
+  readonly transfer: number;
+  readonly qris: number;
+  readonly belumDiketahui: number;
+};
+/** Metode pembayaran penjualan pada rentang setengah terbuka yang sama. */
+export async function summarizePayments(
+  db: Database,
+  businessId: string,
+  period: Period,
+): Promise<PaymentSummary> {
+  const rows = await db
+    .select({
+      method: transactions.method,
+      amount: sql<number>`cast(coalesce(sum(${transactions.amount}),0) as integer)`,
+    })
+    .from(transactions)
+    .where(
+      and(
+        eq(transactions.businessId, businessId),
+        eq(transactions.kind, "sale"),
+        gte(transactions.occurredAt, period.from),
+        lt(transactions.occurredAt, period.to),
+      ),
+    )
+    .groupBy(transactions.method);
+  const result = { tunai: 0, transfer: 0, qris: 0, belumDiketahui: 0 };
+  for (const row of rows) result[row.method ?? "belumDiketahui"] += row.amount;
+  return result;
+}

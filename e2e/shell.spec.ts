@@ -1,8 +1,9 @@
-import { expect, test, type Page } from "@playwright/test";
+﻿import { expect, test, type Page } from "@playwright/test";
 
 /** Setiap tujuan beserta judul halaman yang harus tampil. */
 const DESTINATIONS: readonly { path: string; heading: string }[] = [
   { path: "/", heading: "Dasbor" },
+  { path: "/kasir", heading: "Kasir" },
   { path: "/percakapan", heading: "Percakapan dengan Agen AI" },
   { path: "/whatsapp", heading: "Integrasi WhatsApp" },
   { path: "/laporan", heading: "Laporan Keuangan" },
@@ -12,10 +13,10 @@ const DESTINATIONS: readonly { path: string; heading: string }[] = [
 ];
 
 /** Tujuan yang tampil langsung pada batang bawah layar sempit. */
-const BOTTOM_BAR_LABELS: readonly string[] = ["Dasbor", "Agen AI", "WhatsApp", "Laporan"];
+const BOTTOM_BAR_LABELS: readonly string[] = ["Dasbor", "Agen AI", "Kasir", "Laporan"];
 
 /** Tujuan yang tersembunyi di dalam lembar menu Lainnya. */
-const SHEET_LABELS: readonly string[] = ["Stok", "Persetujuan", "Pengaturan"];
+const SHEET_LABELS: readonly string[] = ["WhatsApp", "Stok", "Persetujuan", "Pengaturan"];
 
 const NARROW_PROJECT = "layar-sempit";
 

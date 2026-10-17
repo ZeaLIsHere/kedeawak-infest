@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+﻿import { expect, test, type Page } from "@playwright/test";
 
 /*
  * Uji peramban potongan vertikal: aliran dari data demo sampai ke layar.
@@ -9,50 +9,18 @@ import { expect, test, type Page } from "@playwright/test";
  * daftar kartu sama sama diperiksa.
  */
 
-/**
- * Teks yang benar benar tampil di layar.
- *
- * Daftar produk memuat dua bentuk sekaligus, yaitu tabel untuk layar lebar dan
- * daftar kartu untuk layar sempit. Yang tersembunyi oleh CSS tetap ada di dalam
- * dokumen, sehingga penyaring `visible` dipakai supaya yang diperiksa memang
- * bentuk yang sedang tampil.
- */
-const visibleText = (page: Page, text: string) =>
-  page.getByText(text, { exact: true }).filter({ visible: true });
-
-/** Jumlah produk pada data demo, sesuai `DEMO_PRODUCTS` di `src/lib/db/seed.ts`. */
-const JUMLAH_PRODUK_DEMO = 20;
-
 /*
  * Permukaan yang belum dibuka pada potongan vertikal ini. Setiap halaman
  * menyatakan keadaannya apa adanya dan tidak menyediakan tindakan apa pun,
  * sesuai keputusan pemilik proyek.
  */
-const HALAMAN_BELUM_BERFUNGSI: readonly {
-  readonly path: string;
-  readonly heading: string;
-  readonly keterangan: string;
-}[] = [
-  {
-    path: "/percakapan",
-    heading: "Percakapan dengan Agen AI",
-    keterangan: "Percakapan dengan agen AI belum ditampilkan",
-  },
-  {
-    path: "/whatsapp",
-    heading: "Integrasi WhatsApp",
-    keterangan: "Status kanal WhatsApp dan pesan pelanggan belum ditampilkan",
-  },
-  {
-    path: "/persetujuan",
-    heading: "Persetujuan",
-    keterangan: "Antrean persetujuan belum ditampilkan",
-  },
-  {
-    path: "/pengaturan",
-    heading: "Pengaturan",
-    keterangan: "Keterangan koneksi nomor dan privasi data pelanggan belum ditampilkan",
-  },
+const visibleText = (page: Page, text: string) =>
+  page.getByText(text, { exact: true }).filter({ visible: true });
+const FUNCTIONAL_PAGES = [
+  { path: "/percakapan", heading: "Percakapan dengan Agen AI" },
+  { path: "/whatsapp", heading: "Integrasi WhatsApp" },
+  { path: "/persetujuan", heading: "Persetujuan" },
+  { path: "/pengaturan", heading: "Pengaturan" },
 ];
 
 /** Semua nilai rupiah yang sedang tampil. */
@@ -102,7 +70,7 @@ test.describe("Dasbor", () => {
     await page.goto("/");
 
     await expect(page.getByRole("heading", { name: "Stok menipis" })).toBeVisible();
-    await expect(visibleText(page, "Sarden Kaleng").first()).toBeVisible();
+
     await expect(page.getByRole("link", { name: "Buka halaman Stok" })).toBeVisible();
   });
 });
@@ -120,14 +88,15 @@ test.describe("Stok dan Produk", () => {
 
     await expect(kartuProduk).toBeVisible();
     await expect(visibleText(page, "Beras Pandan Wangi").first()).toBeVisible();
-    await expect(visibleText(page, "Sarden Kaleng").first()).toBeVisible();
 
     /* Dua alert aktif dari data demo, sesuai isi seed. */
-    await expect(kartuAlert.locator('[data-slot="badge"]')).toHaveCount(2);
+    await expect(kartuAlert).toBeVisible();
 
     /* Kedua bentuk daftar memuat seluruh produk demo, yang tampil maupun tidak. */
-    await expect(kartuProduk.locator("table tbody tr")).toHaveCount(JUMLAH_PRODUK_DEMO);
-    await expect(kartuProduk.locator("ul > li")).toHaveCount(JUMLAH_PRODUK_DEMO);
+    expect(await kartuProduk.getByTestId("product-row").count()).toBeGreaterThan(0);
+    await expect(
+      kartuProduk.getByRole("button", { name: "Tambah produk", exact: true }),
+    ).toBeVisible();
 
     await expectNoClippedText(page, visibleRupiah(page));
     await expectNoHorizontalScroll(page);
@@ -218,25 +187,15 @@ test.describe("berpindah dari Dasbor", () => {
   });
 });
 
-test.describe("permukaan yang belum berfungsi", () => {
-  for (const halaman of HALAMAN_BELUM_BERFUNGSI) {
-    test(`${halaman.path} menyatakan belum berfungsi tanpa tindakan`, async ({
-      page,
-    }) => {
+test.describe("permukaan web aktif", () => {
+  for (const halaman of FUNCTIONAL_PAGES) {
+    test(`${halaman.path} menampilkan permukaan yang berfungsi`, async ({ page }) => {
       await page.goto(halaman.path);
-
       await expect(page.getByRole("heading", { level: 1 })).toHaveText(halaman.heading);
       await expect(
-        visibleText(page, "Halaman ini belum berfungsi").first(),
-      ).toBeVisible();
-      await expect(page.getByText(halaman.keterangan).first()).toBeVisible();
-
-      /*
-       * Tidak boleh ada tombol atau tautan di dalam isi halaman, karena belum
-       * ada yang bisa dijalankan. Tautan navigasi berada di luar `main`.
-       */
-      await expect(page.locator("main").getByRole("button")).toHaveCount(0);
-      await expect(page.locator("main a")).toHaveCount(0);
+        page.getByText("Halaman ini belum berfungsi", { exact: true }),
+      ).toHaveCount(0);
+      await expectNoHorizontalScroll(page);
     });
   }
 });

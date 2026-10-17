@@ -9,7 +9,12 @@ import { findOrCreateCustomer, listCustomers } from "../data/customers";
 import { listKnowledgeChunks, replaceKnowledgeSource } from "../data/knowledge";
 import { createOrder, listOrders, updateOrderStatus } from "../data/orders";
 import { startOfDay } from "../data/period";
-import { createProduct, findProduct, listProducts } from "../data/products";
+import {
+  archiveProduct,
+  createProduct,
+  findProduct,
+  listProducts,
+} from "../data/products";
 import { createPurchaseOrder } from "../data/purchase-orders";
 import { listStockAlerts, listStockMovements, recordStockMovement } from "../data/stock";
 import { createTransaction, listTransactions } from "../data/transactions";
@@ -379,6 +384,22 @@ export async function seedDemoData(
     });
   }
 
+  const archivedProduct = await createProduct(db, businessId, {
+    name: "Kopi Kemasan Lama",
+    unit: "bungkus",
+    salePrice: 5000,
+    purchasePrice: 3500,
+    minimumStock: 0,
+  });
+  await recordStockMovement(db, businessId, {
+    productId: archivedProduct.id,
+    kind: "masuk",
+    quantityChange: 3,
+    reason: "Stok kemasan sebelumnya",
+    createdAt: atHour(firstDay, 7),
+  });
+  await archiveProduct(db, businessId, archivedProduct.id);
+
   const customerIds = new Map<string, string>();
 
   for (const customer of DEMO_CUSTOMERS) {
@@ -494,6 +515,7 @@ export async function seedDemoData(
 
       await createTransaction(db, businessId, {
         kind: "sale",
+        method: (["tunai", "transfer", "qris"] as const)[(index + offset) % 3],
         description: `Penjualan ${item.name}`,
         amount: quantity * item.salePrice,
         source: "whatsapp",
@@ -577,6 +599,7 @@ export async function seedDemoData(
 
     await createTransaction(db, businessId, {
       kind: "sale",
+      method: "tunai",
       description: `Penjualan ${item.name}`,
       amount: sold * item.salePrice,
       source: "app",

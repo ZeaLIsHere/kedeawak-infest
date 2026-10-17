@@ -1,8 +1,8 @@
-import { and, asc, eq } from "drizzle-orm";
+import { and, asc, eq, inArray } from "drizzle-orm";
 
 import { getFieldCipher } from "../crypto/field-encryption";
 import type { Database } from "../db/client";
-import { conversations, customers, type Customer } from "../db/schema";
+import { conversations, customers, messages, orders, payments, transactions, type Customer } from "../db/schema";
 import { isUuid } from "./ids";
 
 /** Nama dan nomor telepon pelanggan dalam bentuk terbuka. */
@@ -166,7 +166,15 @@ export async function deleteCustomerData(
   businessId: string,
   customerId: string,
 ): Promise<boolean> {
+  if (!isUuid(customerId)) return false;
   return db.transaction(async (tx) => {
+    const owned = await findCustomer(tx, businessId, customerId);
+    if (!owned) return false;
+    const linked = await tx.select({id:conversations.id}).from(conversations).where(and(eq(conversations.businessId,businessId),eq(conversations.customerId,customerId)));
+    if (linked.length) await tx.update(messages).set({body:null,mediaUrl:null}).where(and(eq(messages.businessId,businessId),inArray(messages.conversationId,linked.map(row=>row.id))));
+    const linkedOrders=await tx.select({id:orders.id}).from(orders).where(and(eq(orders.businessId,businessId),eq(orders.customerId,customerId)));
+    if (linkedOrders.length) await tx.update(payments).set({proofUrl:null}).where(and(eq(payments.businessId,businessId),inArray(payments.orderId,linkedOrders.map(row=>row.id))));
+    await tx.update(transactions).set({proofUrl:null,description:"Catatan transaksi pelanggan"}).where(and(eq(transactions.businessId,businessId),eq(transactions.customerId,customerId)));
     await tx
       .update(conversations)
       .set({ customerId: null })

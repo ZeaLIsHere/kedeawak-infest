@@ -1,4 +1,4 @@
-import { and, desc, eq, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 
 import type { Database } from "../db/client";
 import {
@@ -59,7 +59,18 @@ export async function listStockAlerts(
   businessId: string,
   status?: StockAlert["status"],
 ): Promise<StockAlert[]> {
-  const conditions = [eq(stockAlerts.businessId, businessId)];
+  const activeProducts = await db
+    .select({ id: products.id })
+    .from(products)
+    .where(and(eq(products.businessId, businessId), isNull(products.archivedAt)));
+  if (activeProducts.length === 0) return [];
+  const conditions = [
+    eq(stockAlerts.businessId, businessId),
+    inArray(
+      stockAlerts.productId,
+      activeProducts.map((p) => p.id),
+    ),
+  ];
 
   if (status !== undefined) {
     conditions.push(eq(stockAlerts.status, status));
@@ -97,7 +108,7 @@ export async function reconcileStockAlert(
     )
     .limit(1);
 
-  if (product.stock >= product.minimumStock) {
+  if (product.archivedAt !== null || product.stock >= product.minimumStock) {
     if (active === undefined) {
       return undefined;
     }

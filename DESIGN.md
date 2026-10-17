@@ -237,3 +237,16 @@ token itu akan bernilai kosong.
   penyelarasan seluruh dokumen dengan kenyataan kode pada tugas T6.4.
 - Bila kode menyimpang dari dokumen ini, salah satu harus diperbaiki dalam
   commit yang sama. Membiarkan keduanya berbeda dilarang.
+
+## 12. Permukaan tambahan dan status pemeriksaan
+
+S7 Kasir ditambahkan atas keputusan pemilik 18 Oktober 2026 dan mengikuti
+arah visual serta token yang sama. Keranjang berada setelah daftar produk
+pada layar sempit. Dialog produk dan arsip memakai Radix melalui komponen
+UI bersama. Antrean Persetujuan memisahkan aksi menunggu dari riwayat.
+WhatsApp menyajikan kartu orderan, pesan asal, dan balasan tanpa tampilan
+obrolan pelanggan.
+
+Pengembangan dihentikan pada titik yang diminta pemilik. Uji peramban dua
+ukuran layar tersedia, tetapi audit akhir aksesibilitas dan kualitas desain
+T6.2 serta T6.3 belum selesai; dokumen ini tidak mengklaim audit tersebut lulus.

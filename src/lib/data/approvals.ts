@@ -1,7 +1,15 @@
-import { and, desc, eq, sql } from "drizzle-orm";
+import { and, desc, eq, isNull, sql } from "drizzle-orm";
 
 import type { Database } from "../db/client";
-import { approvals, type Approval } from "../db/schema";
+import {
+  approvals,
+  agentSessions,
+  products,
+  purchaseOrders,
+  purchaseOrderItems,
+  type Approval,
+  type PurchaseOrder,
+} from "../db/schema";
 import { isUuid } from "./ids";
 import { assertPurchaseOrderOwned } from "./ownership";
 import { applyPurchaseOrderDecision } from "./purchase-orders";
@@ -183,6 +191,181 @@ export async function decideApproval(
       }
     }
 
+    await tx
+      .update(agentSessions)
+      .set({ lockStatus: "bebas", pendingApprovalId: null })
+      .where(
+        and(
+          eq(agentSessions.businessId, businessId),
+          eq(agentSessions.pendingApprovalId, approvalId),
+        ),
+      );
+    return approval;
+  });
+}
+
+export type ApprovalDetails = {
+  readonly approval: Approval;
+  readonly order: PurchaseOrder;
+  readonly items: readonly {
+    id: string;
+    productId: string;
+    name: string;
+    unit: string;
+    quantity: number;
+    estimatedPrice: number;
+  }[];
+};
+export async function getApprovalDetails(
+  db: Database,
+  businessId: string,
+  approvalId: string,
+): Promise<ApprovalDetails | undefined> {
+  const approval = await findApproval(db, businessId, approvalId);
+  if (!approval) return undefined;
+  const id = readPurchaseOrderId(approval.payload);
+  if (!id || !isUuid(id)) return undefined;
+  const [order] = await db
+    .select()
+    .from(purchaseOrders)
+    .where(and(eq(purchaseOrders.businessId, businessId), eq(purchaseOrders.id, id)));
+  if (!order) return undefined;
+  const items = await db
+    .select({
+      id: purchaseOrderItems.id,
+      productId: products.id,
+      name: products.name,
+      unit: products.unit,
+      quantity: purchaseOrderItems.quantity,
+      estimatedPrice: purchaseOrderItems.estimatedPrice,
+    })
+    .from(purchaseOrderItems)
+    .innerJoin(
+      products,
+      and(
+        eq(products.businessId, businessId),
+        eq(products.id, purchaseOrderItems.productId),
+      ),
+    )
+    .where(
+      and(
+        eq(purchaseOrderItems.businessId, businessId),
+        eq(purchaseOrderItems.purchaseOrderId, id),
+      ),
+    );
+  return { approval, order, items };
+}
+export async function listApprovalDetails(
+  db: Database,
+  businessId: string,
+  status?: Approval["status"],
+): Promise<ApprovalDetails[]> {
+  const rows = await listApprovals(db, businessId, status);
+  const details = await Promise.all(
+    rows.map((row) => getApprovalDetails(db, businessId, row.id)),
+  );
+  return details.filter((row): row is ApprovalDetails => row !== undefined);
+}
+export class ApprovalError extends Error {}
+/** Kunci produk menyerialkan permintaan draft alert yang berbarengan. */
+export async function draftFromStockAlert(
+  db: Database,
+  businessId: string,
+  productId: string,
+): Promise<Approval> {
+  if (!isUuid(productId)) throw new ApprovalError("Produk tidak ditemukan");
+  return db.transaction(async (tx) => {
+    const [product] = await tx
+      .select()
+      .from(products)
+      .where(
+        and(
+          eq(products.businessId, businessId),
+          eq(products.id, productId),
+          isNull(products.archivedAt),
+        ),
+      )
+      .for("update");
+    if (!product) throw new ApprovalError("Produk tidak ditemukan atau sudah diarsipkan");
+    if (product.stock >= product.minimumStock || product.minimumStock <= 0)
+      throw new ApprovalError("Stok produk masih mencukupi ambang minimum");
+    const pending = await tx
+      .select({ approval: approvals, orderId: purchaseOrders.id })
+      .from(approvals)
+      .innerJoin(
+        purchaseOrders,
+        and(
+          eq(purchaseOrders.businessId, businessId),
+          sql`${approvals.payload}->>'purchaseOrderId' = cast(${purchaseOrders.id} as text)`,
+        ),
+      )
+      .innerJoin(
+        purchaseOrderItems,
+        and(
+          eq(purchaseOrderItems.businessId, businessId),
+          eq(purchaseOrderItems.purchaseOrderId, purchaseOrders.id),
+        ),
+      )
+      .where(
+        and(
+          eq(approvals.businessId, businessId),
+          eq(approvals.status, "menunggu"),
+          eq(purchaseOrderItems.productId, productId),
+        ),
+      );
+    if (pending[0]) return pending[0].approval;
+    const [last] = await tx
+      .select({ supplierName: purchaseOrders.supplierName })
+      .from(purchaseOrders)
+      .innerJoin(
+        purchaseOrderItems,
+        and(
+          eq(purchaseOrderItems.businessId, businessId),
+          eq(purchaseOrderItems.purchaseOrderId, purchaseOrders.id),
+        ),
+      )
+      .where(
+        and(
+          eq(purchaseOrders.businessId, businessId),
+          eq(purchaseOrderItems.productId, productId),
+        ),
+      )
+      .orderBy(desc(purchaseOrders.createdAt))
+      .limit(1);
+    const quantity = Math.max(
+      product.minimumStock,
+      2 * product.minimumStock - product.stock,
+    );
+    if (quantity > 2147483647 || quantity * product.purchasePrice > 2147483647)
+      throw new ApprovalError("Nilai pesanan pembelian terlalu besar");
+    const [order] = await tx
+      .insert(purchaseOrders)
+      .values({
+        businessId,
+        supplierName: last?.supplierName ?? "Belum ditentukan",
+        total: quantity * product.purchasePrice,
+      })
+      .returning();
+    if (!order) throw new ApprovalError("Draft pesanan pembelian gagal dibuat");
+    await tx
+      .insert(purchaseOrderItems)
+      .values({
+        businessId,
+        purchaseOrderId: order.id,
+        productId,
+        quantity,
+        estimatedPrice: product.purchasePrice,
+      });
+    const [approval] = await tx
+      .insert(approvals)
+      .values({
+        businessId,
+        kind: "purchase_order",
+        summary: `Tambah stok ${product.name} sebanyak ${quantity} ${product.unit}`,
+        payload: { purchaseOrderId: order.id },
+      })
+      .returning();
+    if (!approval) throw new ApprovalError("Persetujuan gagal dibuat");
     return approval;
   });
 }

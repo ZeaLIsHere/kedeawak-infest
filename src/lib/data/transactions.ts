@@ -11,6 +11,7 @@ export type TransactionInput = {
   readonly description: string;
   readonly amount: number;
   readonly source: Transaction["source"];
+  readonly method?: Transaction["method"];
   readonly customerId?: string | null;
   readonly proofUrl?: string | null;
   readonly confidence?: number | null;
@@ -43,6 +44,7 @@ export async function createTransaction(
         description: input.description,
         amount: input.amount,
         source: input.source,
+        method: input.method ?? null,
         customerId: input.customerId ?? null,
         proofUrl: input.proofUrl ?? null,
         confidence: input.confidence ?? null,
