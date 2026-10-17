@@ -76,7 +76,7 @@ terkunci.
 | T1.3 | Susun token desain tiga lapis | Warna, jarak, ukuran huruf dari token, tanpa nilai langsung | `[x]` |
 | T1.4 | Kunci arah visual sesuai proposal | Clean, minimalis, rata. Gaya chat first. Dibuktikan lewat `DESIGN.md` | `[x]` |
 | T1.5 | Buat kerangka aplikasi dan navigasi | Navigasi menuju enam permukaan, sasaran sentuh memadai | `[x]` |
-| T1.6 | Buat skrip `lint:ui` | Menolak emoji dan tanda hubung pada teks UI | `[ ]` |
+| T1.6 | Buat skrip `lint:ui` | Menolak emoji dan tanda hubung pada teks UI | `[x]` |
 | T1.7 | Pasang ESLint, Prettier, dan skrip `typecheck` | `npm run lint`, `npm run typecheck` berjalan | `[ ]` |
 | T1.8 | Pasang Vitest dan Playwright | `npm test` dan `npm run test:e2e` berjalan | `[ ]` |
 | T1.9 | Siapkan `.env.example` | Semua nama variabel tercatat, tanpa nilai rahasia | `[ ]` |
