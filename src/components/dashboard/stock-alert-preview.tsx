@@ -1,11 +1,11 @@
-import { CircleCheck, TriangleAlert } from "lucide-react";
+import { CircleCheck } from "lucide-react";
 import Link from "next/link";
 import { connection } from "next/server";
 
+import { LowStockBadge } from "@/components/shell/low-stock-badge";
 import { NoWarungState } from "@/components/shell/no-warung-state";
 import { Skeleton } from "@/components/shell/skeleton";
 import { StateBlock } from "@/components/shell/state-block";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { listProducts } from "@/lib/data/products";
 import { withCurrentBusiness } from "@/lib/data/server";
@@ -88,10 +88,7 @@ export async function StockAlertPreview() {
           >
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-body font-medium">{product.name}</span>
-              <Badge variant="warning">
-                <TriangleAlert aria-hidden="true" />
-                Stok menipis
-              </Badge>
+              <LowStockBadge />
             </div>
             <span className="text-caption text-muted-foreground">
               Stok sekarang {formatNumber(product.stock)} {product.unit}, ambang minimum{" "}
