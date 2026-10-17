@@ -21,6 +21,8 @@ export type OrderInput = {
   readonly conversationId?: string | null;
   readonly customerId?: string | null;
   readonly items: readonly OrderItemInput[];
+  /** Waktu pembuatan orderan. Dipakai saat menyiapkan data demo yang beriwayat. */
+  readonly createdAt?: Date;
 };
 
 /** Orderan beserta rincian itemnya. */
@@ -74,6 +76,7 @@ export async function createOrder(
         conversationId: input.conversationId ?? null,
         customerId: input.customerId ?? null,
         total: orderTotal(input.items),
+        ...(input.createdAt === undefined ? {} : { createdAt: input.createdAt }),
       })
       .returning();
 

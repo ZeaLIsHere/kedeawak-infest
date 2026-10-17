@@ -2,7 +2,7 @@ import { and, eq, inArray } from "drizzle-orm";
 import type { PgDatabase, PgQueryResultHKT } from "drizzle-orm/pg-core";
 
 import type * as schema from "../db/schema";
-import { conversations, customers, orders, products } from "../db/schema";
+import { conversations, customers, orders, products, purchaseOrders } from "../db/schema";
 import { isUuid } from "./ids";
 
 /*
@@ -95,6 +95,32 @@ export async function assertOrderOwned(
 
   if (row === undefined) {
     throw new OwnershipError("Orderan tidak ditemukan pada warung ini");
+  }
+}
+
+/** Memastikan draft pesanan pembelian yang dirujuk milik warung ini. */
+export async function assertPurchaseOrderOwned(
+  db: Queryable,
+  businessId: string,
+  purchaseOrderId: string,
+): Promise<void> {
+  if (!isUuid(purchaseOrderId)) {
+    throw new OwnershipError("Draft pesanan pembelian tidak ditemukan pada warung ini");
+  }
+
+  const [row] = await db
+    .select({ id: purchaseOrders.id })
+    .from(purchaseOrders)
+    .where(
+      and(
+        eq(purchaseOrders.businessId, businessId),
+        eq(purchaseOrders.id, purchaseOrderId),
+      ),
+    )
+    .limit(1);
+
+  if (row === undefined) {
+    throw new OwnershipError("Draft pesanan pembelian tidak ditemukan pada warung ini");
   }
 }
 

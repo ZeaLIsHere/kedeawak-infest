@@ -93,16 +93,26 @@ src/
       client.ts                   Pemilih driver PGlite atau Postgres
       migrate.ts                  Penerapan migrasi
       seed.ts                     Data awal untuk demo
+      testing.ts                  Basis data dalam memori untuk pengujian
     data/                         Satu satunya pintu akses data
+      ids.ts                      Pemeriksaan bentuk kunci baris
+      ownership.ts                Pemeriksaan rujukan antar warung
+      period.ts                   Batas hari dan minggu menurut Waktu Indonesia Barat
+      business.ts
       products.ts
+      stock.ts                    Pergerakan stok dan alert
       transactions.ts
+      customers.ts
       conversations.ts
       orders.ts
       payments.ts
-      stock-alerts.ts
+      purchase-orders.ts
       approvals.ts
+      agent-sessions.ts
+      tool-invocations.ts
+      knowledge.ts
+      quota-usage.ts
       reports.ts
-      customers.ts
     channel/
       incoming.ts                 Titik masuk tunggal untuk semua pesan pelanggan
       fonnte.ts                   Penerjemah payload webhook Fonnte
@@ -208,6 +218,21 @@ Aturan skema:
 10. Nilai enum memakai bahasa Indonesia, mengikuti penyebutan pada tabel di
     atas. Nama tabel dan kolom tetap memakai bahasa Inggris, sesuai
     `docs/CONVENTIONS.md` bagian 7.
+11. Setiap rujukan antar tabel diperiksa kepemilikannya lewat
+    `src/lib/data/ownership.ts` sebelum dipakai. Kunci asing hanya memeriksa
+    keberadaan baris, bukan pemiliknya, sehingga tanpa pemeriksaan ini sebuah
+    orderan dapat memakai produk warung lain, dan pembayaran dapat menempel
+    pada orderan warung lain. Pemeriksaan dijalankan di dalam transaksi yang
+    sama dengan penulisannya, supaya tidak ada celah di antara keduanya.
+12. Pencarian dan pengubahan menurut kunci baris memeriksa bentuk uuid lebih
+    dulu lewat `src/lib/data/ids.ts`, dan menjawab kosong untuk kunci yang tidak
+    sah. Alasannya, kunci yang salah bentuk menjadi galat query, sehingga
+    alamat halaman yang salah akan menjadi galat server alih alih jawaban
+    kosong.
+13. Batas hari dan minggu dihitung menurut Waktu Indonesia Barat, yaitu UTC+7,
+    lewat `src/lib/data/period.ts`. Indonesia tidak memakai waktu musim panas,
+    jadi pergeseran tetap ini cukup. Bila kelak ada warung di zona waktu lain,
+    kolom zona waktu pada tabel warung perlu ditambahkan lebih dulu.
 
 Migrasi dibuat oleh `npm run db:generate`, yang memakai drizzle-kit untuk
 membaca skema dan menulis berkas SQL ke folder `drizzle/`. Folder itu masuk
