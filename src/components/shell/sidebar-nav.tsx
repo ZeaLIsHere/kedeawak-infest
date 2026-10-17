@@ -14,7 +14,7 @@ export function SidebarNav() {
 
   return (
     <nav
-      aria-label="Navigasi utama"
+      aria-label="Navigasi halaman"
       className="flex flex-1 flex-col gap-1 overflow-y-auto px-gutter py-section"
     >
       {surfaceNavItems.map((item) => (

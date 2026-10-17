@@ -2,6 +2,7 @@
 
 import { Menu } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 
 import { NavLink } from "@/components/shell/nav-link";
 import {
@@ -20,11 +21,17 @@ import { cn } from "@/lib/utils";
 
 export function BottomNav() {
   const pathname = usePathname();
+  /*
+   * Lembar menu dikendalikan dari sini supaya dapat menutup dirinya setelah
+   * tujuan di dalamnya dipilih. Tanpa itu, halaman berpindah di balik lembar
+   * yang masih terbuka.
+   */
+  const [menuOpen, setMenuOpen] = useState(false);
   const overflowActive = overflowItems.some((item) => isActivePath(pathname, item.href));
 
   return (
     <nav
-      aria-label="Navigasi utama"
+      aria-label="Navigasi bawah"
       className="fixed inset-x-0 bottom-0 z-40 grid h-bottom-nav grid-cols-5 border-t border-border bg-card lg:hidden"
     >
       {bottomBarItems.map((item) => (
@@ -36,7 +43,7 @@ export function BottomNav() {
         />
       ))}
 
-      <Sheet>
+      <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
         <SheetTrigger
           type="button"
           className={cn(
@@ -62,6 +69,7 @@ export function BottomNav() {
                 key={item.href}
                 item={item}
                 active={isActivePath(pathname, item.href)}
+                onNavigate={() => setMenuOpen(false)}
               />
             ))}
           </div>

@@ -11,6 +11,11 @@ type NavLinkProps = {
    * `column` untuk batang bawah pada layar sempit.
    */
   readonly layout?: "row" | "column";
+  /**
+   * Dipanggil saat tautan dipilih. Dipakai lembar menu untuk menutup dirinya
+   * setelah berpindah halaman.
+   */
+  readonly onNavigate?: () => void;
 };
 
 /*
@@ -37,13 +42,14 @@ const stateClass = {
   },
 } as const;
 
-export function NavLink({ item, active, layout = "row" }: NavLinkProps) {
+export function NavLink({ item, active, layout = "row", onNavigate }: NavLinkProps) {
   const Icon = item.icon;
 
   return (
     <Link
       href={item.href}
       aria-current={active ? "page" : undefined}
+      onClick={onNavigate}
       className={cn(
         base,
         layoutClass[layout],
