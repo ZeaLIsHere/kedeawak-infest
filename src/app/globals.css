@@ -1,7 +1,19 @@
-@import "tailwindcss";
+/*
+ * `source(none)` mematikan pemindaian otomatis, lalu `@source` menentukan
+ * sendiri folder yang dipindai.
+ *
+ * Alasannya: Tailwind memindai semua berkas yang tidak masuk `.gitignore`.
+ * Folder `.claude` berisi perkakas pihak ketiga dengan banyak kelas contoh,
+ * misalnya `hover:text-purple-600`, dan kelas itu ikut terbawa ke CSS
+ * aplikasi. Dengan membatasi sumber ke `src/`, CSS hanya memuat kelas yang
+ * benar benar dipakai.
+ */
+@import "tailwindcss" source(none);
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "../styles/tokens/index.css";
+
+@source "../";
 
 /*
  * Kelas `dark` sengaja tidak pernah dipasang pada elemen mana pun.
@@ -109,6 +121,20 @@
   --spacing-page: var(--space-page);
   --spacing-section: var(--space-section);
   --spacing-gutter: var(--space-gutter);
+
+  /*
+   * Ukuran kerangka dan kendali, supaya dapat dipakai langsung sebagai
+   * kelas Tailwind, misalnya `h-touch`, `w-sidebar`, dan `h-bottom-nav`.
+   */
+  --spacing-touch: var(--touch-target-min);
+  --spacing-control: var(--control-height-md);
+  --spacing-control-lg: var(--control-height-lg);
+  --spacing-sidebar: var(--sidebar-width);
+  --spacing-header: var(--header-height);
+  --spacing-bottom-nav: var(--bottom-nav-height);
+
+  /* Lebar isi maksimum, menjadi kelas `max-w-content` */
+  --container-content: var(--content-max-width);
 
   /* Ukuran huruf menurut peran, lengkap dengan tinggi barisnya */
   --text-caption: var(--type-caption);

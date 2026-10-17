@@ -141,13 +141,13 @@ Aturan:
 | Lebar isi maksimum | `--content-max-width`, yaitu 80rem, dipusatkan |
 | Lebar sisi navigasi | `--sidebar-width`, yaitu 15.5rem |
 | Tinggi kepala halaman | `--header-height`, yaitu 3.5rem |
-| Sasaran sentuh minimum | `--touch-target-min`, yaitu 2.75rem |
+| Sasaran sentuh minimum | `--touch-target-min`, yaitu 3rem (48 piksel) |
 
 Titik ubah:
 
 | Lebar | Susunan |
 | --- | --- |
-| Di bawah 768 piksel | Satu kolom penuh. Navigasi berpindah ke batang bawah. Tabel panjang berubah menjadi daftar kartu |
+| Di bawah 768 piksel | Satu kolom penuh. Navigasi berpindah ke batang bawah berisi empat tujuan tersering, dan tujuan lain beserta Pengaturan masuk menu `Lainnya` berupa lembar dari bawah. Tabel panjang berubah menjadi daftar kartu |
 | 768 sampai 1023 piksel | Satu kolom dengan lebar terbatas, navigasi tetap di batang bawah |
 | 1024 piksel ke atas | Sisi navigasi tetap di kiri, isi di kanan, kartu boleh dua atau tiga kolom |
 
