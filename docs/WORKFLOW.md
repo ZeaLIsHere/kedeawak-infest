@@ -133,6 +133,31 @@ Refs: T2.2
 
 ## 6. Aturan berkas
 
+Sebelum menambahkan berkas atau folder baru, lewati uji ini lebih dulu.
+
+**Uji tiga pertanyaan:**
+
+1. Ini karya tim, atau perkakas yang bisa dipasang ulang? Karya tim masuk repo.
+   Perkakas yang bisa dipasang ulang tidak masuk, cukup dicatat cara
+   memasangnya.
+2. Ini sumber, atau hasil bangun? Sumber masuk repo. Hasil bangun tidak.
+3. Ini berisi rahasia atau data pribadi? Kalau ya, tidak masuk repo, dalam
+   bentuk apa pun.
+
+Kalau ragu pada pertanyaan pertama, tanyakan ke user. Jangan menebak.
+
+Contoh keputusan yang sudah diambil:
+
+| Berkas | Masuk repo | Alasan |
+| --- | --- | --- |
+| `docs/`, `AGENTS.md`, `PLAN.md` | Ya | Sumber keputusan proyek, dipakai tim dan juri |
+| `src/` | Ya | Karya tim |
+| `.env.example` | Ya | Daftar nama variabel, tanpa nilai rahasia |
+| `.env.local` | Tidak | Memuat rahasia |
+| `node_modules/`, `.next/` | Tidak | Hasil pemasangan dan hasil bangun, dapat dibuat ulang dari `package.json` |
+| `.pglite/`, `*.db` | Tidak | Berkas basis data lokal |
+| `.claude/skills/` | Ya, sudah terlanjur | Perkakas pihak ketiga. Disetujui user untuk dibiarkan. Untuk perkakas baru sejenis, jangan ditambahkan, cukup catat di `docs/THIRD-PARTY-SKILLS.md` |
+
 Yang **tidak boleh** masuk git:
 
 - `.env` dan semua variannya kecuali `.env.example`

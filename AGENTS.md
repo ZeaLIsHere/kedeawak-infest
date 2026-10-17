@@ -125,6 +125,11 @@ Setiap perubahan kode atau penambahan fitur wajib di commit dan di push.
 - **Satu commit, satu perubahan bermakna.** Commit harus bisa dibalik sendiri.
 - **Dilarang commit yang berisi `.env` atau rahasia apa pun.** Cek
   `.gitignore` sebelum commit pertama pada file baru.
+- **Putuskan dulu apakah berkas baru pantas masuk repo.** Sebelum menambahkan
+  berkas atau folder baru, tanyakan: ini karya tim, atau perkakas yang bisa
+  dipasang ulang? Karya tim masuk repo. Perkakas pihak ketiga, paket terpasang,
+  dan hasil bangun tidak masuk, cukup catat cara memasangnya. Uji lengkap ada di
+  `docs/WORKFLOW.md` bagian 6.
 - **Dilarang force push ke `main`.**
 
 Format pesan commit (Conventional Commits, bahasa Indonesia untuk deskripsi):
