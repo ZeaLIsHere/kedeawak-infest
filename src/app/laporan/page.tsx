@@ -15,6 +15,7 @@ import {
   TransactionList,
   TransactionListSkeleton,
 } from "@/components/reports/transaction-list";
+import { ExpenseForm } from "@/components/reports/expense-form";
 import { CardError } from "@/components/shell/card-error";
 import { NoWarungState } from "@/components/shell/no-warung-state";
 import { PageHeader } from "@/components/shell/page-header";
@@ -48,6 +49,13 @@ export default function LaporanPage(props: PageProps<"/laporan">) {
       />
 
       <div className="mx-auto flex w-full max-w-content flex-col gap-section p-page">
+        <SectionCard
+          title="Catat pengeluaran"
+          description="Pengeluaran yang dicatat di sini langsung masuk ke laporan dan ringkasan hari ini."
+        >
+          <ExpenseForm />
+        </SectionCard>
+
         <CardError title="Laporan keuangan">
           <Suspense fallback={<LaporanSkeleton />}>
             <LaporanContent searchParams={props.searchParams} />

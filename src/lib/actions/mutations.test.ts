@@ -2,8 +2,12 @@
 import { createTestDatabase, type TestDatabase } from "../db/testing";
 import { revalidatePath } from "next/cache";
 import { withCurrentBusiness } from "../data/server";
+import { findBusiness } from "../data/business";
 import { saveProduct } from "../data/products";
+import { listTransactions } from "../data/transactions";
 import { createSaleAction } from "./penjualan";
+import { createExpenseAction } from "./pengeluaran";
+import { saveBusinessProfileAction } from "./profil";
 import { saveProductAction, archiveProductAction, restoreProductAction } from "./produk";
 import { decideApprovalAction, draftFromAlertAction } from "./persetujuan";
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
@@ -90,6 +94,51 @@ describe("aksi mutasi warung", () => {
     expect((await decideApprovalAction(created.approvalId, "disetujui")).ok).toBe(true);
     expect((await decideApprovalAction(created.approvalId, "ditolak")).ok).toBe(false);
     expect(revalidatePath).toHaveBeenCalledWith("/persetujuan");
+  });
+  it("menyimpan profil pemilik dan menolak tanda hubung", async () => {
+    const form = new FormData();
+    for (const [key, value] of Object.entries({
+      name: "Warung Profil",
+      ownerName: "Rina",
+      businessType: "Sembako",
+      address: "Jalan Melati nomor 12",
+      phoneNumber: "0812 3456 7890",
+      description: "Melayani pesanan WhatsApp.",
+      opensAt: "06:00",
+      closesAt: "21:00",
+    }))
+      form.set(key, value);
+
+    expect(await saveBusinessProfileAction(form)).toEqual({ ok: true });
+
+    const business = await findBusiness(test.db, test.business.id);
+    expect(business?.name).toBe("Warung Profil");
+    expect(business?.ownerName).toBe("Rina");
+    expect(business?.phoneNumber).toBe("081234567890");
+    expect(business?.opensAt).toBe("06:00:00");
+    expect(business?.closesAt).toBe("21:00:00");
+
+    const invalid = new FormData();
+    invalid.set("name", "Warung - Profil");
+    expect((await saveBusinessProfileAction(invalid)).ok).toBe(false);
+  });
+  it("menyimpan pengeluaran manual dan menolak nominal nol", async () => {
+    const form = new FormData();
+    form.set("description", "Beli gas");
+    form.set("amount", "50000");
+    form.set("occurredAt", "2026-10-18");
+
+    expect(await createExpenseAction(form)).toEqual({ ok: true, amount: 50000 });
+
+    const expenses = await listTransactions(test.db, test.business.id, {
+      kind: "expense",
+    });
+    expect(expenses.some((row) => row.description === "Beli gas")).toBe(true);
+
+    const invalid = new FormData();
+    invalid.set("description", "Beli gas");
+    invalid.set("amount", "0");
+    expect((await createExpenseAction(invalid)).ok).toBe(false);
   });
   it("menyembunyikan galat SQL dari pembaca bisnis", async () => {
     vi.mocked(withCurrentBusiness).mockRejectedValueOnce(

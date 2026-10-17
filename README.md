@@ -25,11 +25,11 @@ DeepSeek nyata untuk alur baru ini.
 | Dasbor                    | Penjualan, pengeluaran, laba, jumlah order, produk terlaris, alert stok dari basis data                 | Audit akhir dan penerimaan demo lengkap                                        |
 | Kasir                     | Produk, keranjang, stok, tunai/transfer/QRIS, kembalian, simpan penjualan, usulan pesanan teks/mikrofon | Uji DeepSeek dan mikrofon nyata                                                |
 | Stok dan Produk           | Tambah, ubah, stok awal, ambang, penyesuaian, arsip, alert, draft pembelian, tinjau produk dari asisten | Uji asisten nyata dan kartu prediksi restok                                    |
-| Laporan Keuangan          | Harian, mingguan, rincian transaksi dan jenis pembayaran                                                | Audit akhir                                                                    |
+| Laporan Keuangan          | Harian, mingguan, rincian transaksi, jenis pembayaran, dan catat pengeluaran manual                      | Audit akhir                                                                    |
 | Persetujuan               | Antrean, rincian draft, setujui/tolak, riwayat, stok, pencegahan keputusan berulang                     | Penerimaan demo bersama AI nyata                                               |
 | Percakapan dengan Agen AI | Teks, riwayat, mode lokal, laporan, parser foto, tinjau bacaan, context lock, kuota                     | Uji AI/foto/mikrofon nyata dan unggah voice note S2                            |
 | Integrasi WhatsApp        | Daftar pesanan WhatsApp. Kontrol koneksi dan kotak masuk ditunda sampai pembahasan berikutnya | Uji Sandbox, Groq, DeepSeek nyata dan demo ngrok |
-| Pengaturan                | Keterangan persetujuan pemrosesan pesan dan privasi                                                     | Penyesuaian penyedia dan audit akhir                                           |
+| Pengaturan                | Profil pemilik dan usaha tanpa login, persetujuan pemrosesan pesan, dan privasi | Penyesuaian penyedia dan audit akhir                                           |
 
 Sepuluh tool berada di `src/lib/tools/`; setiap pemanggilan meninggalkan audit.
 Keberadaan tool prediksi belum berarti kartu prediksi tersedia pada Stok.

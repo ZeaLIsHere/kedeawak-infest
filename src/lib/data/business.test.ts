@@ -47,13 +47,35 @@ describe("data warung", () => {
   it("mengubah nama dan jam buka", async () => {
     const updated = await updateBusinessProfile(test.db, test.business.id, {
       name: "Warung Bu Sari",
+      ownerName: "Sari",
+      businessType: "Sembako dan kebutuhan harian",
+      address: "Jalan Melati nomor 12, Medan",
+      phoneNumber: "081234567890",
+      description: "Melayani pesanan WhatsApp dan antar ke kampung sekitar.",
       opensAt: "05:30:00",
       closesAt: "22:00:00",
     });
 
     expect(updated?.name).toBe("Warung Bu Sari");
+    expect(updated?.ownerName).toBe("Sari");
+    expect(updated?.businessType).toBe("Sembako dan kebutuhan harian");
+    expect(updated?.address).toBe("Jalan Melati nomor 12, Medan");
+    expect(updated?.phoneNumber).toBe("081234567890");
+    expect(updated?.description).toBe(
+      "Melayani pesanan WhatsApp dan antar ke kampung sekitar.",
+    );
     expect(updated?.opensAt).toBe("05:30:00");
     expect((await getCurrentBusiness(test.db))?.name).toBe("Warung Bu Sari");
+  });
+
+  it("memperbarui sebagian profil tanpa mengosongkan field lain", async () => {
+    const updated = await updateBusinessProfile(test.db, test.business.id, {
+      ownerName: "Rina",
+    });
+
+    expect(updated?.ownerName).toBe("Rina");
+    expect(updated?.name).toBe("Warung Bu Sari");
+    expect(updated?.address).toBe("Jalan Melati nomor 12, Medan");
   });
 
   it("tidak mengubah warung lain", async () => {
@@ -102,11 +124,21 @@ describe("data warung", () => {
   it("membuat warung baru dengan keadaan kanal belum diatur", async () => {
     const created = await createBusiness(test.db, {
       name: "Warung Baru",
+      ownerName: "Budi",
+      businessType: "Kelontong",
+      address: "Jalan Mawar nomor 5",
+      phoneNumber: "081298765432",
+      description: "Menjual kebutuhan harian.",
       opensAt: "07:00:00",
       closesAt: "20:00:00",
     });
 
     expect(created.name).toBe("Warung Baru");
+    expect(created.ownerName).toBe("Budi");
+    expect(created.businessType).toBe("Kelontong");
+    expect(created.address).toBe("Jalan Mawar nomor 5");
+    expect(created.phoneNumber).toBe("081298765432");
+    expect(created.description).toBe("Menjual kebutuhan harian.");
     expect(created.opensAt).toBe("07:00:00");
     expect(created.closesAt).toBe("20:00:00");
     expect(created.channelStatus).toBe("belum_diatur");

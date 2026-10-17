@@ -7,8 +7,17 @@ import { isUuid } from "./ids";
 /** Keadaan koneksi nomor WhatsApp, diambil dari skema. */
 export type ChannelStatus = Business["channelStatus"];
 
+/** Data profil yang dapat diisi pemilik tanpa login. */
+export type BusinessProfileFields = {
+  readonly ownerName?: string | null;
+  readonly businessType?: string | null;
+  readonly address?: string | null;
+  readonly phoneNumber?: string | null;
+  readonly description?: string | null;
+};
+
 /** Perubahan data pokok warung. */
-export type BusinessProfileInput = {
+export type BusinessProfileInput = BusinessProfileFields & {
   readonly name?: string;
   readonly opensAt?: string | null;
   readonly closesAt?: string | null;
@@ -60,7 +69,7 @@ export async function findBusiness(
 }
 
 /** Data pokok warung baru. */
-export type BusinessInput = {
+export type BusinessInput = BusinessProfileFields & {
   readonly name: string;
   readonly opensAt?: string | null;
   readonly closesAt?: string | null;
@@ -75,6 +84,11 @@ export async function createBusiness(
     .insert(businesses)
     .values({
       name: input.name,
+      ownerName: input.ownerName?.trim() || null,
+      businessType: input.businessType?.trim() || null,
+      address: input.address?.trim() || null,
+      phoneNumber: input.phoneNumber?.trim() || null,
+      description: input.description?.trim() || null,
       opensAt: input.opensAt ?? null,
       closesAt: input.closesAt ?? null,
     })
@@ -100,15 +114,38 @@ export async function deleteAllBusinesses(db: Database): Promise<number> {
   return removed.length;
 }
 
-/** Mengubah nama dan jam buka warung. */
+/** Mengubah profil pemilik dan warung. Hanya field yang dikirim yang diubah. */
 export async function updateBusinessProfile(
   db: Database,
   businessId: string,
   input: BusinessProfileInput,
 ): Promise<Business | undefined> {
+  const values: {
+    name?: string;
+    ownerName?: string | null;
+    businessType?: string | null;
+    address?: string | null;
+    phoneNumber?: string | null;
+    description?: string | null;
+    opensAt?: string | null;
+    closesAt?: string | null;
+  } = {};
+
+  if (input.name !== undefined) values.name = input.name.trim();
+  if (input.ownerName !== undefined) values.ownerName = input.ownerName?.trim() || null;
+  if (input.businessType !== undefined)
+    values.businessType = input.businessType?.trim() || null;
+  if (input.address !== undefined) values.address = input.address?.trim() || null;
+  if (input.phoneNumber !== undefined)
+    values.phoneNumber = input.phoneNumber?.trim() || null;
+  if (input.description !== undefined)
+    values.description = input.description?.trim() || null;
+  if (input.opensAt !== undefined) values.opensAt = input.opensAt;
+  if (input.closesAt !== undefined) values.closesAt = input.closesAt;
+
   const [business] = await db
     .update(businesses)
-    .set(input)
+    .set(values)
     .where(eq(businesses.id, businessId))
     .returning();
 

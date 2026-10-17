@@ -43,6 +43,9 @@ describe("data demo", () => {
 
     expect(rows).toHaveLength(1);
     expect(rows[0]?.name).toBe(DEMO_BUSINESS_NAME);
+    expect(rows[0]?.ownerName).toBe("Rina");
+    expect(rows[0]?.businessType).toBe("Sembako dan kebutuhan harian");
+    expect(rows[0]?.address).toBe("Jalan Melati nomor 12, Medan");
     expect(rows[0]?.channelStatus).toBe("belum_diatur");
     expect(seeded.products).toBe(20);
     expect(seeded.customers).toBe(6);

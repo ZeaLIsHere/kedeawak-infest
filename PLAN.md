@@ -41,9 +41,9 @@ diperbarui 18 Oktober 2026.
 | 2    | Basis data dan lapisan data         | 8       | 8     |
 | 3    | Tool layer                          | 12      | 12    |
 | 4    | Lapisan AI dan context lock         | 5       | 10    |
-| 5    | Permukaan aplikasi                  | 33      | 46    |
+| 5    | Permukaan aplikasi                  | 37      | 50    |
 | 6    | Pematangan dan bukti                | 2       | 7     |
-|      | Jumlah                              | 80      | 103   |
+|      | Jumlah                              | 84      | 107   |
 
 Checkpoint penghentian sebelumnya dipertahankan sebagai riwayat di bawah.
 Pekerjaan kanal dibuka kembali sesuai persetujuan Twilio Sandbox. T5.13 dan
@@ -354,6 +354,8 @@ bagian 11.
 | T5.19 | Laporan mingguan                           | `[x]`  |
 | T5.20 | Rincian transaksi per periode              | `[x]`  |
 | T5.21 | Pemisahan penjualan, pengeluaran, dan laba | `[x]`  |
+| T5.47 | Form catat pengeluaran manual di Laporan   | `[x]`  |
+| T5.48 | Uji pengeluaran manual tampil di laporan   | `[x]`  |
 
 ### S5 Stok dan Produk
 
@@ -408,6 +410,8 @@ Tambah, ubah, arsip, dan asisten produk dilacak pada T5.41 sampai T5.44.
 | ----- | --------------------------------------------------------------- | ------ |
 | T5.31 | Keterangan opt in dan persetujuan pemilik atas pemrosesan pesan | `[x]`  |
 | T5.32 | Keterangan privasi data sesuai butir proposal                   | `[x]`  |
+| T5.33 | Profil pemilik dan usaha tanpa login, dipakai konteks agen      | `[x]`  |
+| T5.34 | Uji simpan profil dan pemakaian profil pada konteks agen         | `[x]`  |
 
 Kriteria selesai fase 5: setelah setup manual Sandbox, ngrok, webhook dan
 join peserta sesuai `README.md`, ketujuh permukaan dan halaman pengaturan

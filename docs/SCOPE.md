@@ -30,7 +30,7 @@ proposal. Yang ketujuh, Kasir, ditambahkan atas permintaan pemilik proyek.
 | S1  | Dasbor                    | Statistik penjualan, pengeluaran, laba, jumlah order, produk terlaris, alert stok terbaru                                                             | MASUK  |
 | S2  | Percakapan dengan Agen AI | Obrolan dengan AI untuk mencatat transaksi lewat teks, voice note, dan foto struk, termasuk konfirmasi dan persetujuan aksi                           | MASUK  |
 | S3  | Integrasi WhatsApp        | Daftar pesanan WhatsApp. Kontrol koneksi, kotak masuk, panel simulasi, dan pengaturan pelanggan ditunda sampai rancangan baru disepakati | MASUK  |
-| S4  | Laporan Keuangan          | Laporan harian dan mingguan: penjualan, pengeluaran, laba, rincian transaksi                                                                          | MASUK  |
+| S4  | Laporan Keuangan          | Laporan harian dan mingguan: penjualan, pengeluaran, laba, rincian transaksi, dan catat pengeluaran manual                                          | MASUK  |
 | S5  | Stok dan Produk           | Daftar, tambah, ubah, dan arsip produk, stok, ambang minimum, alert, penyesuaian beralasan, asisten dengan dialog tinjau                              | MASUK  |
 | S6  | Persetujuan               | Antrean aksi yang menunggu persetujuan pemilik, contohnya draft PO ke supplier, dengan aksi setujui atau tolak                                        | MASUK  |
 | S7  | Kasir                     | Daftar produk yang dapat ditekan, keranjang, jenis pembayaran tunai atau transfer atau QRIS, pesanan lewat suara                                      | MASUK  |
@@ -42,12 +42,18 @@ mengurangi satu pun permukaan lain. Rancangannya ada di
 `docs/specs/2026-10-17-kasir-kelola-produk-design.md`, dan tugasnya ada di
 `PLAN.md` bagian S7.
 
+Halaman Pengaturan memuat profil pemilik dan usaha tanpa login. Pemilik dapat
+mengubah nama pemilik, nama usaha, jenis usaha, alamat, nomor telepon, jam
+buka, jam tutup, dan deskripsi. Data itu dipakai agen AI untuk menyapa pemilik
+dan menyesuaikan jawaban dengan usahanya, bukan untuk membuat akun atau login.
+
 ## 2.1 Status implementasi
 
 Checkpoint sebelum migrasi: S1 dan S4 membaca data; S7 menyimpan penjualan;
 S5 mengelola produk/stok; S6 memutus draft. S2 mempunyai percakapan, mode lokal
 dan tinjau struk. S3 mempunyai simulasi pelanggan dan pemeriksaan Fonnte.
-Pengaturan memuat persetujuan serta privasi. Ini riwayat, bukan bukti Twilio.
+Pengaturan memuat profil pemilik, persetujuan, serta privasi. Ini riwayat,
+bukan bukti Twilio.
 
 Pada 18 Oktober 2026 user menyetujui Twilio Sandbox menggantikan Fonnte,
 balasan nyata ke peserta opt in, dan voice note otomatis menjadi teks lalu
@@ -153,6 +159,9 @@ Pemilik mengirim pesan seperti "Laporan hari ini", AI menyajikan rangkuman.
 - **Yang dikerjakan:** perintah bahasa alami di S2 untuk meminta laporan
   harian dan mingguan, hasilnya tersaji sebagai ringkasan di percakapan dan
   sebagai halaman penuh di S4.
+- **Pengeluaran manual:** S4 menyediakan formulir keterangan, nominal, dan
+  tanggal. Data ditulis ke tabel `transactions` dan langsung dipakai laporan
+  serta ringkasan hari ini.
 - **Batas:** periode yang didukung hanya harian dan mingguan, sesuai proposal.
 
 ### 3.6 Agentic Action — MASUK
@@ -258,7 +267,7 @@ Daftar ini sengaja ditulis supaya tidak ikut masuk. Semua LUAR:
 - manajemen peran dan undangan anggota tim
 - log aktivitas pengguna tingkat lanjut
 - integrasi peta, kalender eksternal, atau media sosial
-- halaman pengaturan lengkap di luar butir privasi di bagian 5
+- halaman pengaturan lengkap di luar profil pemilik dan butir privasi di bagian 5
 
 Kalau salah satu di atas terasa perlu, tanyakan dulu. Jangan langsung dibuat.
 

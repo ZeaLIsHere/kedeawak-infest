@@ -172,7 +172,7 @@ privasi proposal tentang pemisahan data antar warung.
 
 | Tabel                  | Isi utama                                                                                 | Catatan                                                                                                            |
 | ---------------------- | ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| `businesses`           | Nama warung, jam buka, status koneksi nomor, nomor bisnis                                 | Akar semua data                                                                                                    |
+| `businesses`           | Nama warung, profil pemilik, jenis usaha, alamat, nomor telepon, deskripsi, jam buka, status koneksi nomor | Akar semua data. Profil dipakai agen untuk menyapa pemilik                                                          |
 | `products`             | Nama, satuan, harga jual, harga beli, stok, ambang minimum                                | Stok disimpan sebagai angka hasil perhitungan terakhir                                                             |
 | `customers`            | Nama dan nomor telepon terenkripsi, ditambah sidik jari nomor                             | Sidik jari nomor dipakai untuk mencari pelanggan tanpa membuka enkripsi                                            |
 | `conversations`        | Kanal, rujukan pelanggan, sidik jari nomor, status, waktu                                 | Kanal bernilai `whatsapp` atau `app`. Nomor pelanggan tidak disimpan di sini, lihat aturan 7                       |
@@ -213,8 +213,11 @@ Aturan skema:
    Keduanya **tidak dirender sebagai tampilan obrolan** di antarmuka. Yang
    ditampilkan ke pemilik adalah orderan, bukti pembayaran, dan pesan asal
    sebagai dasar orderan. Keputusan ini tercatat di `docs/SCOPE.md` bagian 3.1.
-6. `businesses` memuat keadaan koneksi kanal WhatsApp, yaitu status koneksi,
-   nomor bisnis, waktu koneksi, nama paket penyedia, sisa kuota, dan waktu
+6. `businesses` memuat profil pemilik tanpa login, yaitu nama pemilik, jenis
+   usaha, alamat, nomor telepon, dan deskripsi. Profil ini dipakai agen untuk
+   menyapa pemilik dan menjawab sesuai usaha, bukan data pelanggan. Baris yang
+   sama memuat keadaan koneksi kanal WhatsApp, yaitu status koneksi, nomor
+   bisnis, waktu koneksi, nama paket penyedia, sisa kuota, dan waktu
    pemeriksaan terakhir. Nama paket dan sisa kuota ikut disimpan supaya
    halaman Pengaturan dapat menyampaikan apa adanya batas paket yang dipakai,
    termasuk bahwa lampiran masuk belum aktif pada paket gratis. Nilai rahasia

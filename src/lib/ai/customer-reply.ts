@@ -44,6 +44,11 @@ export async function composeCustomerReply(
         prompt: JSON.stringify({
           business: {
             name: business.name,
+            ownerName: business.ownerName,
+            businessType: business.businessType,
+            address: business.address,
+            phoneNumber: business.phoneNumber,
+            description: business.description,
             opensAt: business.opensAt,
             closesAt: business.closesAt,
           },

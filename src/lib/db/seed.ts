@@ -355,6 +355,12 @@ export async function seedDemoData(
 
   const business = await createBusiness(db, {
     name: DEMO_BUSINESS_NAME,
+    ownerName: "Rina",
+    businessType: "Sembako dan kebutuhan harian",
+    address: "Jalan Melati nomor 12, Medan",
+    phoneNumber: "081234567890",
+    description:
+      "Menjual sembako dan kebutuhan harian, melayani pesanan WhatsApp, dan mengantar ke kampung sekitar.",
     opensAt: "06:00",
     closesAt: "21:00",
   });

@@ -135,6 +135,11 @@ const updatedAt = timestamp("updated_at", { withTimezone: true })
 export const businesses = pgTable("businesses", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: text("name").notNull(),
+  ownerName: text("owner_name"),
+  businessType: text("business_type"),
+  address: text("address"),
+  phoneNumber: text("phone_number"),
+  description: text("description"),
   opensAt: time("opens_at"),
   closesAt: time("closes_at"),
   channelStatus: channelStatusEnum("channel_status").notNull().default("belum_diatur"),
