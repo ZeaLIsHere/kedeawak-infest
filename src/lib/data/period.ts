@@ -37,3 +37,56 @@ export function startOfWeek(at: Date): Date {
 export function endOfWeek(at: Date): Date {
   return new Date(startOfWeek(at).getTime() + WEEK_MS);
 }
+
+/*
+ * Kunci tanggal adalah bentuk pendek satu hari Waktu Indonesia Barat, dipakai
+ * pada alamat halaman laporan supaya pilihan periode dapat dibagikan lewat
+ * tautan. Bentuknya baku, jadi tidak diterjemahkan dan tidak pernah tampil
+ * sebagai teks antarmuka.
+ */
+
+/** Bagian tanggal yang dikenali, yaitu tahun, bulan, dan hari. */
+const DATE_KEY_PATTERN = /^(\d{4})-(\d{2})-(\d{2})$/u;
+
+const MONTHS_IN_YEAR = 12;
+
+/** Menulis satu hari Waktu Indonesia Barat, misalnya `2026-10-17`. */
+export function toDateKey(at: Date): string {
+  return new Date(at.getTime() + JAKARTA_OFFSET_MS).toISOString().slice(0, 10);
+}
+
+/**
+ * Mengurai kunci tanggal menjadi awal hari Waktu Indonesia Barat.
+ *
+ * Menjawab `undefined` untuk kunci yang tidak dikenali maupun tanggal yang
+ * tidak ada, misalnya `2026-02-31`, supaya pemanggil dapat kembali ke waktu
+ * berjalan alih alih melempar galat ke halaman.
+ */
+export function parseDateKey(value: string | undefined): Date | undefined {
+  const parts = value === undefined ? null : DATE_KEY_PATTERN.exec(value);
+
+  if (parts === null) {
+    return undefined;
+  }
+
+  const year = Number(parts[1]);
+  const month = Number(parts[2]);
+  const day = Number(parts[3]);
+
+  if (month < 1 || month > MONTHS_IN_YEAR) {
+    return undefined;
+  }
+
+  /* Bulan pada Date dimulai dari nol, dan tanggal yang berlebih akan bergeser. */
+  const midnight = new Date(Date.UTC(year, month - 1, day));
+
+  if (
+    midnight.getUTCFullYear() !== year ||
+    midnight.getUTCMonth() !== month - 1 ||
+    midnight.getUTCDate() !== day
+  ) {
+    return undefined;
+  }
+
+  return new Date(midnight.getTime() - JAKARTA_OFFSET_MS);
+}

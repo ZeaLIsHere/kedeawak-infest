@@ -109,3 +109,68 @@ test.describe("Stok dan Produk", () => {
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("Stok dan Produk");
   });
 });
+
+test.describe("Laporan Keuangan", () => {
+  test("menampilkan ringkasan periode dan rincian transaksi hari ini", async ({
+    page,
+  }) => {
+    await page.goto("/laporan");
+
+    await expect(page.getByRole("heading", { name: "Ringkasan periode" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Rincian transaksi" })).toBeVisible();
+
+    /* Tanpa parameter, laporan dibuka pada periode harian. */
+    await expect(page.getByRole("link", { name: "Harian" })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+    await expect(page.getByRole("link", { name: "Hari sebelumnya" })).toBeVisible();
+
+    await expect(visibleText(page, "Penjualan").first()).toBeVisible();
+    await expect(visibleText(page, "Pengeluaran").first()).toBeVisible();
+    await expectNoClippedText(page, visibleRupiah(page));
+    await expectNoHorizontalScroll(page);
+  });
+
+  test("berpindah ke periode mingguan dan memuat rentang tanggal", async ({ page }) => {
+    await page.goto("/laporan");
+    await page.getByRole("link", { name: "Mingguan" }).click();
+
+    await expect(page).toHaveURL(/periode=mingguan/u);
+    await expect(page.getByRole("link", { name: "Mingguan" })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+    await expect(page.getByRole("link", { name: "Minggu sebelumnya" })).toBeVisible();
+    await expect(
+      page.getByText(/\d+ sampai \d+ [A-Z][a-z]+ \d{4}/u).first(),
+    ).toBeVisible();
+    await expectNoHorizontalScroll(page);
+  });
+
+  test("tautan periode sebelumnya membawa tanggal pada alamat", async ({ page }) => {
+    await page.goto("/laporan");
+    await page.getByRole("link", { name: "Hari sebelumnya" }).click();
+
+    await expect(page).toHaveURL(/\/laporan\?periode=harian&tanggal=\d{4}-\d{2}-\d{2}$/u);
+  });
+
+  test("alamat yang tidak sah kembali ke laporan harian", async ({ page }) => {
+    await page.goto("/laporan?periode=bulanan&tanggal=2026-02-31");
+
+    await expect(page.getByRole("link", { name: "Harian" })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+    await expect(page.getByRole("heading", { name: "Ringkasan periode" })).toBeVisible();
+  });
+
+  test("periode tanpa transaksi menampilkan keadaan kosong", async ({ page }) => {
+    await page.goto("/laporan?periode=harian&tanggal=2030-01-01");
+
+    await expect(
+      visibleText(page, "Belum ada transaksi pada periode ini").first(),
+    ).toBeVisible();
+    await expectNoHorizontalScroll(page);
+  });
+});
