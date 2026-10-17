@@ -150,26 +150,26 @@ Aturan struktur:
 Satu entitas akar `businesses`. Semua tabel lain terikat padanya, sesuai butir
 privasi proposal tentang pemisahan data antar warung.
 
-| Tabel                  | Isi utama                                                                                 | Catatan                                                |
-| ---------------------- | ----------------------------------------------------------------------------------------- | ------------------------------------------------------ |
-| `businesses`           | Nama warung, jam buka, status koneksi nomor, nomor bisnis                                 | Akar semua data                                        |
-| `products`             | Nama, satuan, harga jual, harga beli, stok, ambang minimum                                | Stok disimpan sebagai angka hasil perhitungan terakhir |
-| `customers`            | Nama, nomor telepon                                                                       | Nama dan nomor telepon disimpan terenkripsi            |
-| `conversations`        | Kanal, nomor pelanggan, status, waktu                                                     | Kanal bernilai `whatsapp` atau `app`                   |
-| `messages`             | Percakapan, pengirim, jenis, isi teks, tautan media, waktu                                | Jenis bernilai `text`, `voice`, `image`                |
-| `orders`               | Pelanggan, daftar item, total, status                                                     | Berasal dari percakapan WhatsApp                       |
-| `order_items`          | Order, produk, jumlah, harga satuan                                                       |                                                        |
-| `transactions`         | Jenis, keterangan, jumlah, sumber, tautan bukti, confidence, waktu                        | Jenis bernilai `sale`, `expense`, `debt`               |
-| `payments`             | Order, tautan bukti transfer, nominal yang diharapkan, nominal terbaca, status verifikasi | Status bernilai `menunggu`, `cocok`, `tidak cocok`     |
-| `stock_movements`      | Produk, jenis, jumlah perubahan, alasan, waktu                                            | Jejak audit perubahan stok                             |
-| `stock_alerts`         | Produk, stok saat alert, ambang, status                                                   | Status bernilai `aktif`, `selesai`                     |
-| `purchase_orders`      | Supplier, daftar item, total, status, waktu persetujuan                                   | Status bernilai `draft`, `disetujui`, `ditolak`        |
-| `purchase_order_items` | PO, produk, jumlah, harga perkiraan                                                       |                                                        |
-| `approvals`            | Jenis aksi, muatan aksi, ringkasan, status, waktu keputusan                               | Antrean di S6                                          |
-| `agent_sessions`       | Sesi percakapan, status kunci konteks, aksi yang menunggu                                 | Menggantikan Redis                                     |
-| `tool_invocations`     | Sesi, nama tool, muatan, hasil, waktu                                                     | Jejak audit pemanggilan tool                           |
-| `knowledge_chunks`     | Potongan teks, vektor embedding, sumber                                                   | Basis RAG dengan pgvector                              |
-| `quota_usage`          | Tanggal, jumlah pemakaian                                                                 | Pembatas pemakaian harian                              |
+| Tabel                  | Isi utama                                                                                 | Catatan                                                                                                            |
+| ---------------------- | ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `businesses`           | Nama warung, jam buka, status koneksi nomor, nomor bisnis                                 | Akar semua data                                                                                                    |
+| `products`             | Nama, satuan, harga jual, harga beli, stok, ambang minimum                                | Stok disimpan sebagai angka hasil perhitungan terakhir                                                             |
+| `customers`            | Nama dan nomor telepon terenkripsi, ditambah sidik jari nomor                             | Sidik jari nomor dipakai untuk mencari pelanggan tanpa membuka enkripsi                                            |
+| `conversations`        | Kanal, rujukan pelanggan, sidik jari nomor, status, waktu                                 | Kanal bernilai `whatsapp` atau `app`. Nomor pelanggan tidak disimpan di sini, lihat aturan 7                       |
+| `messages`             | Percakapan, pengirim, jenis, isi teks, tautan media, waktu                                | Jenis bernilai `text`, `voice`, `image`                                                                            |
+| `orders`               | Pelanggan, daftar item, total, status                                                     | Berasal dari percakapan WhatsApp                                                                                   |
+| `order_items`          | Order, produk, jumlah, harga satuan                                                       |                                                                                                                    |
+| `transactions`         | Jenis, keterangan, jumlah, sumber, rujukan pelanggan, tautan bukti, confidence, waktu     | Jenis bernilai `sale`, `expense`, `debt`                                                                           |
+| `payments`             | Order, tautan bukti transfer, nominal yang diharapkan, nominal terbaca, status verifikasi | Status bernilai `menunggu`, `cocok`, `tidak cocok`                                                                 |
+| `stock_movements`      | Produk, jenis, jumlah perubahan, alasan, waktu                                            | Jejak audit perubahan stok                                                                                         |
+| `stock_alerts`         | Produk, stok saat alert, ambang, status                                                   | Status bernilai `aktif`, `selesai`                                                                                 |
+| `purchase_orders`      | Nama pemasok, daftar item, total, status, waktu persetujuan                               | Status bernilai `draft`, `disetujui`, `ditolak`. Pemasok disimpan sebagai teks, belum ada tabel pemasok tersendiri |
+| `purchase_order_items` | PO, produk, jumlah, harga perkiraan                                                       |                                                                                                                    |
+| `approvals`            | Jenis aksi, muatan aksi, ringkasan, status, waktu keputusan                               | Antrean di S6                                                                                                      |
+| `agent_sessions`       | Sesi percakapan, status kunci konteks, aksi yang menunggu                                 | Menggantikan Redis                                                                                                 |
+| `tool_invocations`     | Sesi, nama tool, muatan, hasil, waktu                                                     | Jejak audit pemanggilan tool                                                                                       |
+| `knowledge_chunks`     | Potongan teks, sumber                                                                     | Basis RAG. Kolom vektor embedding belum ditulis, menunggu keputusan T4.6                                           |
+| `quota_usage`          | Tanggal, jumlah pemakaian                                                                 | Pembatas pemakaian harian                                                                                          |
 
 Aturan skema:
 
@@ -178,7 +178,9 @@ Aturan skema:
 2. Semua tabel punya `created_at`. Tabel yang dapat diubah punya `updated_at`.
 3. Penghapusan data pelanggan dilakukan sebagai penghapusan baris sungguhan,
    sesuai butir privasi proposal, bukan penandaan lunak.
-4. Setiap perubahan stok wajib meninggalkan baris di `stock_movements`.
+4. Setiap perubahan stok wajib meninggalkan baris di `stock_movements`. Kolom
+   `products.stock` adalah hasil perhitungan terakhir dari baris baris itu,
+   bukan sumber kebenaran.
 5. Tabel `conversations` dan `messages` tetap ada karena dibutuhkan untuk
    menerima pesan pelanggan, membentuk orderan, dan menyusun balasan otomatis.
    Keduanya **tidak dirender sebagai tampilan obrolan** di antarmuka. Yang
@@ -190,6 +192,21 @@ Aturan skema:
    halaman Pengaturan dapat menyampaikan apa adanya batas paket yang dipakai,
    termasuk bahwa lampiran masuk belum aktif pada paket gratis. Nilai rahasia
    penyedia tidak disimpan di baris ini, lihat bagian 8.
+7. Nomor telepon pelanggan tidak pernah disimpan dalam bentuk terbuka, bahkan
+   di tabel `customers`. Pencocokan pesan masuk membutuhkan nilai yang dapat
+   dicari, sedangkan teks terenkripsi tidak dapat dicari, sehingga nomor juga
+   disimpan sebagai sidik jari pada kolom `phone_number_hash`. Tabel
+   `conversations` memakai sidik jari yang sama dan tidak menyimpan nomornya.
+8. Setiap tabel memuat `business_id` langsung, bukan hanya lewat tabel induk.
+   Alasannya, aturan bagian 8 butir 4 mewajibkan setiap query menyertakan
+   `business_id`, dan kolom langsung membuat aturan itu dapat dipenuhi tanpa
+   join.
+9. Kunci utama memakai `uuid` dengan nilai bawaan dari basis data, bukan angka
+   berurut. Alasannya, seluruh data terikat pada satu warung, dan angka berurut
+   membuat jumlah data antar warung bocor lewat alamat halaman.
+10. Nilai enum memakai bahasa Indonesia, mengikuti penyebutan pada tabel di
+    atas. Nama tabel dan kolom tetap memakai bahasa Inggris, sesuai
+    `docs/CONVENTIONS.md` bagian 7.
 
 ## 5. Antarmuka penyedia AI
 
@@ -377,6 +394,7 @@ langsung dari dokumentasi resmi. Tanggal: 17 Oktober 2026.
 | A14   | Penggabung nama kelas                                 | `cn` diambil dari `src/lib/utils.ts`, bukan langsung dari paket `cn`                                                                                            | Mesin bawaan paket `cn` hanya mengenal ukuran huruf bawaan Tailwind. Tanpa perluasan, `text-body` dan `text-caption` dianggap warna teks dan terbuang saat digabung dengan kelas warna, sehingga ukuran huruf token tidak terpakai. Komponen baru dari perkakas shadcn/ui harus diubah dulu impornya. Bila token `--text-` bertambah di `src/app/globals.css`, daftar di `src/lib/utils.ts` harus ikut bertambah |
 | A15   | Perapian format dan pemeriksaan tipe                  | Prettier dengan `eslint-config-prettier`, lebar baris 90, akhir baris LF. Perintah `npm run format`, `npm run format:check`, dan `npm run typecheck`            | Menghentikan perdebatan gaya dan menjaga kode terbaca. `AGENTS.md` dan `docs/PRODUCT.md` dikecualikan karena isinya tidak diubah tanpa persetujuan user. Berkas `src/components/ui/` yang dihasilkan CLI shadcn/ui ikut dirapikan, jadi hasil `shadcn add` berikutnya perlu dirapikan ulang                                                                                                                      |
 | A16   | Alat pengujian                                        | Vitest 5 untuk unit dan integrasi pada `src/**/*.test.ts`, Playwright 1.64 untuk alur peramban pada `e2e/*.spec.ts`. Dua proyek tata letak: 393 dan 1280 piksel | Sudah ditetapkan pada rencana dan `docs/ARCHITECTURE.md` bagian 9. Node 24 menjalankan TypeScript langsung, sehingga Vitest tidak perlu pustaka tambahan. `@types/node` dinaikkan dari 20 ke 24 karena Vitest 5 menuntutnya, sekaligus sejalan dengan Node 24 di mesin pengembangan. `vitest.config.mts` memakai akhiran `.mts` karena `package.json` tidak menetapkan `type`                                    |
+| A17   | Bentuk skema basis data                               | uuid sebagai kunci utama, `business_id` di setiap tabel, nilai enum bahasa Indonesia, kolom uang bilangan bulat                                                 | Diputuskan saat T2.1 karena tidak diatur di dokumen mana pun. Rinciannya menjadi aturan skema pada bagian 4. Kolom vektor embedding pada `knowledge_chunks` sengaja belum ditulis, menunggu keputusan T4.6 soal sumber embedding, karena DeepSeek tidak menyediakan endpoint embedding                                                                                                                           |
 
 Catatan A9: `cacheComponents` aktif berarti halaman yang membaca data saat
 berjalan wajib dibungkus `Suspense` atau memakai arahan `"use cache"`.
