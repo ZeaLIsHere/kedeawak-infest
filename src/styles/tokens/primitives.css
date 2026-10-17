@@ -102,10 +102,10 @@
 
   /* Bayangan. Warnanya netral gelap dengan kepekatan rendah. */
   --primitive-shadow-xs: 0 1px 2px 0 rgb(15 23 42 / 0.05);
-  --primitive-shadow-sm: 0 1px 3px 0 rgb(15 23 42 / 0.08),
-    0 1px 2px -1px rgb(15 23 42 / 0.06);
-  --primitive-shadow-md: 0 4px 12px -2px rgb(15 23 42 / 0.1),
-    0 2px 6px -2px rgb(15 23 42 / 0.06);
+  --primitive-shadow-sm:
+    0 1px 3px 0 rgb(15 23 42 / 0.08), 0 1px 2px -1px rgb(15 23 42 / 0.06);
+  --primitive-shadow-md:
+    0 4px 12px -2px rgb(15 23 42 / 0.1), 0 2px 6px -2px rgb(15 23 42 / 0.06);
   --primitive-shadow-lg: 0 12px 32px -8px rgb(15 23 42 / 0.16);
 
   /* Durasi gerak. */

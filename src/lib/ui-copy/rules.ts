@@ -21,8 +21,7 @@ export const RULE_LABELS: Readonly<Record<UiTextRuleId, string>> = {
 /** Cara memperbaiki setiap pelanggaran. */
 export const RULE_GUIDANCE: Readonly<Record<UiTextRuleId, string>> = {
   emoji: "Hapus karakternya. Ikon antarmuka memakai komponen SVG dari lucide-react.",
-  dash:
-    "Ganti dengan kata atau spasi, misalnya Rp15.000 sampai Rp20.000. Lihat docs/CONVENTIONS.md bagian 2.2.",
+  dash: "Ganti dengan kata atau spasi, misalnya Rp15.000 sampai Rp20.000. Lihat docs/CONVENTIONS.md bagian 2.2.",
   forbidden: "Ganti dengan teks asli berbahasa Indonesia yang menyebut maksudnya.",
 };
 
@@ -78,8 +77,7 @@ export const FORBIDDEN_TERMS: readonly string[] = [
  * diturunkan ke huruf kecil sebelum dicocokkan.
  */
 const FORBIDDEN_PATTERNS: readonly RegExp[] = FORBIDDEN_TERMS.map(
-  (term) =>
-    new RegExp(`\\b${term.toLowerCase().replace(/\s+/gu, "\\s+")}\\b`, "u"),
+  (term) => new RegExp(`\\b${term.toLowerCase().replace(/\s+/gu, "\\s+")}\\b`, "u"),
 );
 
 /** Satu pelanggaran pada sebuah potongan teks antarmuka. */

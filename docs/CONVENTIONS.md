@@ -6,15 +6,15 @@ Aturan kode, teks antarmuka, dan komponen. Detail dari `AGENTS.md` bagian 3 dan 
 
 ## 1. Bahasa
 
-| Konteks | Bahasa |
-| --- | --- |
-| Teks yang dilihat pengguna | Indonesia |
-| Nama variabel, fungsi, tipe | Inggris |
-| Nama berkas dan folder | Inggris, kebab-case untuk folder, PascalCase untuk komponen |
-| Nama tabel dan kolom basis data | Inggris, snake_case |
-| Commit | Indonesia untuk deskripsi |
-| Dokumen di `docs/` | Indonesia |
-| Komentar kode | Indonesia, singkat, hanya bila kode tidak menjelaskan dirinya |
+| Konteks                         | Bahasa                                                        |
+| ------------------------------- | ------------------------------------------------------------- |
+| Teks yang dilihat pengguna      | Indonesia                                                     |
+| Nama variabel, fungsi, tipe     | Inggris                                                       |
+| Nama berkas dan folder          | Inggris, kebab-case untuk folder, PascalCase untuk komponen   |
+| Nama tabel dan kolom basis data | Inggris, snake_case                                           |
+| Commit                          | Indonesia untuk deskripsi                                     |
+| Dokumen di `docs/`              | Indonesia                                                     |
+| Komentar kode                   | Indonesia, singkat, hanya bila kode tidak menjelaskan dirinya |
 
 Istilah yang tetap bahasa Inggris di UI karena lazim dipakai: `WhatsApp`,
 `OCR`, `stok`, `draft`.
@@ -33,16 +33,16 @@ Istilah yang tetap bahasa Inggris di UI karena lazim dipakai: `WhatsApp`,
 
 ### 2.2 Cara menulis tanpa tanda hubung
 
-| Keperluan | Salah | Benar |
-| --- | --- | --- |
-| Rentang angka | `Rp15.000-20.000` | `Rp15.000 sampai Rp20.000` |
-| Rentang tanggal | `1-7 Okt` | `1 sampai 7 Oktober` |
-| Waktu | `08.00-21.00` | `08.00 sampai 21.00` |
-| Nilai kosong | `-` | `Belum ada data` |
-| Nomor telepon | `0812-3456` | `081234567890` |
-| Nama produk majemuk | `Kopi-susu` | `Kopi susu` |
-| Kata ulang | `sehari-hari` | `setiap hari` |
-| Singkatan | `dll.` | `dan lain lain` |
+| Keperluan           | Salah             | Benar                      |
+| ------------------- | ----------------- | -------------------------- |
+| Rentang angka       | `Rp15.000-20.000` | `Rp15.000 sampai Rp20.000` |
+| Rentang tanggal     | `1-7 Okt`         | `1 sampai 7 Oktober`       |
+| Waktu               | `08.00-21.00`     | `08.00 sampai 21.00`       |
+| Nilai kosong        | `-`               | `Belum ada data`           |
+| Nomor telepon       | `0812-3456`       | `081234567890`             |
+| Nama produk majemuk | `Kopi-susu`       | `Kopi susu`                |
+| Kata ulang          | `sehari-hari`     | `setiap hari`              |
+| Singkatan           | `dll.`            | `dan lain lain`            |
 
 Tanda hubung tetap dipakai pada hal yang tidak dilihat pengguna: nama berkas,
 kelas Tailwind, potongan kode, dan alamat halaman. Ini bukan pelanggaran.
@@ -69,10 +69,10 @@ manual di dalam komponen.
    Contoh: `Catat penjualan`, `Setujui draft`, `Hapus data`.
 3. Pesan galat menyebut apa yang salah dan apa yang harus dilakukan.
    Contoh: `Foto struk tidak terbaca. Sebutkan totalnya lewat suara atau
-   ketik manual.`
+ketik manual.`
 4. Pesan kosong menyebut langkah berikutnya, bukan hanya "tidak ada data".
    Contoh: `Belum ada orderan. Pesan pelanggan dari WhatsApp akan muncul di
-   sini.`
+sini.`
 
 ### 2.5 Pemeriksaan otomatis
 
@@ -135,17 +135,17 @@ Perintah: `npm run lint:ui`.
 
 ## 6. Penamaan
 
-| Hal | Gaya | Contoh |
-| --- | --- | --- |
-| Komponen | PascalCase | `StockAlertList` |
-| Fungsi dan variabel | camelCase | `formatRupiah` |
-| Konstanta | SCREAMING_SNAKE_CASE | `LOW_STOCK_THRESHOLD_DEFAULT` |
-| Tipe dan antarmuka | PascalCase | `TransactionInput` |
-| Berkas komponen | PascalCase | `StockAlertList.tsx` |
-| Berkas lain | kebab-case | `stock-alerts.ts` |
-| Tabel basis data | snake_case, jamak | `stock_alerts` |
-| Kolom basis data | snake_case | `minimum_stock` |
-| Route API | kebab-case | `/api/agent/receipt` |
+| Hal                 | Gaya                 | Contoh                        |
+| ------------------- | -------------------- | ----------------------------- |
+| Komponen            | PascalCase           | `StockAlertList`              |
+| Fungsi dan variabel | camelCase            | `formatRupiah`                |
+| Konstanta           | SCREAMING_SNAKE_CASE | `LOW_STOCK_THRESHOLD_DEFAULT` |
+| Tipe dan antarmuka  | PascalCase           | `TransactionInput`            |
+| Berkas komponen     | PascalCase           | `StockAlertList.tsx`          |
+| Berkas lain         | kebab-case           | `stock-alerts.ts`             |
+| Tabel basis data    | snake_case, jamak    | `stock_alerts`                |
+| Kolom basis data    | snake_case           | `minimum_stock`               |
+| Route API           | kebab-case           | `/api/agent/receipt`          |
 
 ## 7. Gaya CSS
 
@@ -168,12 +168,12 @@ Perintah: `npm run lint:ui`.
 
 Setiap daftar, tabel, dan kartu data wajib menangani:
 
-| Keadaan | Wujud |
-| --- | --- |
+| Keadaan       | Wujud                                                   |
+| ------------- | ------------------------------------------------------- |
 | Sedang memuat | Kerangka muat, bukan pemutar berputar di tengah halaman |
-| Kosong | Keterangan singkat berisi langkah berikutnya |
-| Gagal | Keterangan sebab dan tombol coba lagi |
-| Berhasil | Data tampil, tanpa notifikasi yang mengganggu |
+| Kosong        | Keterangan singkat berisi langkah berikutnya            |
+| Gagal         | Keterangan sebab dan tombol coba lagi                   |
+| Berhasil      | Data tampil, tanpa notifikasi yang mengganggu           |
 
 ## 9. Komentar dan dokumentasi kode
 
@@ -185,13 +185,13 @@ Setiap daftar, tabel, dan kartu data wajib menangani:
 
 ## 10. Yang sering keliru
 
-| Kesalahan | Yang benar |
-| --- | --- |
-| Menulis `Rp15.000-20.000` | `Rp15.000 sampai Rp20.000` |
-| Memakai emoji pada tombol | Ikon SVG dari `lucide-react` |
-| Menampilkan `-` untuk data kosong | `Belum ada data` |
-| Query basis data di dalam komponen | Lewat `src/lib/data/` |
-| Memanggil model bahasa di komponen | Lewat `src/lib/ai/` |
-| Menyimpan uang sebagai bilangan desimal | Bilangan bulat rupiah |
-| Menambah fitur di luar scope | Tanyakan dulu |
+| Kesalahan                                        | Yang benar                           |
+| ------------------------------------------------ | ------------------------------------ |
+| Menulis `Rp15.000-20.000`                        | `Rp15.000 sampai Rp20.000`           |
+| Memakai emoji pada tombol                        | Ikon SVG dari `lucide-react`         |
+| Menampilkan `-` untuk data kosong                | `Belum ada data`                     |
+| Query basis data di dalam komponen               | Lewat `src/lib/data/`                |
+| Memanggil model bahasa di komponen               | Lewat `src/lib/ai/`                  |
+| Menyimpan uang sebagai bilangan desimal          | Bilangan bulat rupiah                |
+| Menambah fitur di luar scope                     | Tanyakan dulu                        |
 | Menyatakan selesai tanpa menjalankan pemeriksaan | Jalankan `docs/WORKFLOW.md` bagian 4 |

@@ -12,11 +12,11 @@ Aturan induk dari user:
 
 ## 1. Cara membaca dokumen ini
 
-| Tanda | Arti |
-| --- | --- |
-| MASUK | Dikerjakan sampai berfungsi penuh di web |
-| SIMULASI | Dikerjakan di web, tetapi sumber eksternalnya disimulasikan |
-| LUAR | Tidak dikerjakan, tidak dibuat kodenya, tidak dibuat skema datanya |
+| Tanda    | Arti                                                               |
+| -------- | ------------------------------------------------------------------ |
+| MASUK    | Dikerjakan sampai berfungsi penuh di web                           |
+| SIMULASI | Dikerjakan di web, tetapi sumber eksternalnya disimulasikan        |
+| LUAR     | Tidak dikerjakan, tidak dibuat kodenya, tidak dibuat skema datanya |
 
 ---
 
@@ -24,14 +24,14 @@ Aturan induk dari user:
 
 Enam permukaan. Semuanya mengacu ke bagian mockup dan fitur utama proposal.
 
-| ID | Permukaan | Isi | Status |
-| --- | --- | --- | --- |
-| S1 | Dasbor | Statistik penjualan, pengeluaran, laba, jumlah order, produk terlaris, alert stok terbaru | MASUK |
-| S2 | Percakapan dengan Agen AI | Obrolan dengan AI untuk mencatat transaksi lewat teks, voice note, dan foto struk, termasuk konfirmasi dan persetujuan aksi | MASUK |
-| S3 | Integrasi WhatsApp | Status koneksi nomor, aksi Hubungkan ke WhatsApp beserta tata caranya, orderan yang masuk, bukti pembayaran, status verifikasi | SIMULASI |
-| S4 | Laporan Keuangan | Laporan harian dan mingguan: penjualan, pengeluaran, laba, rincian transaksi, ekspor | MASUK |
-| S5 | Stok dan Produk | Daftar produk, harga, stok, ambang minimum, alert stok menipis, penyesuaian stok | MASUK |
-| S6 | Persetujuan | Antrean aksi yang menunggu persetujuan pemilik, contohnya draft PO ke supplier, dengan aksi setujui atau tolak | MASUK |
+| ID  | Permukaan                 | Isi                                                                                                                            | Status   |
+| --- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------ | -------- |
+| S1  | Dasbor                    | Statistik penjualan, pengeluaran, laba, jumlah order, produk terlaris, alert stok terbaru                                      | MASUK    |
+| S2  | Percakapan dengan Agen AI | Obrolan dengan AI untuk mencatat transaksi lewat teks, voice note, dan foto struk, termasuk konfirmasi dan persetujuan aksi    | MASUK    |
+| S3  | Integrasi WhatsApp        | Status koneksi nomor, aksi Hubungkan ke WhatsApp beserta tata caranya, orderan yang masuk, bukti pembayaran, status verifikasi | SIMULASI |
+| S4  | Laporan Keuangan          | Laporan harian dan mingguan: penjualan, pengeluaran, laba, rincian transaksi, ekspor                                           | MASUK    |
+| S5  | Stok dan Produk           | Daftar produk, harga, stok, ambang minimum, alert stok menipis, penyesuaian stok                                               | MASUK    |
+| S6  | Persetujuan               | Antrean aksi yang menunggu persetujuan pemilik, contohnya draft PO ke supplier, dengan aksi setujui atau tolak                 | MASUK    |
 
 ## 3. Fitur utama proposal dan statusnya
 
@@ -67,7 +67,6 @@ aplikasi, dan pemilik menghubungkan nomornya sendiri dari dalam aplikasi.
   Fonnte, atau n8n sebagai perantara. Isi tata cara pada tombol Hubungkan ke
   WhatsApp bergantung pada pilihan ini. Rincian ada di
   `docs/ARCHITECTURE.md` bagian 11 dan keputusan K9 pada `PLAN.md`.
-
 
 ### 3.2 Ekstraksi Data Multimodal — MASUK
 
@@ -109,7 +108,6 @@ AI menjawab pertanyaan berulang seperti harga, ketersediaan, dan jam buka.
   sebagai fitur utama. Keputusan: dikerjakan dengan status SIMULASI, karena
   seluruh mekanismenya dapat diperagakan di dalam web.
 
-
 ### 3.5 Permintaan Laporan Keuangan — MASUK
 
 Pemilik mengirim pesan seperti "Laporan hari ini", AI menyajikan rangkuman.
@@ -137,18 +135,18 @@ AI membuat draft PO, mengirim setelah disetujui pemilik, lalu memperbarui stok.
 
 Sepuluh tool dari proposal. Ini daftar kerja yang harus ada dan berfungsi.
 
-| Tool | Status | Catatan |
-| --- | --- | --- |
-| `check_stock(product_id)` | MASUK | Membaca stok terkini |
-| `create_sale(items, total)` | MASUK | Menulis transaksi penjualan |
-| `create_expense(description, amount)` | MASUK | Menulis transaksi pengeluaran |
-| `create_debt(customer, amount)` | MASUK | Menulis hutang pelanggan |
-| `create_purchase_order(supplier, items)` | MASUK | Membuat draft PO ke antrean persetujuan |
-| `send_whatsapp(phone, message)` | SIMULASI | Menulis balasan pada konteks pesan pelanggan, tidak benar benar mengirim |
-| `verify_payment(image_url, expected_amount)` | MASUK | Mencocokkan bukti transfer dengan nominal yang diharapkan |
-| `get_report(period)` | MASUK | Menghitung ringkasan harian dan mingguan |
-| `forecast_stock(product_id)` | MASUK | Rata rata bergerak dengan safety stock, seperti di proposal |
-| `business_strategy()` | MASUK | Rekomendasi berbasis data transaksi yang ada |
+| Tool                                         | Status   | Catatan                                                                  |
+| -------------------------------------------- | -------- | ------------------------------------------------------------------------ |
+| `check_stock(product_id)`                    | MASUK    | Membaca stok terkini                                                     |
+| `create_sale(items, total)`                  | MASUK    | Menulis transaksi penjualan                                              |
+| `create_expense(description, amount)`        | MASUK    | Menulis transaksi pengeluaran                                            |
+| `create_debt(customer, amount)`              | MASUK    | Menulis hutang pelanggan                                                 |
+| `create_purchase_order(supplier, items)`     | MASUK    | Membuat draft PO ke antrean persetujuan                                  |
+| `send_whatsapp(phone, message)`              | SIMULASI | Menulis balasan pada konteks pesan pelanggan, tidak benar benar mengirim |
+| `verify_payment(image_url, expected_amount)` | MASUK    | Mencocokkan bukti transfer dengan nominal yang diharapkan                |
+| `get_report(period)`                         | MASUK    | Menghitung ringkasan harian dan mingguan                                 |
+| `forecast_stock(product_id)`                 | MASUK    | Rata rata bergerak dengan safety stock, seperti di proposal              |
+| `business_strategy()`                        | MASUK    | Rekomendasi berbasis data transaksi yang ada                             |
 
 Kesepuluh tool dipanggil lewat satu lapisan orkestrasi AI, dan setiap
 pemanggilan tercatat di jejak audit agar dapat diperiksa saat demo.
@@ -157,12 +155,12 @@ pemanggilan tercatat di jejak audit agar dapat diperiksa saat demo.
 
 Empat butir dari bagian privasi proposal. Keempatnya tampil di web.
 
-| Butir proposal | Status | Wujud di aplikasi |
-| --- | --- | --- |
-| Hanya memproses pesan ke nomor bisnis warung | MASUK | Setiap entitas data terikat ke `business_id`. Tidak ada query lintas warung |
-| Pemilik menghubungkan nomor secara opt in | MASUK | Permukaan S3 berisi status koneksi nomor, tata cara, aksi Hubungkan ke WhatsApp, dan aksi memutuskan koneksi |
-| Data pelanggan disimpan terenkripsi | MASUK | Kolom nama dan nomor telepon pelanggan dienkripsi saat disimpan |
-| Pemilik dapat menghapus data pelanggan | MASUK | Aksi hapus data pelanggan di S3, dengan konfirmasi |
+| Butir proposal                               | Status | Wujud di aplikasi                                                                                            |
+| -------------------------------------------- | ------ | ------------------------------------------------------------------------------------------------------------ |
+| Hanya memproses pesan ke nomor bisnis warung | MASUK  | Setiap entitas data terikat ke `business_id`. Tidak ada query lintas warung                                  |
+| Pemilik menghubungkan nomor secara opt in    | MASUK  | Permukaan S3 berisi status koneksi nomor, tata cara, aksi Hubungkan ke WhatsApp, dan aksi memutuskan koneksi |
+| Data pelanggan disimpan terenkripsi          | MASUK  | Kolom nama dan nomor telepon pelanggan dienkripsi saat disimpan                                              |
+| Pemilik dapat menghapus data pelanggan       | MASUK  | Aksi hapus data pelanggan di S3, dengan konfirmasi                                                           |
 
 Butir ke-2 proposal, "pelanggan yang mengirim pesan ke nomor bisnis dianggap
 memasuki konteks transaksi bisnis", cukup ditulis sebagai keterangan di
@@ -191,13 +189,13 @@ Table di bawah ini adalah roadmap enam bulan ke depan, bukan pekerjaan
 hackathon. Beberapa di antaranya tetap dibangun dalam bentuk terbatas karena
 muncul juga sebagai fitur utama, dan sudah ditandai SIMULASI di bagian 3.
 
-| Item Extended | Keputusan |
-| --- | --- |
-| AI agent membalas chat pelanggan secara otomatis | Dibangun terbatas, status SIMULASI, lihat 3.4 |
-| Prediksi stok dan rekomendasi restok dari data historis | Dibangun lewat `forecast_stock`, lihat bagian 4 |
-| Data keuangan terstruktur untuk penilaian kredit | LUAR. Tidak ada ekspor ke lembaga pembiayaan |
-| Pilot project 50 sampai 100 warung, target 500 pengguna aktif | LUAR. Ini rencana bisnis, bukan fitur |
-| Kolaborasi dengan pemerintah dan lembaga keuangan | LUAR |
+| Item Extended                                                 | Keputusan                                       |
+| ------------------------------------------------------------- | ----------------------------------------------- |
+| AI agent membalas chat pelanggan secara otomatis              | Dibangun terbatas, status SIMULASI, lihat 3.4   |
+| Prediksi stok dan rekomendasi restok dari data historis       | Dibangun lewat `forecast_stock`, lihat bagian 4 |
+| Data keuangan terstruktur untuk penilaian kredit              | LUAR. Tidak ada ekspor ke lembaga pembiayaan    |
+| Pilot project 50 sampai 100 warung, target 500 pengguna aktif | LUAR. Ini rencana bisnis, bukan fitur           |
+| Kolaborasi dengan pemerintah dan lembaga keuangan             | LUAR                                            |
 
 ### 6.3 Fitur umum yang sering ditambahkan tanpa diminta
 
@@ -242,4 +240,3 @@ manual di luar aplikasi:
 
 Semua langkah di atas adalah pengujian penerimaan yang harus lulus sebelum
 proyek dinyatakan selesai.
-

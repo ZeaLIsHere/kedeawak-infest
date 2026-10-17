@@ -23,13 +23,13 @@ pelatihan.
 
 Terjemahannya menjadi aturan yang bisa diperiksa:
 
-| Kata | Artinya di sini |
-| --- | --- |
-| Clean | Ruang kosong lega. Satu gagasan per kartu. Tidak ada hiasan yang tidak menjelaskan apa pun |
-| Minimalist | Setiap elemen harus punya alasan. Kalau dihapus dan tidak ada yang hilang, hapus |
-| Flat | Tanpa gradien, tanpa bayangan tebal, tanpa efek timbul. Ketinggian hanya dari garis tepi dan bayangan sangat halus |
+| Kata       | Artinya di sini                                                                                                                 |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| Clean      | Ruang kosong lega. Satu gagasan per kartu. Tidak ada hiasan yang tidak menjelaskan apa pun                                      |
+| Minimalist | Setiap elemen harus punya alasan. Kalau dihapus dan tidak ada yang hilang, hapus                                                |
+| Flat       | Tanpa gradien, tanpa bayangan tebal, tanpa efek timbul. Ketinggian hanya dari garis tepi dan bayangan sangat halus              |
 | Chat first | Percakapan adalah pusat pengalaman. Permukaan S2 tampil seperti aplikasi pesan, dengan gelembung pesan dan kolom ketik di bawah |
-| Sederhana | Satu tindakan utama per layar. Label memakai kata kerja sehari hari. Angka penting dibuat besar |
+| Sederhana  | Satu tindakan utama per layar. Label memakai kata kerja sehari hari. Angka penting dibuat besar                                 |
 
 ---
 
@@ -58,20 +58,20 @@ Terjemahannya menjadi aturan yang bisa diperiksa:
 Semua nilai di bawah berasal dari `src/styles/tokens/semantic.css`, yang
 menunjuk `src/styles/tokens/primitives.css`.
 
-| Peran | Token | Nilai |
-| --- | --- | --- |
-| Latar halaman | `--background` | `#f8fafc` |
-| Teks utama | `--foreground` | `#0f172a` |
-| Permukaan kartu | `--card` | `#ffffff` |
-| Warna merek | `--primary` | `#059669` |
-| Teks sekunder | `--muted-foreground` | `#64748b` |
-| Garis | `--border` | `#e2e8f0` |
-| Pemasukan | `--income` | `#059669` |
-| Pengeluaran | `--expense` | `#dc2626` |
-| Laba | `--profit` | `#047857` |
-| Peringatan | `--warning` | `#d97706` |
-| Berhasil | `--success` | `#059669` |
-| Informasi | `--info` | `#2563eb` |
+| Peran           | Token                | Nilai     |
+| --------------- | -------------------- | --------- |
+| Latar halaman   | `--background`       | `#f8fafc` |
+| Teks utama      | `--foreground`       | `#0f172a` |
+| Permukaan kartu | `--card`             | `#ffffff` |
+| Warna merek     | `--primary`          | `#059669` |
+| Teks sekunder   | `--muted-foreground` | `#64748b` |
+| Garis           | `--border`           | `#e2e8f0` |
+| Pemasukan       | `--income`           | `#059669` |
+| Pengeluaran     | `--expense`          | `#dc2626` |
+| Laba            | `--profit`           | `#047857` |
+| Peringatan      | `--warning`          | `#d97706` |
+| Berhasil        | `--success`          | `#059669` |
+| Informasi       | `--info`             | `#2563eb` |
 
 Catatan:
 
@@ -93,13 +93,13 @@ Catatan:
 Satu keluarga huruf, yaitu Geist, dimuat lewat `next/font`. Tidak ada huruf
 kedua. Pembedaan dibuat lewat ukuran dan ketebalan.
 
-| Peran | Kelas | Ukuran | Ketebalan |
-| --- | --- | --- | --- |
-| Angka besar dasbor | `text-metric` | 1.875rem | 600 |
-| Judul halaman | `text-page-title` | 1.5rem | 600 |
-| Judul bagian | `text-section-title` | 1.0625rem | 600 |
-| Isi | `text-body` | 0.9375rem | 400 |
-| Keterangan kecil | `text-caption` | 0.75rem | 400 |
+| Peran              | Kelas                | Ukuran    | Ketebalan |
+| ------------------ | -------------------- | --------- | --------- |
+| Angka besar dasbor | `text-metric`        | 1.875rem  | 600       |
+| Judul halaman      | `text-page-title`    | 1.5rem    | 600       |
+| Judul bagian       | `text-section-title` | 1.0625rem | 600       |
+| Isi                | `text-body`          | 0.9375rem | 400       |
+| Keterangan kecil   | `text-caption`       | 0.75rem   | 400       |
 
 Aturan:
 
@@ -112,14 +112,14 @@ Aturan:
 
 ## 5. Bentuk dan ketinggian
 
-| Peran | Token | Nilai |
-| --- | --- | --- |
-| Kendali, misalnya tombol dan masukan | `--radius-control` | 0.375rem |
-| Permukaan, misalnya kartu dan panel | `--radius-surface` | 0.875rem |
-| Lencana dan chip | `--radius-pill` | penuh |
-| Kartu diam | `shadow-card` | bayangan paling halus |
-| Permukaan terangkat | `shadow-raised` | untuk menu dan popover |
-| Lapisan atas | `shadow-overlay` | untuk dialog dan lembar |
+| Peran                                | Token              | Nilai                   |
+| ------------------------------------ | ------------------ | ----------------------- |
+| Kendali, misalnya tombol dan masukan | `--radius-control` | 0.375rem                |
+| Permukaan, misalnya kartu dan panel  | `--radius-surface` | 0.875rem                |
+| Lencana dan chip                     | `--radius-pill`    | penuh                   |
+| Kartu diam                           | `shadow-card`      | bayangan paling halus   |
+| Permukaan terangkat                  | `shadow-raised`    | untuk menu dan popover  |
+| Lapisan atas                         | `shadow-overlay`   | untuk dialog dan lembar |
 
 Aturan:
 
@@ -133,23 +133,23 @@ Aturan:
 
 ## 6. Tata letak
 
-| Hal | Token atau aturan |
-| --- | --- |
-| Jarak tepi halaman | `p-page` |
-| Jarak antarbagian | `p-section` |
-| Jarak antarunsur dalam satu baris | `p-gutter` |
-| Lebar isi maksimum | `--content-max-width`, yaitu 80rem, dipusatkan |
-| Lebar sisi navigasi | `--sidebar-width`, yaitu 15.5rem |
-| Tinggi kepala halaman | `--header-height`, yaitu 3.5rem |
-| Sasaran sentuh minimum | `--touch-target-min`, yaitu 3rem (48 piksel) |
+| Hal                               | Token atau aturan                              |
+| --------------------------------- | ---------------------------------------------- |
+| Jarak tepi halaman                | `p-page`                                       |
+| Jarak antarbagian                 | `p-section`                                    |
+| Jarak antarunsur dalam satu baris | `p-gutter`                                     |
+| Lebar isi maksimum                | `--content-max-width`, yaitu 80rem, dipusatkan |
+| Lebar sisi navigasi               | `--sidebar-width`, yaitu 15.5rem               |
+| Tinggi kepala halaman             | `--header-height`, yaitu 3.5rem                |
+| Sasaran sentuh minimum            | `--touch-target-min`, yaitu 3rem (48 piksel)   |
 
 Titik ubah:
 
-| Lebar | Susunan |
-| --- | --- |
-| Di bawah 768 piksel | Satu kolom penuh. Navigasi berpindah ke batang bawah berisi empat tujuan tersering, dan tujuan lain beserta Pengaturan masuk menu `Lainnya` berupa lembar dari bawah. Tabel panjang berubah menjadi daftar kartu |
-| 768 sampai 1023 piksel | Satu kolom dengan lebar terbatas, navigasi tetap di batang bawah |
-| 1024 piksel ke atas | Sisi navigasi tetap di kiri, isi di kanan, kartu boleh dua atau tiga kolom |
+| Lebar                  | Susunan                                                                                                                                                                                                          |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Di bawah 768 piksel    | Satu kolom penuh. Navigasi berpindah ke batang bawah berisi empat tujuan tersering, dan tujuan lain beserta Pengaturan masuk menu `Lainnya` berupa lembar dari bawah. Tabel panjang berubah menjadi daftar kartu |
+| 768 sampai 1023 piksel | Satu kolom dengan lebar terbatas, navigasi tetap di batang bawah                                                                                                                                                 |
+| 1024 piksel ke atas    | Sisi navigasi tetap di kiri, isi di kanan, kartu boleh dua atau tiga kolom                                                                                                                                       |
 
 Aturan:
 
@@ -162,17 +162,17 @@ Aturan:
 
 ## 7. Komponen inti
 
-| Komponen | Aturan |
-| --- | --- |
-| Tombol utama | Warna `--primary`, teks `--primary-foreground`, tinggi `--control-height-md`, sudut `--radius-control` |
-| Tombol sekunder | Permukaan `--card`, garis `--border-strong`, teks `--foreground` |
-| Kartu | Permukaan `--card`, garis `--border`, sudut `--radius-surface`, jarak dalam `--card-padding` |
-| Lencana status | Bentuk pil, memakai pasangan warna status dan permukaannya, selalu berisi teks |
-| Tabel | Kepala tabel memakai `text-caption` dan `--muted-foreground`, kolom angka memakai `tabular-nums` dan rata kanan |
-| Keadaan kosong | Judul singkat, satu kalimat penjelasan, satu tindakan lanjutan. Tidak ada gambar hiasan |
-| Keadaan memuat | Kerangka abu dengan bentuk menyerupai isi aslinya. Bukan pemutar berputar di tengah halaman |
-| Keadaan gagal | Kalimat sebab yang dapat dimengerti, dan satu tombol coba lagi |
-| Dialog konfirmasi | Dipakai untuk tindakan yang tidak bisa dibatalkan, misalnya menghapus data pelanggan |
+| Komponen          | Aturan                                                                                                          |
+| ----------------- | --------------------------------------------------------------------------------------------------------------- |
+| Tombol utama      | Warna `--primary`, teks `--primary-foreground`, tinggi `--control-height-md`, sudut `--radius-control`          |
+| Tombol sekunder   | Permukaan `--card`, garis `--border-strong`, teks `--foreground`                                                |
+| Kartu             | Permukaan `--card`, garis `--border`, sudut `--radius-surface`, jarak dalam `--card-padding`                    |
+| Lencana status    | Bentuk pil, memakai pasangan warna status dan permukaannya, selalu berisi teks                                  |
+| Tabel             | Kepala tabel memakai `text-caption` dan `--muted-foreground`, kolom angka memakai `tabular-nums` dan rata kanan |
+| Keadaan kosong    | Judul singkat, satu kalimat penjelasan, satu tindakan lanjutan. Tidak ada gambar hiasan                         |
+| Keadaan memuat    | Kerangka abu dengan bentuk menyerupai isi aslinya. Bukan pemutar berputar di tengah halaman                     |
+| Keadaan gagal     | Kalimat sebab yang dapat dimengerti, dan satu tombol coba lagi                                                  |
+| Dialog konfirmasi | Dipakai untuk tindakan yang tidak bisa dibatalkan, misalnya menghapus data pelanggan                            |
 
 ---
 
@@ -180,11 +180,11 @@ Aturan:
 
 Gerak hanya dipakai untuk memberi umpan balik, bukan untuk hiasan.
 
-| Keperluan | Durasi |
-| --- | --- |
-| Umpan balik langsung, misalnya tombol ditekan | `--motion-fast`, 120 milidetik |
-| Perubahan tampilan, misalnya kartu muncul | `--motion-normal`, 200 milidetik |
-| Perpindahan panel atau lembar | `--motion-slow`, 320 milidetik |
+| Keperluan                                     | Durasi                           |
+| --------------------------------------------- | -------------------------------- |
+| Umpan balik langsung, misalnya tombol ditekan | `--motion-fast`, 120 milidetik   |
+| Perubahan tampilan, misalnya kartu muncul     | `--motion-normal`, 200 milidetik |
+| Perpindahan panel atau lembar                 | `--motion-slow`, 320 milidetik   |
 
 Aturan:
 
@@ -212,13 +212,13 @@ Aturan:
 
 ## 10. Di mana tokennya
 
-| Berkas | Isi |
-| --- | --- |
-| `src/styles/tokens/primitives.css` | Lapis 1, nilai mentah berawalan `--primitive-` |
-| `src/styles/tokens/semantic.css` | Lapis 2, makna, misalnya `--primary` dan `--income` |
-| `src/styles/tokens/components.css` | Lapis 3, sudut, ketinggian, tinggi kendali, ukuran kerangka |
-| `src/styles/tokens/index.css` | Mengimpor ketiga lapis secara berurutan |
-| `src/app/globals.css` | Pemetaan token menjadi utilitas Tailwind lewat blok `@theme inline` |
+| Berkas                             | Isi                                                                 |
+| ---------------------------------- | ------------------------------------------------------------------- |
+| `src/styles/tokens/primitives.css` | Lapis 1, nilai mentah berawalan `--primitive-`                      |
+| `src/styles/tokens/semantic.css`   | Lapis 2, makna, misalnya `--primary` dan `--income`                 |
+| `src/styles/tokens/components.css` | Lapis 3, sudut, ketinggian, tinggi kendali, ukuran kerangka         |
+| `src/styles/tokens/index.css`      | Mengimpor ketiga lapis secara berurutan                             |
+| `src/app/globals.css`              | Pemetaan token menjadi utilitas Tailwind lewat blok `@theme inline` |
 
 Aturan penamaan yang wajib dijaga: nama di lapis 2 dan lapis 3 tidak boleh
 bertabrakan dengan ruang nama tema Tailwind, yaitu `--color-`, `--text-`,

@@ -6,10 +6,7 @@ import { PageHeader } from "@/components/shell/page-header";
 export default function PengaturanPage() {
   return (
     <>
-      <PageHeader
-        title="Pengaturan"
-        description="Kendali data dan privasi warung."
-      />
+      <PageHeader title="Pengaturan" description="Kendali data dan privasi warung." />
 
       <div className="mx-auto w-full max-w-content p-page">
         <EmptyState

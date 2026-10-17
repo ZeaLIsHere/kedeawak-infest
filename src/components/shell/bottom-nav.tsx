@@ -20,9 +20,7 @@ import { cn } from "@/lib/utils";
 
 export function BottomNav() {
   const pathname = usePathname();
-  const overflowActive = overflowItems.some((item) =>
-    isActivePath(pathname, item.href),
-  );
+  const overflowActive = overflowItems.some((item) => isActivePath(pathname, item.href));
 
   return (
     <nav

@@ -18,11 +18,7 @@ export function SidebarNav() {
       className="flex flex-1 flex-col gap-1 overflow-y-auto px-gutter py-section"
     >
       {surfaceNavItems.map((item) => (
-        <NavLink
-          key={item.href}
-          item={item}
-          active={isActivePath(pathname, item.href)}
-        />
+        <NavLink key={item.href} item={item} active={isActivePath(pathname, item.href)} />
       ))}
 
       <div className="mt-auto pt-section">

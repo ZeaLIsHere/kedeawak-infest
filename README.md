@@ -29,28 +29,28 @@ menghilangkan hambatan itu dengan membuat WhatsApp tetap menjadi pintu masuk.
 
 Enam permukaan aplikasi, sesuai `docs/SCOPE.md`:
 
-| Halaman | Isi |
-| --- | --- |
-| Dasbor | Statistik penjualan, pengeluaran, laba, order, alert stok |
-| Percakapan dengan Agen AI | Mencatat transaksi lewat teks, suara, dan foto struk |
-| Integrasi WhatsApp | Status koneksi WhatsApp, orderan, bukti pembayaran, status verifikasi |
-| Laporan Keuangan | Laporan harian dan mingguan |
-| Stok dan Produk | Produk, stok, ambang minimum, alert, prediksi restok |
-| Persetujuan | Antrean aksi menunggu persetujuan, misalnya draft PO |
+| Halaman                   | Isi                                                                   |
+| ------------------------- | --------------------------------------------------------------------- |
+| Dasbor                    | Statistik penjualan, pengeluaran, laba, order, alert stok             |
+| Percakapan dengan Agen AI | Mencatat transaksi lewat teks, suara, dan foto struk                  |
+| Integrasi WhatsApp        | Status koneksi WhatsApp, orderan, bukti pembayaran, status verifikasi |
+| Laporan Keuangan          | Laporan harian dan mingguan                                           |
+| Stok dan Produk           | Produk, stok, ambang minimum, alert, prediksi restok                  |
+| Persetujuan               | Antrean aksi menunggu persetujuan, misalnya draft PO                  |
 
 ## Dokumen
 
-| Berkas | Isi |
-| --- | --- |
-| `AGENTS.md` | Aturan main kerja. Wajib dibaca lebih dulu |
-| `PLAN.md` | Rencana induk dan daftar tugas |
-| `DESIGN.md` | Arah visual, warna, huruf, tata letak, dan larangan tampilan |
-| `docs/PRODUCT.md` | Kebenaran produk hasil ekstraksi proposal |
-| `docs/SCOPE.md` | Batas fitur, termasuk yang tidak dikerjakan |
-| `docs/ARCHITECTURE.md` | Tumpukan teknologi, struktur, skema data |
-| `docs/CONVENTIONS.md` | Aturan kode dan teks antarmuka |
-| `docs/WORKFLOW.md` | Alur git, commit, push, dan verifikasi |
-| `docs/THIRD-PARTY-SKILLS.md` | Asal usul dan lisensi skills pihak ketiga |
+| Berkas                       | Isi                                                          |
+| ---------------------------- | ------------------------------------------------------------ |
+| `AGENTS.md`                  | Aturan main kerja. Wajib dibaca lebih dulu                   |
+| `PLAN.md`                    | Rencana induk dan daftar tugas                               |
+| `DESIGN.md`                  | Arah visual, warna, huruf, tata letak, dan larangan tampilan |
+| `docs/PRODUCT.md`            | Kebenaran produk hasil ekstraksi proposal                    |
+| `docs/SCOPE.md`              | Batas fitur, termasuk yang tidak dikerjakan                  |
+| `docs/ARCHITECTURE.md`       | Tumpukan teknologi, struktur, skema data                     |
+| `docs/CONVENTIONS.md`        | Aturan kode dan teks antarmuka                               |
+| `docs/WORKFLOW.md`           | Alur git, commit, push, dan verifikasi                       |
+| `docs/THIRD-PARTY-SKILLS.md` | Asal usul dan lisensi skills pihak ketiga                    |
 
 ## Menjalankan
 
@@ -63,11 +63,11 @@ Buka http://localhost:3000.
 
 Perintah lain:
 
-| Perintah | Fungsi |
-| --- | --- |
+| Perintah        | Fungsi                         |
+| --------------- | ------------------------------ |
 | `npm run build` | Bangun aplikasi untuk produksi |
-| `npm run lint` | Periksa aturan kode |
-| `npm start` | Jalankan hasil bangun produksi |
+| `npm run lint`  | Periksa aturan kode            |
+| `npm start`     | Jalankan hasil bangun produksi |
 
 Persyaratan: Node.js 24 atau lebih baru.
 

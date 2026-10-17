@@ -10,23 +10,23 @@ aplikasi, tidak ikut dibangun, dan tidak memengaruhi hasil build.
 
 ## 1. Daftar skills terpasang
 
-| Skill | Sumber | Lisensi | Commit | Tanggal |
-| --- | --- | --- | --- | --- |
-| `ui-ux-pro-max` | https://github.com/nextlevelbuilder/ui-ux-pro-max-skill | MIT | `56ea9cf174ed86786187daa9de0e6247cb0747e4` | 2026-10-15 |
-| `design-system` | sama dengan di atas | MIT | sama | sama |
-| `ui-styling` | sama dengan di atas | MIT | sama | sama |
-| `impeccable` | https://github.com/pbakaus/impeccable | Apache 2.0 | `6af45ac9a5eb8792f033d3242f52e99812fd91fa` | 2026-10-16 |
-| `using-superpowers` | https://github.com/obra/superpowers | MIT | `bb92a77741419a4ab5f06e711a283343f1ada0c3` | 2026-10-09 |
-| `brainstorming` | sama dengan di atas | MIT | sama | sama |
-| `writing-plans` | sama dengan di atas | MIT | sama | sama |
-| `executing-plans` | sama dengan di atas | MIT | sama | sama |
-| `subagent-driven-development` | sama dengan di atas | MIT | sama | sama |
-| `dispatching-parallel-agents` | sama dengan di atas | MIT | sama | sama |
-| `test-driven-development` | sama dengan di atas | MIT | sama | sama |
-| `systematic-debugging` | sama dengan di atas | MIT | sama | sama |
-| `requesting-code-review` | sama dengan di atas | MIT | sama | sama |
-| `receiving-code-review` | sama dengan di atas | MIT | sama | sama |
-| `verification-before-completion` | sama dengan di atas | MIT | sama | sama |
+| Skill                            | Sumber                                                  | Lisensi    | Commit                                     | Tanggal    |
+| -------------------------------- | ------------------------------------------------------- | ---------- | ------------------------------------------ | ---------- |
+| `ui-ux-pro-max`                  | https://github.com/nextlevelbuilder/ui-ux-pro-max-skill | MIT        | `56ea9cf174ed86786187daa9de0e6247cb0747e4` | 2026-10-15 |
+| `design-system`                  | sama dengan di atas                                     | MIT        | sama                                       | sama       |
+| `ui-styling`                     | sama dengan di atas                                     | MIT        | sama                                       | sama       |
+| `impeccable`                     | https://github.com/pbakaus/impeccable                   | Apache 2.0 | `6af45ac9a5eb8792f033d3242f52e99812fd91fa` | 2026-10-16 |
+| `using-superpowers`              | https://github.com/obra/superpowers                     | MIT        | `bb92a77741419a4ab5f06e711a283343f1ada0c3` | 2026-10-09 |
+| `brainstorming`                  | sama dengan di atas                                     | MIT        | sama                                       | sama       |
+| `writing-plans`                  | sama dengan di atas                                     | MIT        | sama                                       | sama       |
+| `executing-plans`                | sama dengan di atas                                     | MIT        | sama                                       | sama       |
+| `subagent-driven-development`    | sama dengan di atas                                     | MIT        | sama                                       | sama       |
+| `dispatching-parallel-agents`    | sama dengan di atas                                     | MIT        | sama                                       | sama       |
+| `test-driven-development`        | sama dengan di atas                                     | MIT        | sama                                       | sama       |
+| `systematic-debugging`           | sama dengan di atas                                     | MIT        | sama                                       | sama       |
+| `requesting-code-review`         | sama dengan di atas                                     | MIT        | sama                                       | sama       |
+| `receiving-code-review`          | sama dengan di atas                                     | MIT        | sama                                       | sama       |
+| `verification-before-completion` | sama dengan di atas                                     | MIT        | sama                                       | sama       |
 
 Berkas lisensi asli disimpan di dalam repo:
 
@@ -36,22 +36,22 @@ Berkas lisensi asli disimpan di dalam repo:
 
 ## 2. Alasan pemilihan
 
-| Skill | Dipakai untuk |
-| --- | --- |
-| `ui-ux-pro-max` | Basis data gaya, palet, pasangan font, pedoman UX, dan arahan khusus stack Next.js saat merancang antarmuka |
-| `design-system` | Menyusun token tiga lapis dan spesifikasi komponen |
-| `ui-styling` | Membangun komponen dengan shadcn/ui dan Tailwind, termasuk tema dan mode gelap bila diperlukan |
-| `impeccable` | Audit, critique, polish, dan perbaikan kualitas desain sebelum demo |
-| `brainstorming` | Menggali maksud sebelum membangun fitur baru |
-| `writing-plans` | Menyusun rencana multi langkah |
-| `executing-plans` | Menjalankan rencana di sesi ini |
-| `subagent-driven-development` | Menjalankan rencana memakai beberapa subagent |
-| `dispatching-parallel-agents` | Menjalankan tugas yang saling bebas secara paralel |
-| `test-driven-development` | Menulis uji sebelum kode implementasi |
-| `systematic-debugging` | Menangani bug secara sistematis |
-| `requesting-code-review` | Meninjau pekerjaan sebelum dinyatakan selesai |
-| `receiving-code-review` | Menanggapi hasil tinjauan dengan benar |
-| `verification-before-completion` | Memastikan klaim selesai didukung bukti |
+| Skill                            | Dipakai untuk                                                                                               |
+| -------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `ui-ux-pro-max`                  | Basis data gaya, palet, pasangan font, pedoman UX, dan arahan khusus stack Next.js saat merancang antarmuka |
+| `design-system`                  | Menyusun token tiga lapis dan spesifikasi komponen                                                          |
+| `ui-styling`                     | Membangun komponen dengan shadcn/ui dan Tailwind, termasuk tema dan mode gelap bila diperlukan              |
+| `impeccable`                     | Audit, critique, polish, dan perbaikan kualitas desain sebelum demo                                         |
+| `brainstorming`                  | Menggali maksud sebelum membangun fitur baru                                                                |
+| `writing-plans`                  | Menyusun rencana multi langkah                                                                              |
+| `executing-plans`                | Menjalankan rencana di sesi ini                                                                             |
+| `subagent-driven-development`    | Menjalankan rencana memakai beberapa subagent                                                               |
+| `dispatching-parallel-agents`    | Menjalankan tugas yang saling bebas secara paralel                                                          |
+| `test-driven-development`        | Menulis uji sebelum kode implementasi                                                                       |
+| `systematic-debugging`           | Menangani bug secara sistematis                                                                             |
+| `requesting-code-review`         | Meninjau pekerjaan sebelum dinyatakan selesai                                                               |
+| `receiving-code-review`          | Menanggapi hasil tinjauan dengan benar                                                                      |
+| `verification-before-completion` | Memastikan klaim selesai didukung bukti                                                                     |
 
 ## 3. Perubahan terhadap berkas asli
 

@@ -218,9 +218,7 @@ const isSkippedAttribute = (
   const name = attribute.name.getText(sourceFile);
 
   return (
-    SKIPPED_JSX_ATTRIBUTES.has(name) ||
-    name.startsWith("data-") ||
-    /^on[A-Z]/u.test(name)
+    SKIPPED_JSX_ATTRIBUTES.has(name) || name.startsWith("data-") || /^on[A-Z]/u.test(name)
   );
 };
 
@@ -296,7 +294,10 @@ const readParseDiagnostics = (sourceFile: ts.SourceFile): readonly ts.Diagnostic
 };
 
 /** Periksa satu berkas dan kembalikan seluruh pelanggarannya. */
-export function scanSource(source: string, fileName: string): readonly ScannedViolation[] {
+export function scanSource(
+  source: string,
+  fileName: string,
+): readonly ScannedViolation[] {
   const sourceFile = ts.createSourceFile(
     fileName,
     source,
@@ -336,8 +337,7 @@ export function scanSource(source: string, fileName: string): readonly ScannedVi
 const isExcluded = (relativePath: string): boolean =>
   EXCLUDED_FILES.includes(relativePath) ||
   EXCLUDED_DIRECTORIES.some(
-    (directory) =>
-      relativePath === directory || relativePath.startsWith(`${directory}/`),
+    (directory) => relativePath === directory || relativePath.startsWith(`${directory}/`),
   );
 
 const collectSourceFiles = (directory: string, root: string): readonly string[] => {
@@ -430,7 +430,8 @@ export function main(): number {
 }
 
 const isDirectRun =
-  process.argv[1] !== undefined && import.meta.url === pathToFileURL(process.argv[1]).href;
+  process.argv[1] !== undefined &&
+  import.meta.url === pathToFileURL(process.argv[1]).href;
 
 if (isDirectRun) {
   process.exitCode = main();

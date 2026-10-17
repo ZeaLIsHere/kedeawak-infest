@@ -21,21 +21,21 @@ Basis: bagian "Mekanisme Teknologi" dan "Desain Sistem" pada proposal.
 
 ## 2. Tumpukan teknologi
 
-| Lapisan | Pilihan | Alasan |
-| --- | --- | --- |
-| Bahasa | TypeScript, mode strict | Menjaga tipe data transaksi tetap benar |
-| Framework | Next.js App Router | Server Component untuk data, Route Handler untuk webhook dan agen |
-| Antarmuka | Tailwind CSS, shadcn/ui, lucide-react | Cepat, aksesibel, ikon SVG bukan emoji, sesuai aturan UI |
-| Basis data | PostgreSQL | Sesuai proposal |
-| Driver lokal | PGlite | PostgreSQL asli yang berjalan di dalam proses, tanpa pemasangan server, sehingga demo tetap jalan di Windows |
-| Driver produksi | Postgres biasa | Supabase atau Neon, kode aplikasi tidak berubah |
-| ORM | Drizzle | Skema bertipe, migrasi ringan, mendukung PGlite dan Postgres |
-| Pencarian vektor | pgvector | Sesuai proposal, untuk RAG konteks bisnis |
-| Sesi dan context lock | Tabel di PostgreSQL lewat satu antarmuka | Menggantikan Redis saat demo, tanpa mengubah pemanggil |
-| Model bahasa | DeepSeek, model `deepseek-flash`, endpoint kompatibel OpenAI | Token sudah tersedia dari user. Mendukung pemanggilan fungsi dan keluaran JSON, dua hal yang dibutuhkan tool layer |
-| Speech to text | Web Speech API peramban, yang di Chrome dilayani Google | Sesuai proposal yang menyebut Google STT. Tidak menambah kunci API, tidak menambah titik gagal |
-| Ekstraksi struk | Model vision, yaitu `deepseek-flash` | Satu penyedia menangani teks sekaligus gambar. Fallback tiga lapis sesuai proposal tetap berlaku |
-| Uji | Vitest untuk unit, Playwright untuk alur browser | Menutup kriteria demo di `docs/SCOPE.md` bagian 7 |
+| Lapisan               | Pilihan                                                      | Alasan                                                                                                             |
+| --------------------- | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------ |
+| Bahasa                | TypeScript, mode strict                                      | Menjaga tipe data transaksi tetap benar                                                                            |
+| Framework             | Next.js App Router                                           | Server Component untuk data, Route Handler untuk webhook dan agen                                                  |
+| Antarmuka             | Tailwind CSS, shadcn/ui, lucide-react                        | Cepat, aksesibel, ikon SVG bukan emoji, sesuai aturan UI                                                           |
+| Basis data            | PostgreSQL                                                   | Sesuai proposal                                                                                                    |
+| Driver lokal          | PGlite                                                       | PostgreSQL asli yang berjalan di dalam proses, tanpa pemasangan server, sehingga demo tetap jalan di Windows       |
+| Driver produksi       | Postgres biasa                                               | Supabase atau Neon, kode aplikasi tidak berubah                                                                    |
+| ORM                   | Drizzle                                                      | Skema bertipe, migrasi ringan, mendukung PGlite dan Postgres                                                       |
+| Pencarian vektor      | pgvector                                                     | Sesuai proposal, untuk RAG konteks bisnis                                                                          |
+| Sesi dan context lock | Tabel di PostgreSQL lewat satu antarmuka                     | Menggantikan Redis saat demo, tanpa mengubah pemanggil                                                             |
+| Model bahasa          | DeepSeek, model `deepseek-flash`, endpoint kompatibel OpenAI | Token sudah tersedia dari user. Mendukung pemanggilan fungsi dan keluaran JSON, dua hal yang dibutuhkan tool layer |
+| Speech to text        | Web Speech API peramban, yang di Chrome dilayani Google      | Sesuai proposal yang menyebut Google STT. Tidak menambah kunci API, tidak menambah titik gagal                     |
+| Ekstraksi struk       | Model vision, yaitu `deepseek-flash`                         | Satu penyedia menangani teks sekaligus gambar. Fallback tiga lapis sesuai proposal tetap berlaku                   |
+| Uji                   | Vitest untuk unit, Playwright untuk alur browser             | Menutup kriteria demo di `docs/SCOPE.md` bagian 7                                                                  |
 
 Catatan penyimpangan dari proposal, disengaja dan dicatat:
 
@@ -141,26 +141,26 @@ Aturan struktur:
 Satu entitas akar `businesses`. Semua tabel lain terikat padanya, sesuai butir
 privasi proposal tentang pemisahan data antar warung.
 
-| Tabel | Isi utama | Catatan |
-| --- | --- | --- |
-| `businesses` | Nama warung, jam buka, status koneksi nomor, nomor bisnis | Akar semua data |
-| `products` | Nama, satuan, harga jual, harga beli, stok, ambang minimum | Stok disimpan sebagai angka hasil perhitungan terakhir |
-| `customers` | Nama, nomor telepon | Nama dan nomor telepon disimpan terenkripsi |
-| `conversations` | Kanal, nomor pelanggan, status, waktu | Kanal bernilai `whatsapp` atau `app` |
-| `messages` | Percakapan, pengirim, jenis, isi teks, tautan media, waktu | Jenis bernilai `text`, `voice`, `image` |
-| `orders` | Pelanggan, daftar item, total, status | Berasal dari percakapan WhatsApp |
-| `order_items` | Order, produk, jumlah, harga satuan | |
-| `transactions` | Jenis, keterangan, jumlah, sumber, tautan bukti, confidence, waktu | Jenis bernilai `sale`, `expense`, `debt` |
-| `payments` | Order, tautan bukti transfer, nominal yang diharapkan, nominal terbaca, status verifikasi | Status bernilai `menunggu`, `cocok`, `tidak cocok` |
-| `stock_movements` | Produk, jenis, jumlah perubahan, alasan, waktu | Jejak audit perubahan stok |
-| `stock_alerts` | Produk, stok saat alert, ambang, status | Status bernilai `aktif`, `selesai` |
-| `purchase_orders` | Supplier, daftar item, total, status, waktu persetujuan | Status bernilai `draft`, `disetujui`, `ditolak` |
-| `purchase_order_items` | PO, produk, jumlah, harga perkiraan | |
-| `approvals` | Jenis aksi, muatan aksi, ringkasan, status, waktu keputusan | Antrean di S6 |
-| `agent_sessions` | Sesi percakapan, status kunci konteks, aksi yang menunggu | Menggantikan Redis |
-| `tool_invocations` | Sesi, nama tool, muatan, hasil, waktu | Jejak audit pemanggilan tool |
-| `knowledge_chunks` | Potongan teks, vektor embedding, sumber | Basis RAG dengan pgvector |
-| `quota_usage` | Tanggal, jumlah pemakaian | Pembatas pemakaian harian |
+| Tabel                  | Isi utama                                                                                 | Catatan                                                |
+| ---------------------- | ----------------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| `businesses`           | Nama warung, jam buka, status koneksi nomor, nomor bisnis                                 | Akar semua data                                        |
+| `products`             | Nama, satuan, harga jual, harga beli, stok, ambang minimum                                | Stok disimpan sebagai angka hasil perhitungan terakhir |
+| `customers`            | Nama, nomor telepon                                                                       | Nama dan nomor telepon disimpan terenkripsi            |
+| `conversations`        | Kanal, nomor pelanggan, status, waktu                                                     | Kanal bernilai `whatsapp` atau `app`                   |
+| `messages`             | Percakapan, pengirim, jenis, isi teks, tautan media, waktu                                | Jenis bernilai `text`, `voice`, `image`                |
+| `orders`               | Pelanggan, daftar item, total, status                                                     | Berasal dari percakapan WhatsApp                       |
+| `order_items`          | Order, produk, jumlah, harga satuan                                                       |                                                        |
+| `transactions`         | Jenis, keterangan, jumlah, sumber, tautan bukti, confidence, waktu                        | Jenis bernilai `sale`, `expense`, `debt`               |
+| `payments`             | Order, tautan bukti transfer, nominal yang diharapkan, nominal terbaca, status verifikasi | Status bernilai `menunggu`, `cocok`, `tidak cocok`     |
+| `stock_movements`      | Produk, jenis, jumlah perubahan, alasan, waktu                                            | Jejak audit perubahan stok                             |
+| `stock_alerts`         | Produk, stok saat alert, ambang, status                                                   | Status bernilai `aktif`, `selesai`                     |
+| `purchase_orders`      | Supplier, daftar item, total, status, waktu persetujuan                                   | Status bernilai `draft`, `disetujui`, `ditolak`        |
+| `purchase_order_items` | PO, produk, jumlah, harga perkiraan                                                       |                                                        |
+| `approvals`            | Jenis aksi, muatan aksi, ringkasan, status, waktu keputusan                               | Antrean di S6                                          |
+| `agent_sessions`       | Sesi percakapan, status kunci konteks, aksi yang menunggu                                 | Menggantikan Redis                                     |
+| `tool_invocations`     | Sesi, nama tool, muatan, hasil, waktu                                                     | Jejak audit pemanggilan tool                           |
+| `knowledge_chunks`     | Potongan teks, vektor embedding, sumber                                                   | Basis RAG dengan pgvector                              |
+| `quota_usage`          | Tanggal, jumlah pemakaian                                                                 | Pembatas pemakaian harian                              |
 
 Aturan skema:
 
@@ -210,19 +210,19 @@ Aturan pemilihan penyedia:
 Fakta berikut sudah diverifikasi dari dokumentasi resmi DeepSeek, bukan
 perkiraan. Tanggal pemeriksaan: 17 Oktober 2026.
 
-| Hal | Nilai |
-| --- | --- |
-| Alamat dasar, format OpenAI | `https://api.deepseek.com` |
-| Alamat dasar, format Anthropic | `https://api.deepseek.com/anthropic` |
-| Model untuk percakapan | `deepseek-flash` |
-| Model penalaran | `deepseek-v4-pro` |
-| Panjang konteks | 1 juta token |
-| Pemanggilan fungsi | Didukung kedua model |
-| Keluaran JSON | Didukung kedua model |
-| Gambar | Hanya `deepseek-flash` |
-| Format gambar | JPEG, PNG, GIF, WebP |
-| Batas satu gambar | 32 MB untuk base64 atau alamat luar, 64 MB lewat Files API |
-| Endpoint transkripsi audio | **Tidak ada** |
+| Hal                            | Nilai                                                      |
+| ------------------------------ | ---------------------------------------------------------- |
+| Alamat dasar, format OpenAI    | `https://api.deepseek.com`                                 |
+| Alamat dasar, format Anthropic | `https://api.deepseek.com/anthropic`                       |
+| Model untuk percakapan         | `deepseek-flash`                                           |
+| Model penalaran                | `deepseek-v4-pro`                                          |
+| Panjang konteks                | 1 juta token                                               |
+| Pemanggilan fungsi             | Didukung kedua model                                       |
+| Keluaran JSON                  | Didukung kedua model                                       |
+| Gambar                         | Hanya `deepseek-flash`                                     |
+| Format gambar                  | JPEG, PNG, GIF, WebP                                       |
+| Batas satu gambar              | 32 MB untuk base64 atau alamat luar, 64 MB lewat Files API |
+| Endpoint transkripsi audio     | **Tidak ada**                                              |
 
 Konsekuensi yang wajib dipatuhi saat implementasi:
 
@@ -280,7 +280,6 @@ Nilai keyakinan diperoleh dari jawaban model secara terstruktur, bukan dari
 logprob, karena logprob tidak tersedia untuk keluaran fungsi. Model diminta
 mengisi nilai keyakinan antara 0 dan 1 beserta alasan singkatnya.
 
-
 ## 6. Orkestrasi dan context lock
 
 1. Setiap pesan masuk, baik dari kanal WhatsApp maupun dari percakapan di
@@ -298,15 +297,15 @@ Ini yang dimaksud human in the loop pada proposal, dan wajib.
 
 ## 7. Penanganan kegagalan
 
-| Kegagalan | Perilaku |
-| --- | --- |
-| Kunci API model tidak ada | Pengganti lokal aktif, pemberitahuan tampil di permukaan S2 |
-| Panggilan model gagal | Coba sekali lagi, lalu sampaikan ke pemilik bahwa pemrosesan gagal dan minta input manual |
-| Confidence pembacaan struk di bawah 70 persen | AI meminta konfirmasi nominal, sesuai lapis kedua proposal |
-| Foto struk tidak terbaca | AI meminta pemilik mendikte atau mengetik manual, sesuai lapis ketiga proposal |
-| Bukti transfer tidak cocok nominalnya | Status pembayaran menjadi tidak cocok dan muncul di antrean pemeriksaan |
-| Voice note tidak dapat ditranskripsi | Sampaikan gagal, minta pemilik mengetik |
-| Basis data belum dimigrasi | Halaman menampilkan langkah yang harus dijalankan, bukan galat mentah |
+| Kegagalan                                     | Perilaku                                                                                  |
+| --------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| Kunci API model tidak ada                     | Pengganti lokal aktif, pemberitahuan tampil di permukaan S2                               |
+| Panggilan model gagal                         | Coba sekali lagi, lalu sampaikan ke pemilik bahwa pemrosesan gagal dan minta input manual |
+| Confidence pembacaan struk di bawah 70 persen | AI meminta konfirmasi nominal, sesuai lapis kedua proposal                                |
+| Foto struk tidak terbaca                      | AI meminta pemilik mendikte atau mengetik manual, sesuai lapis ketiga proposal            |
+| Bukti transfer tidak cocok nominalnya         | Status pembayaran menjadi tidak cocok dan muncul di antrean pemeriksaan                   |
+| Voice note tidak dapat ditranskripsi          | Sampaikan gagal, minta pemilik mengetik                                                   |
+| Basis data belum dimigrasi                    | Halaman menampilkan langkah yang harus dijalankan, bukan galat mentah                     |
 
 ## 8. Keamanan
 
@@ -324,34 +323,35 @@ Ini yang dimaksud human in the loop pada proposal, dan wajib.
 
 ## 9. Pengujian
 
-| Tingkat | Alat | Sasaran |
-| --- | --- | --- |
-| Unit | Vitest | Sepuluh tool, perhitungan laporan, rata rata bergerak, context lock, format rupiah dan tanggal, aturan teks UI |
-| Integrasi | Vitest | Kanal webhook sampai tersimpan sebagai order dan pembayaran, orkestrasi sampai tool terpanggil |
-| Ujung ke ujung | Playwright | Delapan langkah kriteria sukses demo di `docs/SCOPE.md` bagian 7 |
-| Aturan UI | Skrip sendiri | Larangan emoji dan tanda hubung pada semua teks yang dilihat pengguna |
+| Tingkat        | Alat          | Sasaran                                                                                                        |
+| -------------- | ------------- | -------------------------------------------------------------------------------------------------------------- |
+| Unit           | Vitest        | Sepuluh tool, perhitungan laporan, rata rata bergerak, context lock, format rupiah dan tanggal, aturan teks UI |
+| Integrasi      | Vitest        | Kanal webhook sampai tersimpan sebagai order dan pembayaran, orkestrasi sampai tool terpanggil                 |
+| Ujung ke ujung | Playwright    | Delapan langkah kriteria sukses demo di `docs/SCOPE.md` bagian 7                                               |
+| Aturan UI      | Skrip sendiri | Larangan emoji dan tanda hubung pada semua teks yang dilihat pengguna                                          |
 
 ## 10. Keputusan yang sudah ditetapkan
 
 Semua keputusan berikut sudah dikonfirmasi user atau sudah diverifikasi
 langsung dari dokumentasi resmi. Tanggal: 17 Oktober 2026.
 
-| Nomor | Hal | Keputusan | Dasar |
-| --- | --- | --- | --- |
-| A1 | Penyedia model bahasa | DeepSeek, model `deepseek-flash` | User memiliki token DeepSeek |
-| A2 | Pembacaan foto struk | `deepseek-flash`, yang menerima gambar | Dokumentasi DeepSeek bagian Vision |
-| A3 | Transkripsi voice note | Web Speech API peramban | DeepSeek tidak punya endpoint audio, lihat bagian 5.2 |
-| A4 | Basis data demo | PGlite, PostgreSQL di dalam proses | User menyetujui setelah dipastikan mendukung CRUD penuh |
-| A5 | Pencarian vektor | Ekstensi pgvector untuk PGlite | PGlite menyediakan paket `@electric-sql/pglite-pgvector` |
-| A6 | Identitas git dan autentikasi push | Nama `ZeaLIsHere`, email noreply GitHub, kredensial Windows Credential Manager | Push sudah terverifikasi berhasil |
-| A7 | Akses skill desain | Belum diputuskan, akan dipakai saat fase 1 | Data skill dibaca lewat Node selama Python belum terpasang |
-| A8 | Penyedia kanal WhatsApp | **Belum diputuskan.** Meta Cloud API, Fonnte, atau n8n sebagai perantara | User menunda keputusan. Rincian pertimbangan ada di bagian 11 |
-| A9 | Versi dan opsi bawaan Next.js | Next.js 16.4.2, React 19.3.0, Tailwind 4, `cacheComponents` aktif, `partialPrefetching` aktif | Keluaran `create-next-app`. Lihat catatan di bawah tabel |
-| A10 | Penulisan otomatis blok aturan Next.js ke `AGENTS.md` | Dimatikan, memakai `agentRules: false` pada `next.config.ts` | `AGENTS.md` dikelola tim. Panduan Next.js 16 dibaca dari `node_modules/next/dist/docs/` |
-| A11 | Pustaka primitif dan preset shadcn/ui | Pustaka primitif `radix`, preset `nova`, warna dasar `neutral`, ikon `lucide` | Radix paling matang dan sudah tertulis di rencana. Preset nova memakai Lucide, sejalan dengan aturan ikon SVG dan larangan emoji |
-| A12 | Arah warna dan susunan token | Warna utama hijau `#059669`, susunan tiga lapis di `src/styles/tokens/`, pemetaan ke utilitas Tailwind lewat `@theme inline` di `src/app/globals.css` | Pilihan user: hijau warung, karena pintu masuk aplikasi adalah WhatsApp. Sumber palet: data skill `ui-ux-pro-max`, profil Grocery dan E-commerce |
-| A13 | Mode gelap | Tidak dikerjakan | Tidak ada di `docs/SCOPE.md`. Variabel `dark` tetap dideklarasikan tanpa pernah dipasang, supaya kelas `dark:` bawaan shadcn/ui tidak mengikuti pengaturan sistem operasi pengguna |
-| A14 | Penggabung nama kelas | `cn` diambil dari `src/lib/utils.ts`, bukan langsung dari paket `cn` | Mesin bawaan paket `cn` hanya mengenal ukuran huruf bawaan Tailwind. Tanpa perluasan, `text-body` dan `text-caption` dianggap warna teks dan terbuang saat digabung dengan kelas warna, sehingga ukuran huruf token tidak terpakai. Komponen baru dari perkakas shadcn/ui harus diubah dulu impornya. Bila token `--text-` bertambah di `src/app/globals.css`, daftar di `src/lib/utils.ts` harus ikut bertambah |
+| Nomor | Hal                                                   | Keputusan                                                                                                                                             | Dasar                                                                                                                                                                                                                                                                                                                                                                                                            |
+| ----- | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A1    | Penyedia model bahasa                                 | DeepSeek, model `deepseek-flash`                                                                                                                      | User memiliki token DeepSeek                                                                                                                                                                                                                                                                                                                                                                                     |
+| A2    | Pembacaan foto struk                                  | `deepseek-flash`, yang menerima gambar                                                                                                                | Dokumentasi DeepSeek bagian Vision                                                                                                                                                                                                                                                                                                                                                                               |
+| A3    | Transkripsi voice note                                | Web Speech API peramban                                                                                                                               | DeepSeek tidak punya endpoint audio, lihat bagian 5.2                                                                                                                                                                                                                                                                                                                                                            |
+| A4    | Basis data demo                                       | PGlite, PostgreSQL di dalam proses                                                                                                                    | User menyetujui setelah dipastikan mendukung CRUD penuh                                                                                                                                                                                                                                                                                                                                                          |
+| A5    | Pencarian vektor                                      | Ekstensi pgvector untuk PGlite                                                                                                                        | PGlite menyediakan paket `@electric-sql/pglite-pgvector`                                                                                                                                                                                                                                                                                                                                                         |
+| A6    | Identitas git dan autentikasi push                    | Nama `ZeaLIsHere`, email noreply GitHub, kredensial Windows Credential Manager                                                                        | Push sudah terverifikasi berhasil                                                                                                                                                                                                                                                                                                                                                                                |
+| A7    | Akses skill desain                                    | Belum diputuskan, akan dipakai saat fase 1                                                                                                            | Data skill dibaca lewat Node selama Python belum terpasang                                                                                                                                                                                                                                                                                                                                                       |
+| A8    | Penyedia kanal WhatsApp                               | **Belum diputuskan.** Meta Cloud API, Fonnte, atau n8n sebagai perantara                                                                              | User menunda keputusan. Rincian pertimbangan ada di bagian 11                                                                                                                                                                                                                                                                                                                                                    |
+| A9    | Versi dan opsi bawaan Next.js                         | Next.js 16.4.2, React 19.3.0, Tailwind 4, `cacheComponents` aktif, `partialPrefetching` aktif                                                         | Keluaran `create-next-app`. Lihat catatan di bawah tabel                                                                                                                                                                                                                                                                                                                                                         |
+| A10   | Penulisan otomatis blok aturan Next.js ke `AGENTS.md` | Dimatikan, memakai `agentRules: false` pada `next.config.ts`                                                                                          | `AGENTS.md` dikelola tim. Panduan Next.js 16 dibaca dari `node_modules/next/dist/docs/`                                                                                                                                                                                                                                                                                                                          |
+| A11   | Pustaka primitif dan preset shadcn/ui                 | Pustaka primitif `radix`, preset `nova`, warna dasar `neutral`, ikon `lucide`                                                                         | Radix paling matang dan sudah tertulis di rencana. Preset nova memakai Lucide, sejalan dengan aturan ikon SVG dan larangan emoji                                                                                                                                                                                                                                                                                 |
+| A12   | Arah warna dan susunan token                          | Warna utama hijau `#059669`, susunan tiga lapis di `src/styles/tokens/`, pemetaan ke utilitas Tailwind lewat `@theme inline` di `src/app/globals.css` | Pilihan user: hijau warung, karena pintu masuk aplikasi adalah WhatsApp. Sumber palet: data skill `ui-ux-pro-max`, profil Grocery dan E-commerce                                                                                                                                                                                                                                                                 |
+| A13   | Mode gelap                                            | Tidak dikerjakan                                                                                                                                      | Tidak ada di `docs/SCOPE.md`. Variabel `dark` tetap dideklarasikan tanpa pernah dipasang, supaya kelas `dark:` bawaan shadcn/ui tidak mengikuti pengaturan sistem operasi pengguna                                                                                                                                                                                                                               |
+| A14   | Penggabung nama kelas                                 | `cn` diambil dari `src/lib/utils.ts`, bukan langsung dari paket `cn`                                                                                  | Mesin bawaan paket `cn` hanya mengenal ukuran huruf bawaan Tailwind. Tanpa perluasan, `text-body` dan `text-caption` dianggap warna teks dan terbuang saat digabung dengan kelas warna, sehingga ukuran huruf token tidak terpakai. Komponen baru dari perkakas shadcn/ui harus diubah dulu impornya. Bila token `--text-` bertambah di `src/app/globals.css`, daftar di `src/lib/utils.ts` harus ikut bertambah |
+| A15 | Perapian format dan pemeriksaan tipe | Prettier dengan `eslint-config-prettier`, lebar baris 90, akhir baris LF. Perintah `npm run format`, `npm run format:check`, dan `npm run typecheck` | Menghentikan perdebatan gaya dan menjaga kode terbaca. `AGENTS.md` dan `docs/PRODUCT.md` dikecualikan karena isinya tidak diubah tanpa persetujuan user. Berkas `src/components/ui/` yang dihasilkan CLI shadcn/ui ikut dirapikan, jadi hasil `shadcn add` berikutnya perlu dirapikan ulang |
 
 Catatan A9: `cacheComponents` aktif berarti halaman yang membaca data saat
 berjalan wajib dibungkus `Suspense` atau memakai arahan `"use cache"`.
@@ -367,11 +367,11 @@ dibelum difinalkan.
 
 Tiga jalur yang dipertimbangkan beserta akibatnya pada kode:
 
-| Jalur | Tata cara yang ditulis | Akibat pada kode |
-| --- | --- | --- |
-| Meta WhatsApp Business Cloud API langsung | Daftar aplikasi Meta, verifikasi bisnis, daftarkan nomor, ambil Phone Number ID dan token akses, atur alamat webhook dan token verifikasi | Bentuk payload webhook mengikuti Cloud API. Perlu penanganan verifikasi webhook dan tanda tangan permintaan |
-| Penyedia perantara seperti Fonnte | Daftar akun penyedia, hubungkan nomor, ambil token perangkat, atur alamat webhook | Bentuk payload mengikuti penyedia. Perlu lapisan penerjemah payload agar inti aplikasi tetap bebas dari penyedia |
-| n8n sebagai perantara alur | Pasang n8n, susun alur penerimaan pesan, arahkan ke webhook aplikasi | n8n bukan penyedia WhatsApp, sehingga tetap butuh salah satu dari dua jalur di atas. Nilainya adalah perantara alur dan antrean |
+| Jalur                                     | Tata cara yang ditulis                                                                                                                    | Akibat pada kode                                                                                                                |
+| ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| Meta WhatsApp Business Cloud API langsung | Daftar aplikasi Meta, verifikasi bisnis, daftarkan nomor, ambil Phone Number ID dan token akses, atur alamat webhook dan token verifikasi | Bentuk payload webhook mengikuti Cloud API. Perlu penanganan verifikasi webhook dan tanda tangan permintaan                     |
+| Penyedia perantara seperti Fonnte         | Daftar akun penyedia, hubungkan nomor, ambil token perangkat, atur alamat webhook                                                         | Bentuk payload mengikuti penyedia. Perlu lapisan penerjemah payload agar inti aplikasi tetap bebas dari penyedia                |
+| n8n sebagai perantara alur                | Pasang n8n, susun alur penerimaan pesan, arahkan ke webhook aplikasi                                                                      | n8n bukan penyedia WhatsApp, sehingga tetap butuh salah satu dari dua jalur di atas. Nilainya adalah perantara alur dan antrean |
 
 Yang tidak berubah dari pilihan mana pun:
 
@@ -385,22 +385,20 @@ Yang tidak berubah dari pilihan mana pun:
 
 Keputusan ini wajib diambil sebelum tugas T5.11 dikerjakan.
 
-
 ### Kemampuan PGlite yang sudah dipastikan
 
 PGlite adalah PostgreSQL asli yang dikompilasi ke WebAssembly dan berjalan di
 dalam proses Node. Yang tersedia dan akan dipakai:
 
-| Kemampuan | Keterangan |
-| --- | --- |
-| Baca dan tulis | Method `query` dengan parameter, method `exec` untuk banyak pernyataan |
-| Transaksi | Method `transaction` dengan commit otomatis dan rollback otomatis bila gagal |
-| Query bertemplate | Method `sql` dengan pengikatan parameter otomatis |
-| Impor dan ekspor | Device virtual `/dev/blob` lewat perintah `COPY` |
-| Ekstensi | Objek `extensions` saat inisialisasi, termasuk `pgvector` |
-| Penyimpanan | `file://` ke disk, `memory://` sementara, atau `idb://` di peramban |
+| Kemampuan         | Keterangan                                                                   |
+| ----------------- | ---------------------------------------------------------------------------- |
+| Baca dan tulis    | Method `query` dengan parameter, method `exec` untuk banyak pernyataan       |
+| Transaksi         | Method `transaction` dengan commit otomatis dan rollback otomatis bila gagal |
+| Query bertemplate | Method `sql` dengan pengikatan parameter otomatis                            |
+| Impor dan ekspor  | Device virtual `/dev/blob` lewat perintah `COPY`                             |
+| Ekstensi          | Objek `extensions` saat inisialisasi, termasuk `pgvector`                    |
+| Penyimpanan       | `file://` ke disk, `memory://` sementara, atau `idb://` di peramban          |
 
 Konsekuensi: seluruh operasi basis data yang dibutuhkan aplikasi ini, termasuk
 CRUD, transaksi, dan pencarian vektor, dapat berjalan tanpa server basis data.
 Berkas basis data disimpan di direktori yang masuk `.gitignore`.
-

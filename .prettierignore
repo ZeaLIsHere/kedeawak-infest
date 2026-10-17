@@ -1,0 +1,27 @@
+# Hasil bangun dan paket terpasang.
+.next
+out
+build
+node_modules
+
+# Perkakas pihak ketiga, bukan karya tim.
+.claude
+.opencode
+
+# Hasil bangun dan laporan pengujian.
+coverage
+playwright-report
+test-results
+
+# Media unggahan pengguna.
+uploads
+public/uploads
+
+# Dokumen yang isinya tidak diubah tanpa persetujuan user, yaitu aturan main
+# tim dan kebenaran produk. Perapian formatnya diserahkan ke tim.
+AGENTS.md
+docs/PRODUCT.md
+
+# Berkas yang dikelola perkakas lain.
+package-lock.json
+next-env.d.ts

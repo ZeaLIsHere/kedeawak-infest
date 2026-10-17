@@ -11,11 +11,11 @@ di commit dan di push.
 
 Tiga hal ini harus dibereskan sebelum commit pertama bisa dikirim.
 
-| Hal | Status | Yang dibutuhkan |
-| --- | --- | --- |
-| Remote `origin` | Belum diatur | Sudah ditentukan: https://github.com/ZeaLIsHere/kedeawak-infest.git |
-| Identitas git: `user.name` dan `user.email` | Kosong | Nilai dari user |
-| Autentikasi push | Belum ada | Kredensial GitHub, karena `gh` tidak terpasang dan helper kredensial kosong |
+| Hal                                         | Status       | Yang dibutuhkan                                                             |
+| ------------------------------------------- | ------------ | --------------------------------------------------------------------------- |
+| Remote `origin`                             | Belum diatur | Sudah ditentukan: https://github.com/ZeaLIsHere/kedeawak-infest.git         |
+| Identitas git: `user.name` dan `user.email` | Kosong       | Nilai dari user                                                             |
+| Autentikasi push                            | Belum ada    | Kredensial GitHub, karena `gh` tidak terpasang dan helper kredensial kosong |
 
 Perintah yang akan dijalankan setelah nilainya diberikan:
 
@@ -148,15 +148,15 @@ Kalau ragu pada pertanyaan pertama, tanyakan ke user. Jangan menebak.
 
 Contoh keputusan yang sudah diambil:
 
-| Berkas | Masuk repo | Alasan |
-| --- | --- | --- |
-| `docs/`, `AGENTS.md`, `PLAN.md` | Ya | Sumber keputusan proyek, dipakai tim dan juri |
-| `src/` | Ya | Karya tim |
-| `.env.example` | Ya | Daftar nama variabel, tanpa nilai rahasia |
-| `.env.local` | Tidak | Memuat rahasia |
-| `node_modules/`, `.next/` | Tidak | Hasil pemasangan dan hasil bangun, dapat dibuat ulang dari `package.json` |
-| `.pglite/`, `*.db` | Tidak | Berkas basis data lokal |
-| `.claude/skills/` | Ya, sudah terlanjur | Perkakas pihak ketiga. Disetujui user untuk dibiarkan. Untuk perkakas baru sejenis, jangan ditambahkan, cukup catat di `docs/THIRD-PARTY-SKILLS.md` |
+| Berkas                          | Masuk repo          | Alasan                                                                                                                                              |
+| ------------------------------- | ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `docs/`, `AGENTS.md`, `PLAN.md` | Ya                  | Sumber keputusan proyek, dipakai tim dan juri                                                                                                       |
+| `src/`                          | Ya                  | Karya tim                                                                                                                                           |
+| `.env.example`                  | Ya                  | Daftar nama variabel, tanpa nilai rahasia                                                                                                           |
+| `.env.local`                    | Tidak               | Memuat rahasia                                                                                                                                      |
+| `node_modules/`, `.next/`       | Tidak               | Hasil pemasangan dan hasil bangun, dapat dibuat ulang dari `package.json`                                                                           |
+| `.pglite/`, `*.db`              | Tidak               | Berkas basis data lokal                                                                                                                             |
+| `.claude/skills/`               | Ya, sudah terlanjur | Perkakas pihak ketiga. Disetujui user untuk dibiarkan. Untuk perkakas baru sejenis, jangan ditambahkan, cukup catat di `docs/THIRD-PARTY-SKILLS.md` |
 
 Yang **tidak boleh** masuk git:
 
@@ -179,25 +179,25 @@ kosong atau contoh, tanpa nilai rahasia.
 
 ## 7. Ketika push gagal
 
-| Gejala | Tindakan |
-| --- | --- |
-| Menolak karena non fast forward | `git pull --rebase origin main`, selesaikan konflik, ulangi pemeriksaan, lalu push lagi |
-| Diminta kredensial berulang | Hentikan. Tanyakan ke user cara autentikasi yang benar. Jangan menulis token ke berkas |
-| Ditolak karena berkas besar | Kecilkan berkasnya. Jangan menambahkan Git LFS tanpa persetujuan user |
-| Tidak ada jaringan | Sampaikan ke user. Commit lokal boleh dibuat, tetapi status "belum di push" harus dilaporkan apa adanya |
+| Gejala                          | Tindakan                                                                                                |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| Menolak karena non fast forward | `git pull --rebase origin main`, selesaikan konflik, ulangi pemeriksaan, lalu push lagi                 |
+| Diminta kredensial berulang     | Hentikan. Tanyakan ke user cara autentikasi yang benar. Jangan menulis token ke berkas                  |
+| Ditolak karena berkas besar     | Kecilkan berkasnya. Jangan menambahkan Git LFS tanpa persetujuan user                                   |
+| Tidak ada jaringan              | Sampaikan ke user. Commit lokal boleh dibuat, tetapi status "belum di push" harus dilaporkan apa adanya |
 
 ## 8. Penyelarasan dokumen
 
 Setiap perubahan yang mengubah perilaku wajib ikut memperbarui dokumen yang
 terkait, dalam commit yang sama:
 
-| Perubahan | Dokumen yang ikut diubah |
-| --- | --- |
+| Perubahan                                 | Dokumen yang ikut diubah   |
+| ----------------------------------------- | -------------------------- |
 | Menambah atau mengubah permukaan aplikasi | `docs/SCOPE.md`, `PLAN.md` |
-| Mengubah tabel atau kolom | `docs/ARCHITECTURE.md` |
-| Mengubah pilihan teknologi | `docs/ARCHITECTURE.md` |
-| Mengubah aturan UI atau kode | `docs/CONVENTIONS.md` |
-| Menyelesaikan tugas | `PLAN.md`, tandai selesai |
+| Mengubah tabel atau kolom                 | `docs/ARCHITECTURE.md`     |
+| Mengubah pilihan teknologi                | `docs/ARCHITECTURE.md`     |
+| Mengubah aturan UI atau kode              | `docs/CONVENTIONS.md`      |
+| Menyelesaikan tugas                       | `PLAN.md`, tandai selesai  |
 
 ## 9. Ringkasan alur satu perubahan
 

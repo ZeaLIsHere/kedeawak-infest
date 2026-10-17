@@ -6,10 +6,7 @@ import { PageHeader } from "@/components/shell/page-header";
 export default function DasborPage() {
   return (
     <>
-      <PageHeader
-        title="Dasbor"
-        description="Ringkasan keadaan warung hari ini."
-      />
+      <PageHeader title="Dasbor" description="Ringkasan keadaan warung hari ini." />
 
       <div className="mx-auto w-full max-w-content p-page">
         <EmptyState
