@@ -16,6 +16,7 @@
     "db:migrate": "tsx src/scripts/db-migrate.ts",
     "db:seed": "tsx src/scripts/db-seed.ts",
     "db:cleanup-e2e": "tsx src/scripts/db-cleanup-e2e.ts",
+    "db:cleanup-demo-stock": "tsx src/scripts/db-cleanup-demo-stock.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },

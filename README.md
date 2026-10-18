@@ -131,8 +131,10 @@ Hentikan proses yang mengakses direktori PGlite yang sama sebelum migrasi.
 PGlite hanya mengizinkan satu proses menulis. Menjalankan migrasi atau skrip
 basis data saat server dev hidup dapat merusak WAL. Hentikan server lebih dulu,
 lalu jalankan perintahnya. `db:cleanup-e2e` menghapus produk bernama
-`Biskuit uji ...` yang dibuat uji peramban dan tidak menyentuh produk yang sudah
-punya riwayat orderan atau pesanan pembelian.
+`Biskuit uji ...` dan `Persediaan uji ...` yang dibuat uji peramban, beserta
+rincian pesanan pembeliannya, dan tidak menyentuh produk yang sudah punya
+riwayat orderan. `db:cleanup-demo-stock` mengembalikan stok dua produk demo yang
+dulu sengaja dibuat menipis beserta alert dan draft persetujuannya.
 
 ```powershell
 npm run db:migrate
@@ -140,12 +142,15 @@ npm run db:migrate
 npm run db:seed
 # Bersihkan sisa produk uji e2e. Hentikan server dev lebih dulu.
 npm run db:cleanup-e2e
+# Kembalikan stok demo lama yang sengaja dibuat menipis.
+npm run db:cleanup-demo-stock
 npm run dev -- --port 3100
 ```
 
 **`db:seed` menghapus dan membuat ulang seluruh data demo.** Jangan jalankan
 pada data yang ingin dipertahankan. Seed berisi satu warung, 20 produk aktif,
-satu produk arsip, pelanggan, transaksi, dan draft persetujuan.
+satu produk arsip, pelanggan, dan transaksi. Seluruh stok awal berada di atas
+ambang minimum sehingga tidak ada alert stok atau aksi menunggu di awal.
 
 Buka http://localhost:3100/whatsapp. Di terminal lain, setelah server hidup:
 

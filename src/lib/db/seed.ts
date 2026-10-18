@@ -1,4 +1,4 @@
-import { createApproval, listApprovals } from "../data/approvals";
+import { listApprovals } from "../data/approvals";
 import { createBusiness, deleteAllBusinesses } from "../data/business";
 import {
   appendMessage,
@@ -9,13 +9,7 @@ import { findOrCreateCustomer, listCustomers } from "../data/customers";
 import { listKnowledgeChunks, replaceKnowledgeSource } from "../data/knowledge";
 import { createOrder, listOrders, updateOrderStatus } from "../data/orders";
 import { startOfDay } from "../data/period";
-import {
-  archiveProduct,
-  createProduct,
-  findProduct,
-  listProducts,
-} from "../data/products";
-import { createPurchaseOrder } from "../data/purchase-orders";
+import { archiveProduct, createProduct, listProducts } from "../data/products";
 import { listStockAlerts, listStockMovements, recordStockMovement } from "../data/stock";
 import { createTransaction, listTransactions } from "../data/transactions";
 import type { Database } from "./client";
@@ -572,63 +566,6 @@ export async function seedDemoData(
     source: "struk",
     occurredAt: atHour(today, 13),
   });
-
-  /*
-   * Dua barang terakhir laku pada hari ini, sehingga stoknya berakhir di bawah
-   * ambang minimum dan alertnya muncul. Dari alert itu pemilik dapat membuat
-   * draft pesanan pembelian, sesuai alur pada `docs/SCOPE.md` bagian 7.
-   */
-  for (const name of ["Sarden Kaleng", "Biskuit Kaleng"]) {
-    const item = DEMO_PRODUCTS.find((candidate) => candidate.name === name);
-    const productId = productIds.get(name);
-
-    if (item === undefined || productId === undefined) {
-      continue;
-    }
-
-    const product = await findProduct(db, businessId, productId);
-    const sold = (product?.stock ?? 0) - (item.minimumStock - 2);
-
-    if (sold <= 0) {
-      continue;
-    }
-
-    const at = atHour(today, 16);
-
-    await recordStockMovement(db, businessId, {
-      productId,
-      kind: "keluar",
-      quantityChange: -sold,
-      reason: `Penjualan ${item.name}`,
-      createdAt: at,
-    });
-
-    await createTransaction(db, businessId, {
-      kind: "sale",
-      method: "tunai",
-      description: `Penjualan ${item.name}`,
-      amount: sold * item.salePrice,
-      source: "app",
-      occurredAt: at,
-    });
-  }
-
-  const restock = DEMO_PRODUCTS.find((item) => item.name === "Sarden Kaleng");
-  const restockId = productIds.get("Sarden Kaleng");
-
-  if (restock !== undefined && restockId !== undefined) {
-    const draft = await createPurchaseOrder(db, businessId, {
-      supplierName: "Pasar Induk",
-      items: [
-        { productId: restockId, quantity: 24, estimatedPrice: restock.purchasePrice },
-      ],
-    });
-
-    await createApproval(db, businessId, {
-      purchaseOrderId: draft.order.id,
-      summary: `Tambah stok ${restock.name} sebanyak 24 ${restock.unit} dari Pasar Induk`,
-    });
-  }
 
   return {
     businessId,
