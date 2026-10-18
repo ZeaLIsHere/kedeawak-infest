@@ -18,7 +18,8 @@
   --radius-pill: var(--primitive-radius-full);
 
   /* Ketinggian permukaan */
-  --elevation-card: var(--primitive-shadow-xs);
+  --elevation-card: var(--primitive-shadow-sm);
+  --elevation-control: var(--primitive-shadow-xs);
   --elevation-raised: var(--primitive-shadow-md);
   --elevation-overlay: var(--primitive-shadow-lg);
 

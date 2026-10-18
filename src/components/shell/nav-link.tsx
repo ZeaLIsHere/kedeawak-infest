@@ -23,28 +23,26 @@ type NavLinkProps = {
  * bukan sebagai teks antarmuka. Perkakas `lint:ui` melewati argumen `cn`.
  */
 const base = cn(
-  "flex rounded-md font-medium transition-colors focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-none",
+  "flex rounded-md border-2 border-transparent font-bold transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none",
 );
 
 const layoutClass = {
-  row: cn("min-h-touch items-center gap-3 px-3 text-body"),
-  column: cn("h-full flex-col items-center justify-center gap-1 px-1 text-caption"),
+  row: cn("min-h-touch items-center px-3 text-body"),
+  column: cn("h-full flex-col items-center justify-center px-1 text-caption"),
 } as const;
 
 const stateClass = {
   row: {
-    active: cn("bg-sidebar-accent text-sidebar-accent-foreground"),
+    active: cn("border-border bg-primary text-foreground shadow-control"),
     idle: cn("text-sidebar-foreground hover:bg-muted"),
   },
   column: {
-    active: cn("bg-accent text-accent-foreground"),
+    active: cn("bg-primary text-foreground"),
     idle: cn("text-muted-foreground hover:bg-muted"),
   },
 } as const;
 
 export function NavLink({ item, active, layout = "row", onNavigate }: NavLinkProps) {
-  const Icon = item.icon;
-
   return (
     <Link
       href={item.href}
@@ -56,7 +54,6 @@ export function NavLink({ item, active, layout = "row", onNavigate }: NavLinkPro
         active ? stateClass[layout].active : stateClass[layout].idle,
       )}
     >
-      <Icon aria-hidden="true" className="size-5 shrink-0" />
       <span className="truncate">{item.label}</span>
     </Link>
   );

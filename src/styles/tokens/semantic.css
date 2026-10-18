@@ -17,73 +17,79 @@
 
 :root {
   /* Permukaan dan teks */
-  --background: var(--primitive-slate-50);
-  --foreground: var(--primitive-slate-900);
-  --card: var(--primitive-white);
-  --card-foreground: var(--primitive-slate-900);
-  --popover: var(--primitive-white);
-  --popover-foreground: var(--primitive-slate-900);
+  --background: var(--primitive-neo-blue-50);
+  --foreground: var(--primitive-neo-black);
+  --card: var(--primitive-neo-white);
+  --card-foreground: var(--primitive-neo-black);
+  --popover: var(--primitive-neo-white);
+  --popover-foreground: var(--primitive-neo-black);
 
   /* Warna merek */
-  --primary: var(--primitive-emerald-600);
-  --primary-foreground: var(--primitive-white);
-  --primary-hover: var(--primitive-emerald-700);
-  --secondary: var(--primitive-slate-100);
-  --secondary-foreground: var(--primitive-slate-900);
-  --muted: var(--primitive-slate-100);
-  --muted-foreground: var(--primitive-slate-500);
-  --accent: var(--primitive-emerald-50);
-  --accent-foreground: var(--primitive-emerald-800);
+  --primary: var(--primitive-neo-blue-500);
+  --primary-foreground: var(--primitive-neo-black);
+  --primary-hover: var(--primitive-neo-blue-600);
+  --secondary: var(--primitive-neo-white);
+  --secondary-foreground: var(--primitive-neo-black);
+  --muted: var(--primitive-neo-blue-100);
+  --muted-foreground: var(--primitive-neo-slate-700);
+  --accent: var(--primitive-neo-blue-500);
+  --accent-foreground: var(--primitive-neo-black);
+
+  /* Nama tambahan mengikuti spesifikasi palet neo-brutalism. */
+  --main: var(--primary);
+  --main-foreground: var(--primary-foreground);
+  --secondary-background: var(--card);
+  --overlay: var(--primitive-neo-overlay);
 
   /* Keadaan merugikan */
-  --destructive: var(--primitive-red-600);
-  --destructive-foreground: var(--primitive-white);
-  --destructive-surface: var(--primitive-red-50);
+  --destructive: var(--primitive-neo-red-700);
+  --destructive-foreground: var(--primitive-neo-white);
+  --destructive-surface: var(--primitive-neo-red-400);
 
   /* Garis dan fokus */
-  --border: var(--primitive-slate-200);
-  --border-strong: var(--primitive-slate-300);
-  --input: var(--primitive-slate-300);
-  --ring: var(--primitive-emerald-600);
+  --border: var(--primitive-neo-black);
+  --border-strong: var(--primitive-neo-black);
+  --input: var(--primitive-neo-black);
+  --ring: var(--primitive-neo-black);
 
   /* Makna keuangan. Dipakai di dasbor dan laporan. */
-  --income: var(--primitive-emerald-600);
-  --income-foreground: var(--primitive-emerald-800);
-  --income-surface: var(--primitive-emerald-50);
-  --expense: var(--primitive-red-600);
-  --expense-foreground: var(--primitive-red-700);
-  --expense-surface: var(--primitive-red-50);
-  --profit: var(--primitive-emerald-700);
-  --profit-foreground: var(--primitive-emerald-900);
-  --profit-surface: var(--primitive-emerald-100);
+  --income: var(--primitive-neo-green-700);
+  --income-foreground: var(--primitive-neo-black);
+  --income-surface: var(--primitive-neo-green-400);
+  --expense: var(--primitive-neo-red-700);
+  --expense-foreground: var(--primitive-neo-black);
+  --expense-surface: var(--primitive-neo-red-400);
+  --profit: var(--primitive-neo-blue-700);
+  --profit-foreground: var(--primitive-neo-black);
+  --profit-surface: var(--primitive-neo-blue-500);
 
   /* Makna status. Dipakai di lencana, alert, dan status verifikasi. */
-  --success: var(--primitive-emerald-600);
-  --success-foreground: var(--primitive-emerald-800);
-  --success-surface: var(--primitive-emerald-50);
-  --warning: var(--primitive-amber-600);
-  --warning-foreground: var(--primitive-amber-800);
-  --warning-surface: var(--primitive-amber-50);
-  --info: var(--primitive-blue-600);
-  --info-foreground: var(--primitive-blue-700);
-  --info-surface: var(--primitive-blue-50);
+  --success: var(--primitive-neo-green-700);
+  --success-foreground: var(--primitive-neo-black);
+  --success-surface: var(--primitive-neo-green-400);
+  --warning: var(--primitive-neo-yellow-700);
+  --warning-foreground: var(--primitive-neo-black);
+  --warning-surface: var(--primitive-neo-yellow-400);
+  --info: var(--primitive-neo-blue-700);
+  --info-foreground: var(--primitive-neo-black);
+  --info-surface: var(--primitive-neo-blue-200);
 
   /* Warna grafik laporan. Urutannya dipilih agar saling mudah dibedakan. */
-  --chart-1: var(--primitive-emerald-600);
-  --chart-2: var(--primitive-red-500);
-  --chart-3: var(--primitive-blue-600);
-  --chart-4: var(--primitive-amber-500);
-  --chart-5: var(--primitive-slate-500);
+  --chart-1: var(--primitive-neo-blue-500);
+  --chart-2: var(--primitive-neo-red-400);
+  --chart-3: var(--primitive-neo-yellow-400);
+  --chart-4: var(--primitive-neo-green-400);
+  --chart-5: var(--primitive-neo-purple-400);
 
   /* Sisi navigasi */
-  --sidebar: var(--primitive-white);
-  --sidebar-foreground: var(--primitive-slate-700);
-  --sidebar-primary: var(--primitive-emerald-600);
-  --sidebar-primary-foreground: var(--primitive-white);
-  --sidebar-accent: var(--primitive-emerald-50);
-  --sidebar-accent-foreground: var(--primitive-emerald-800);
-  --sidebar-border: var(--primitive-slate-200);
-  --sidebar-ring: var(--primitive-emerald-600);
+  --sidebar: var(--primitive-neo-white);
+  --sidebar-foreground: var(--primitive-neo-black);
+  --sidebar-primary: var(--primitive-neo-blue-500);
+  --sidebar-primary-foreground: var(--primitive-neo-black);
+  --sidebar-accent: var(--primitive-neo-blue-500);
+  --sidebar-accent-foreground: var(--primitive-neo-black);
+  --sidebar-border: var(--primitive-neo-black);
+  --sidebar-ring: var(--primitive-neo-black);
 
   /* Jarak menurut peran, bukan menurut angka */
   --space-page: var(--primitive-space-6);

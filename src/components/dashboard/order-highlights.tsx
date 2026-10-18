@@ -1,4 +1,3 @@
-import { ShoppingBag, Trophy } from "lucide-react";
 import { connection } from "next/server";
 
 import { MetricTile } from "@/components/dashboard/metric-tile";
@@ -16,7 +15,7 @@ import { formatNumber } from "@/lib/format/number";
 export function OrderHighlightsSkeleton() {
   return (
     <div className="grid gap-gutter md:grid-cols-5">
-      <div className="flex flex-col gap-3 rounded-lg border border-border p-4 md:col-span-2">
+      <div className="flex flex-col gap-3 rounded-md border-2 border-border p-4 md:col-span-2">
         <Skeleton className="h-5 w-32" />
         <Skeleton className="h-9 w-20" />
         <Skeleton className="h-4 w-36" />
@@ -29,7 +28,7 @@ export function OrderHighlightsSkeleton() {
               <Skeleton className="h-4 w-32" />
               <Skeleton className="h-4 w-16" />
             </div>
-            <Skeleton className="h-2 w-full" />
+            <Skeleton className="h-3 w-full" />
           </div>
         ))}
       </div>
@@ -67,7 +66,6 @@ export async function OrderHighlights() {
   if (data.todayOrders.length === 0 && data.topProducts.length === 0) {
     return (
       <StateBlock
-        icon={ShoppingBag}
         title="Belum ada orderan"
         description="Jumlah orderan hari ini dan produk terlaris minggu ini muncul setelah ada orderan pelanggan yang tercatat."
       />
@@ -83,21 +81,18 @@ export async function OrderHighlights() {
     <div className="grid items-start gap-gutter md:grid-cols-5 md:gap-section">
       <div className="min-w-0 md:col-span-2">
         <MetricTile
+          className="bg-accent"
           label="Orderan hari ini"
           value={formatNumber(data.todayOrders.length)}
-          icon={ShoppingBag}
           note="Dari kasir dan WhatsApp"
         />
       </div>
 
       <div className="flex min-w-0 flex-col gap-gutter md:col-span-3">
-        <p className="flex items-center gap-2 text-body font-semibold">
-          <Trophy className="size-4 text-primary" aria-hidden="true" />
-          Produk terlaris minggu ini
-        </p>
+        <p className="text-body font-bold">Produk terlaris minggu ini</p>
 
         {data.topProducts.length === 0 ? (
-          <p className="text-body text-muted-foreground">
+          <p className="text-body font-medium text-muted-foreground">
             Belum ada rincian produk pada orderan minggu ini.
           </p>
         ) : (
@@ -114,22 +109,22 @@ export async function OrderHighlights() {
 
               return (
                 <li key={product.productId} className="flex items-start gap-3">
-                  <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-accent text-caption font-semibold tabular-nums text-accent-foreground">
+                  <span className="flex size-7 shrink-0 items-center justify-center rounded-md border-2 border-border bg-card text-caption font-bold tabular-nums">
                     {formatNumber(index + 1)}
                   </span>
                   <div className="flex min-w-0 flex-1 flex-col gap-1">
                     <div className="flex flex-wrap items-baseline justify-between gap-x-3">
-                      <span className="text-body font-semibold">{product.name}</span>
-                      <span className="text-body font-semibold tabular-nums">
+                      <span className="text-body font-bold">{product.name}</span>
+                      <span className="text-body font-bold tabular-nums">
                         {formatNumber(product.quantity)} {product.unit}
                       </span>
                     </div>
-                    <span className="text-caption text-muted-foreground">
+                    <span className="text-caption font-medium text-muted-foreground">
                       Senilai {formatRupiah(product.revenue)}
                     </span>
                     <div
                       aria-hidden="true"
-                      className="mt-1 h-2 overflow-hidden rounded-full bg-muted"
+                      className="mt-1 h-3 overflow-hidden rounded-full border-2 border-border bg-card"
                     >
                       <div
                         className="h-full rounded-full bg-primary"

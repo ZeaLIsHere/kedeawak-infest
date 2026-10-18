@@ -1,5 +1,3 @@
-import { Store } from "lucide-react";
-
 import { StateBlock } from "@/components/shell/state-block";
 
 /**
@@ -12,7 +10,6 @@ import { StateBlock } from "@/components/shell/state-block";
 export function NoWarungState() {
   return (
     <StateBlock
-      icon={Store}
       title="Belum ada data warung"
       description="Data warung belum disiapkan di perangkat ini. Siapkan data demo lebih dulu, lalu buka kembali halaman ini."
     />

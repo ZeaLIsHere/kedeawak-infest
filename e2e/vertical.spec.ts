@@ -60,7 +60,13 @@ test.describe("Dasbor", () => {
     await expect(page.getByRole("heading", { name: "Ringkasan hari ini" })).toBeVisible();
     await expect(visibleText(page, "Penjualan").first()).toBeVisible();
     await expect(visibleText(page, "Pengeluaran").first()).toBeVisible();
-    await expect(visibleText(page, "Laba").first()).toBeVisible();
+    /* Laba berubah menjadi Rugi bila pengeluaran uji melebihi penjualan. */
+    await expect(
+      page
+        .getByText(/^(Laba|Rugi)$/u)
+        .filter({ visible: true })
+        .first(),
+    ).toBeVisible();
 
     await expectNoClippedText(page, visibleRupiah(page));
     await expectNoHorizontalScroll(page);

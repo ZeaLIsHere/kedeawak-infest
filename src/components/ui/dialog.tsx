@@ -15,10 +15,10 @@ export function DialogContent({
 }: ComponentProps<typeof Primitive.Content>) {
   return (
     <Primitive.Portal>
-      <Primitive.Overlay className="fixed inset-0 z-50 bg-foreground/30" />
+      <Primitive.Overlay className="fixed inset-0 z-50 bg-foreground/40" />
       <Primitive.Content
         className={cn(
-          "fixed top-1/2 left-1/2 z-50 max-h-[90dvh] w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-lg border border-border bg-card p-5 shadow-card",
+          "fixed top-1/2 left-1/2 z-50 max-h-[90dvh] w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-md border-2 border-border bg-card p-5 shadow-overlay",
           className,
         )}
         {...props}
@@ -40,7 +40,7 @@ export function DialogTitle({
 }: ComponentProps<typeof Primitive.Title>) {
   return (
     <Primitive.Title
-      className={cn("pr-10 text-section-title font-semibold", className)}
+      className={cn("pr-10 text-section-title font-bold", className)}
       {...props}
     />
   );
@@ -51,7 +51,7 @@ export function DialogDescription({
 }: ComponentProps<typeof Primitive.Description>) {
   return (
     <Primitive.Description
-      className={cn("mt-2 text-body text-muted-foreground", className)}
+      className={cn("mt-2 text-body font-medium text-muted-foreground", className)}
       {...props}
     />
   );

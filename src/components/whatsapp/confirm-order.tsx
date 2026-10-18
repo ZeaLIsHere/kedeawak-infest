@@ -42,7 +42,7 @@ export function ConfirmOrder({ orderId }: { readonly orderId: string }) {
           value={method}
           disabled={pending}
           onChange={(event) => setMethod(event.target.value as Method)}
-          className="min-h-11 rounded-md border border-border bg-background px-2 text-sm"
+          className="min-h-11 rounded-md border-2 border-border bg-card px-2 text-sm font-medium shadow-control outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         >
           {METHODS.map((option) => (
             <option key={option.value} value={option.value}>

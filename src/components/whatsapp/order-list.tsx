@@ -1,5 +1,3 @@
-import { ShoppingBag } from "lucide-react";
-
 import { SectionCard } from "@/components/shell/section-card";
 import { StateBlock } from "@/components/shell/state-block";
 import { ConfirmOrder } from "@/components/whatsapp/confirm-order";
@@ -65,14 +63,16 @@ export function WhatsAppOrderList({
     >
       {orders.length === 0 ? (
         <StateBlock
-          icon={ShoppingBag}
           title="Belum ada pesanan WhatsApp"
           description="Pesanan muncul di sini setelah pelanggan menyebut nama produk dan jumlah lewat WhatsApp."
         />
       ) : (
         <ul className="flex flex-col gap-4">
           {orders.map((order) => (
-            <li key={order.id} className="rounded-lg border border-border p-4">
+            <li
+              key={order.id}
+              className="rounded-md border-2 border-border bg-card p-4 shadow-card"
+            >
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p className="break-words font-semibold">

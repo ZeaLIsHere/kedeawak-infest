@@ -1,5 +1,3 @@
-import type { LucideIcon } from "lucide-react";
-
 import { cn } from "@/lib/utils";
 
 /** Warna nilai: biasa, pemasukan, pengeluaran, laba, atau kerugian. */
@@ -11,11 +9,6 @@ type MetricBlockProps = {
   readonly value: string;
   readonly note?: string;
   readonly tone?: MetricTone;
-  /**
-   * Ikon pendamping nilai. Dipakai saat arah nilai perlu ditandai, karena
-   * `DESIGN.md` melarang status yang hanya dibedakan oleh warna.
-   */
-  readonly icon?: LucideIcon;
 };
 
 /*
@@ -35,24 +28,15 @@ const TONE_CLASS: Record<MetricTone, string> = {
 };
 
 /** Satu angka penting beserta labelnya. */
-export function MetricBlock({
-  label,
-  value,
-  note,
-  tone = "default",
-  icon: Icon,
-}: MetricBlockProps) {
+export function MetricBlock({ label, value, note, tone = "default" }: MetricBlockProps) {
   return (
     <div>
-      <p className="text-metric-label text-muted-foreground">{label}</p>
-      <p className={cn("text-metric font-semibold tabular-nums", TONE_CLASS[tone])}>
-        {Icon === undefined ? null : (
-          <Icon aria-hidden="true" className="mr-2 inline size-6 align-text-bottom" />
-        )}
+      <p className="text-metric-label font-bold text-muted-foreground">{label}</p>
+      <p className={cn("text-metric font-bold tabular-nums", TONE_CLASS[tone])}>
         {value}
       </p>
       {note === undefined ? null : (
-        <p className="mt-1 text-caption text-muted-foreground">{note}</p>
+        <p className="mt-1 text-caption font-medium text-muted-foreground">{note}</p>
       )}
     </div>
   );

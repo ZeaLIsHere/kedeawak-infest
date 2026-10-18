@@ -37,10 +37,10 @@ export async function ProductList() {
           <li
             data-testid="product-row"
             key={product.id}
-            className="flex flex-col gap-3 rounded-md border border-border p-4"
+            className="flex flex-col gap-3 rounded-md border-2 border-border bg-card p-4 shadow-card"
           >
             <div className="flex flex-wrap items-center gap-2">
-              <h3 className="text-body font-medium">{product.name}</h3>
+              <h3 className="text-body font-bold">{product.name}</h3>
               {product.stock < product.minimumStock && <LowStockBadge />}
             </div>
             <dl className="grid grid-cols-2 gap-x-3 gap-y-2 text-caption">
@@ -61,8 +61,8 @@ export async function ProductList() {
           </li>
         ))}
       </ul>
-      <details className="rounded-md border border-border p-4">
-        <summary className="min-h-11 cursor-pointer text-body font-medium">
+      <details className="rounded-md border-2 border-border bg-card p-4 shadow-control">
+        <summary className="min-h-11 cursor-pointer text-body font-bold">
           Produk arsip
         </summary>
         {!data.archived.length ? (

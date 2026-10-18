@@ -1,4 +1,3 @@
-import { ShoppingBag, TriangleAlert, Wallet } from "lucide-react";
 import { Suspense } from "react";
 
 import {
@@ -39,7 +38,6 @@ export default function DasborPage() {
         <SectionCard
           title={JUDUL_RINGKASAN}
           description="Uang masuk, uang keluar, dan laba bersih hari ini."
-          icon={Wallet}
         >
           <CardError title={JUDUL_RINGKASAN}>
             <Suspense fallback={<TodaySummarySkeleton />}>
@@ -53,7 +51,6 @@ export default function DasborPage() {
             <SectionCard
               title={JUDUL_ORDERAN}
               description="Orderan hari ini dan produk yang paling banyak terjual minggu ini."
-              icon={ShoppingBag}
             >
               <CardError title={JUDUL_ORDERAN}>
                 <Suspense fallback={<OrderHighlightsSkeleton />}>
@@ -66,8 +63,6 @@ export default function DasborPage() {
           <SectionCard
             title={JUDUL_STOK}
             description="Produk yang sudah menyentuh atau melewati ambang minimum."
-            icon={TriangleAlert}
-            tone="warning"
           >
             <CardError title={JUDUL_STOK}>
               <Suspense fallback={<StockAlertPreviewSkeleton />}>

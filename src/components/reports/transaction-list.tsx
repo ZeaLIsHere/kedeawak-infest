@@ -1,6 +1,4 @@
-﻿import { Receipt } from "lucide-react";
-
-import { Skeleton } from "@/components/shell/skeleton";
+﻿import { Skeleton } from "@/components/shell/skeleton";
 import { StateBlock } from "@/components/shell/state-block";
 import { Badge } from "@/components/ui/badge";
 import type { listTransactions } from "@/lib/data/transactions";
@@ -42,7 +40,6 @@ export function TransactionList({
   if (transactions.length === 0) {
     return (
       <StateBlock
-        icon={Receipt}
         title="Belum ada transaksi pada periode ini"
         description="Ringkasan akan terisi setelah ada penjualan atau pengeluaran yang tercatat."
       />
@@ -57,8 +54,8 @@ export function TransactionList({
           className="flex flex-col gap-1 border-b border-border pb-3 last:border-b-0 last:pb-0"
         >
           <div className="flex flex-wrap items-baseline justify-between gap-x-gutter gap-y-1">
-            <span className="text-body font-medium">{transaction.description}</span>
-            <span className="text-body font-medium tabular-nums">
+            <span className="text-body font-bold">{transaction.description}</span>
+            <span className="text-body font-bold tabular-nums">
               {formatRupiah(transaction.amount)}
             </span>
           </div>

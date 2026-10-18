@@ -1,5 +1,4 @@
 ﻿import { DraftFromAlert } from "./draft-from-alert";
-import { CircleCheck } from "lucide-react";
 import { connection } from "next/server";
 
 import { LowStockBadge } from "@/components/shell/low-stock-badge";
@@ -60,7 +59,6 @@ export async function StockAlertList() {
   if (alerts.length === 0) {
     return (
       <StateBlock
-        icon={CircleCheck}
         title="Tidak ada stok yang menipis"
         description="Semua produk berada di atas ambang minimum."
       />
@@ -76,13 +74,15 @@ export async function StockAlertList() {
           className="flex flex-col gap-2 border-b border-border pb-3 last:border-b-0 last:pb-0"
         >
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-body font-medium">{product.name}</span>
+            <span className="text-body font-bold">{product.name}</span>
             <LowStockBadge />
           </div>
 
           <dl className="flex flex-wrap gap-x-section gap-y-2">
             <div>
-              <dt className="text-caption text-muted-foreground">Stok sekarang</dt>
+              <dt className="text-caption font-medium text-muted-foreground">
+                Stok sekarang
+              </dt>
               <dd className="text-body tabular-nums">
                 {formatNumber(product.stock)} {product.unit}
               </dd>

@@ -127,7 +127,7 @@ export function ProfileForm({ values }: { readonly values: ProfileFormValues }) 
           defaultValue={values.description ?? ""}
           maxLength={500}
           rows={3}
-          className="w-full resize-y rounded-md border border-border bg-background px-3 py-2 text-base outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="w-full resize-y rounded-md border-2 border-border bg-card px-3 py-2 text-base font-medium shadow-control outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           placeholder="Contoh: Menjual sembako dan kebutuhan harian, melayani pesanan WhatsApp."
         />
       </label>

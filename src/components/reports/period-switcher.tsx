@@ -49,21 +49,21 @@ export function PeriodSwitcher({
   nextHref,
 }: PeriodSwitcherProps) {
   const navLinkClass = cn(
-    "flex min-h-touch items-center gap-1 rounded-md border border-border px-3 font-medium transition-colors hover:bg-muted",
+    "flex min-h-touch items-center gap-1 rounded-md border-2 border-border bg-card px-3 font-bold shadow-control transition-colors hover:bg-muted",
   );
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-gutter">
-      <div className="flex items-center gap-1 rounded-lg border border-border p-1">
+      <div className="flex items-center gap-1 rounded-md border-2 border-border bg-card p-1 shadow-control">
         {MODE_LINKS.map((item) => (
           <Link
             key={item.mode}
             href={item.href}
             aria-current={item.mode === mode ? "page" : undefined}
             className={cn(
-              "flex min-h-touch items-center rounded-md px-4 font-medium transition-colors",
+              "flex min-h-touch items-center rounded-sm px-4 font-bold transition-colors",
               item.mode === mode
-                ? cn("bg-secondary text-secondary-foreground")
+                ? cn("bg-primary text-foreground")
                 : cn("text-muted-foreground hover:bg-muted hover:text-foreground"),
             )}
           >

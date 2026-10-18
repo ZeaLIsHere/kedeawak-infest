@@ -1,11 +1,3 @@
-import {
-  CalendarDays,
-  Receipt,
-  ReceiptText,
-  TrendingDown,
-  TrendingUp,
-  Wallet,
-} from "lucide-react";
 import { connection } from "next/server";
 
 import { MetricTile } from "@/components/dashboard/metric-tile";
@@ -28,7 +20,7 @@ export function TodaySummarySkeleton() {
           <div
             key={index}
             className={cn(
-              "flex flex-col gap-3 rounded-lg border border-border p-4",
+              "flex flex-col gap-3 rounded-md border-2 border-border p-4",
               index === 2 && "md:col-span-2 xl:col-span-1",
             )}
           >
@@ -64,7 +56,6 @@ export async function TodaySummary() {
   if (summary.transactionCount === 0) {
     return (
       <StateBlock
-        icon={Receipt}
         title="Belum ada transaksi hari ini"
         description="Ringkasan penjualan, pengeluaran, dan laba terisi setelah ada transaksi yang tercatat hari ini."
       />
@@ -79,14 +70,12 @@ export async function TodaySummary() {
         <MetricTile
           label="Penjualan"
           value={formatRupiah(summary.sales)}
-          icon={Wallet}
           tone="income"
           note="Uang masuk hari ini"
         />
         <MetricTile
           label="Pengeluaran"
           value={formatRupiah(summary.expenses)}
-          icon={ReceiptText}
           tone="expense"
           note="Uang keluar hari ini"
         />
@@ -94,13 +83,11 @@ export async function TodaySummary() {
           className="md:col-span-2 xl:col-span-1"
           label={rugi ? "Rugi" : "Laba"}
           value={formatRupiah(summary.profit)}
-          icon={rugi ? TrendingDown : TrendingUp}
           tone={rugi ? "loss" : "profit"}
           note={rugi ? "Pengeluaran melebihi penjualan" : "Setelah semua pengeluaran"}
         />
       </div>
-      <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-caption text-muted-foreground">
-        <CalendarDays className="size-4 shrink-0" aria-hidden="true" />
+      <p className="text-caption font-medium text-muted-foreground">
         {formatDateWithDay(now)}, {formatNumber(summary.transactionCount)} transaksi
         tercatat
       </p>

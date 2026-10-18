@@ -9,11 +9,11 @@ type PageHeaderProps = {
 
 export function PageHeader({ title, description, action }: PageHeaderProps) {
   return (
-    <header className="border-b border-border bg-card px-page py-section">
+    <header className="border-b-2 border-border bg-card px-page py-section">
       <div className="mx-auto flex w-full max-w-content flex-col gap-gutter sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0">
-          <h1 className="text-page-title font-semibold">{title}</h1>
-          <p className="mt-1 max-w-prose text-body text-muted-foreground">
+          <h1 className="text-page-title font-bold">{title}</h1>
+          <p className="mt-1 max-w-prose text-body font-medium text-muted-foreground">
             {description}
           </p>
         </div>

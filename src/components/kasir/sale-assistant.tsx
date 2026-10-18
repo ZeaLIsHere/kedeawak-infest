@@ -83,7 +83,7 @@ export function SaleAssistant({ products, onApply, disabled }: Props) {
         </p>
       )}
       {proposal && proposal.length > 0 && (
-        <div className="rounded-md border border-border p-3">
+        <div className="rounded-md border-2 border-border bg-card p-3 shadow-control">
           <ul className="space-y-2">
             {proposal.map((item) => (
               <li key={item.productId} className="text-body">

@@ -1,5 +1,3 @@
-import { TrendingDown, TrendingUp } from "lucide-react";
-
 import { MetricBlock } from "@/components/shell/metric-block";
 import { Skeleton } from "@/components/shell/skeleton";
 import type { FinancialSummary } from "@/lib/data/reports";
@@ -42,7 +40,6 @@ export function PeriodSummary({ summary }: { readonly summary: FinancialSummary 
         label={rugi ? "Rugi" : "Laba"}
         value={formatRupiah(summary.profit)}
         tone={rugi ? "loss" : "profit"}
-        icon={rugi ? TrendingDown : TrendingUp}
       />
       <MetricBlock
         label="Jumlah transaksi"

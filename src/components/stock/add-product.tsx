@@ -8,6 +8,7 @@ import {
   DialogContent,
   DialogTitle,
   DialogDescription,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { ProductForm, type ProductFields } from "./product-form";
@@ -40,19 +41,21 @@ export function AddProduct() {
   }
   return (
     <>
-      <Button
-        className="min-h-11"
-        onClick={() => {
-          setMode("choice");
-          setText("");
-          setError("");
-          setProposal(undefined);
-          setOpen(true);
-        }}
-      >
-        Tambah produk
-      </Button>
       <Dialog open={open} onOpenChange={setOpen}>
+        <DialogTrigger asChild>
+          <Button
+            className="min-h-11"
+            onClick={() => {
+              setMode("choice");
+              setText("");
+              setError("");
+              setProposal(undefined);
+              setOpen(true);
+            }}
+          >
+            Tambah produk
+          </Button>
+        </DialogTrigger>
         <DialogContent>
           {mode === "manual" || mode === "review" ? (
             <ProductForm

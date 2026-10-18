@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { CheckCircle2, RefreshCw, Unplug } from "lucide-react";
+import { RefreshCw, Unplug } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { connectChannelAction, disconnectChannelAction } from "@/lib/actions/whatsapp";
@@ -41,12 +41,7 @@ export function ConnectionPanel({ state }: { readonly state: ConnectionState }) 
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center gap-3">
-        <p className="flex items-center gap-2 font-medium">
-          {state.connected ? (
-            <CheckCircle2 className="size-4 text-success" aria-hidden="true" />
-          ) : (
-            <Unplug className="size-4 text-muted-foreground" aria-hidden="true" />
-          )}
+        <p className="flex items-center gap-2 font-bold">
           {state.connected ? "WhatsApp Fonnte terhubung" : "WhatsApp belum terhubung"}
         </p>
         {state.phone && (
@@ -86,7 +81,7 @@ export function ConnectionPanel({ state }: { readonly state: ConnectionState }) 
           {pending ? (
             <RefreshCw className="animate-spin" aria-hidden="true" />
           ) : (
-            <CheckCircle2 aria-hidden="true" />
+            <RefreshCw aria-hidden="true" />
           )}
           {pending
             ? "Memeriksa koneksi"

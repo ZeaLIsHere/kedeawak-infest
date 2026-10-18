@@ -58,9 +58,9 @@ function ApprovalCard({ detail }: { detail: ApprovalDetails }) {
   return (
     <li
       data-testid={waiting ? "pending-approval" : "approval-history"}
-      className="rounded-md border border-border p-4"
+      className="rounded-md border-2 border-border bg-card p-4 shadow-card"
     >
-      <h3 className="text-body font-semibold">{approval.summary}</h3>
+      <h3 className="text-body font-bold">{approval.summary}</h3>
       <dl className="mt-3 grid grid-cols-2 gap-2 text-caption">
         <dt className="text-muted-foreground">Pemasok</dt>
         <dd>{order.supplierName}</dd>

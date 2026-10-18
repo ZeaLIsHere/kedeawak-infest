@@ -1,4 +1,3 @@
-import { Store } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { BottomNav } from "@/components/shell/bottom-nav";
@@ -7,10 +6,9 @@ import { SidebarNav } from "@/components/shell/sidebar-nav";
 export function AppShell({ children }: { readonly children: ReactNode }) {
   return (
     <div className="flex min-h-dvh flex-col lg:flex-row">
-      <aside className="hidden w-sidebar shrink-0 flex-col border-r border-sidebar-border bg-sidebar lg:sticky lg:top-0 lg:flex lg:h-dvh">
-        <div className="flex h-header shrink-0 items-center gap-2 border-b border-sidebar-border px-gutter">
-          <Store aria-hidden="true" className="size-5 shrink-0 text-primary" />
-          <span className="text-section-title font-semibold">KedeAwak</span>
+      <aside className="hidden w-sidebar shrink-0 flex-col border-r-2 border-sidebar-border bg-sidebar lg:sticky lg:top-0 lg:flex lg:h-dvh">
+        <div className="flex h-header shrink-0 items-center border-b-2 border-sidebar-border px-gutter">
+          <span className="text-section-title font-bold">KedeAwak</span>
         </div>
 
         <SidebarNav />

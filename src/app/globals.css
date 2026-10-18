@@ -51,6 +51,10 @@
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+  --color-main: var(--main);
+  --color-main-foreground: var(--main-foreground);
+  --color-secondary-background: var(--secondary-background);
+  --color-overlay: var(--overlay);
 
   /* Keadaan merugikan */
   --color-destructive: var(--destructive);
@@ -114,6 +118,7 @@
 
   /* Ketinggian permukaan */
   --shadow-card: var(--elevation-card);
+  --shadow-control: var(--elevation-control);
   --shadow-raised: var(--elevation-raised);
   --shadow-overlay: var(--elevation-overlay);
 
@@ -161,7 +166,16 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background font-medium text-foreground;
     font-family: var(--font-sans);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-bold;
   }
 }

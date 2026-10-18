@@ -10,6 +10,25 @@
  */
 
 :root {
+  /* Palet neo-brutalism: biru sebagai warna utama, hitam sebagai garis. */
+  --primitive-neo-blue-50: hsl(214 95% 93%);
+  --primitive-neo-blue-100: hsl(214 90% 88%);
+  --primitive-neo-blue-200: hsl(214 90% 80%);
+  --primitive-neo-blue-500: hsl(217 100% 66%);
+  --primitive-neo-blue-600: hsl(217 100% 58%);
+  --primitive-neo-blue-700: hsl(217 90% 45%);
+  --primitive-neo-green-400: #05e17a;
+  --primitive-neo-green-700: #047a45;
+  --primitive-neo-red-400: #ff4d50;
+  --primitive-neo-red-700: #c81e22;
+  --primitive-neo-yellow-400: #facc00;
+  --primitive-neo-yellow-700: #6b5300;
+  --primitive-neo-purple-400: #7a83ff;
+  --primitive-neo-slate-700: hsl(215 30% 25%);
+  --primitive-neo-overlay: hsl(0 0% 0% / 0.8);
+  --primitive-neo-white: #ffffff;
+  --primitive-neo-black: #000000;
+
   /* Hijau utama. Dipakai untuk merek, pemasukan, dan status terverifikasi. */
   --primitive-emerald-50: #ecfdf5;
   --primitive-emerald-100: #d1fae5;
@@ -95,20 +114,18 @@
   --primitive-leading-relaxed: 1.65;
 
   /* Sudut lengkung. */
-  --primitive-radius-xs: 0.25rem;
-  --primitive-radius-sm: 0.375rem;
-  --primitive-radius-md: 0.625rem;
-  --primitive-radius-lg: 0.875rem;
-  --primitive-radius-xl: 1.125rem;
+  --primitive-radius-xs: 2px;
+  --primitive-radius-sm: 4px;
+  --primitive-radius-md: 5px;
+  --primitive-radius-lg: 5px;
+  --primitive-radius-xl: 6px;
   --primitive-radius-full: 9999px;
 
-  /* Bayangan. Warnanya netral gelap dengan kepekatan rendah. */
-  --primitive-shadow-xs: 0 1px 2px 0 rgb(15 23 42 / 0.05);
-  --primitive-shadow-sm:
-    0 1px 3px 0 rgb(15 23 42 / 0.08), 0 1px 2px -1px rgb(15 23 42 / 0.06);
-  --primitive-shadow-md:
-    0 4px 12px -2px rgb(15 23 42 / 0.1), 0 2px 6px -2px rgb(15 23 42 / 0.06);
-  --primitive-shadow-lg: 0 12px 32px -8px rgb(15 23 42 / 0.16);
+  /* Bayangan keras tanpa blur, ciri neo-brutalism. */
+  --primitive-shadow-xs: 2px 2px 0 0 #000000;
+  --primitive-shadow-sm: 4px 4px 0 0 #000000;
+  --primitive-shadow-md: 4px 4px 0 0 #000000;
+  --primitive-shadow-lg: 8px 8px 0 0 #000000;
 
   /* Durasi gerak. */
   --primitive-duration-fast: 120ms;

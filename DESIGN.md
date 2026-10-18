@@ -12,24 +12,18 @@ ditulis, supaya tidak ada halaman yang dibuat dengan selera masing masing.
 
 ## 1. Arah
 
-Proposal menyebut tiga kata, dan ketiganya mengikat:
+Arah visual KedeAwak diperbarui atas permintaan pemilik pada 18 Oktober 2026:
+**neo-brutalism monokromatik biru**. Ciri utamanya garis hitam tebal, bayangan
+keras tanpa blur, blok warna pekat, dan huruf tebal. Nilai proposal tentang
+antarmuka sederhana dan mudah dipakai tetap berlaku.
 
-> Dashboard KedeAwak: Clean, Minimalist, Flat.
-
-Ditambah dua hal lain dari proposal: pendekatan antarmuka **chat first**,
-karena mengikuti kebiasaan WhatsApp, dan sasaran pengguna yang **termasuk yang
-belum melek digital**, sehingga antarmuka harus sederhana dan tidak menuntut
-pelatihan.
-
-Terjemahannya menjadi aturan yang bisa diperiksa:
-
-| Kata       | Artinya di sini                                                                                                                 |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| Clean      | Ruang kosong lega. Satu gagasan per kartu. Tidak ada hiasan yang tidak menjelaskan apa pun                                      |
-| Minimalist | Setiap elemen harus punya alasan. Kalau dihapus dan tidak ada yang hilang, hapus                                                |
-| Flat       | Tanpa gradien, tanpa bayangan tebal, tanpa efek timbul. Ketinggian hanya dari garis tepi dan bayangan sangat halus              |
-| Chat first | Percakapan adalah pusat pengalaman. Permukaan S2 tampil seperti aplikasi pesan, dengan gelembung pesan dan kolom ketik di bawah |
-| Sederhana  | Satu tindakan utama per layar. Label memakai kata kerja sehari hari. Angka penting dibuat besar                                 |
+| Kata       | Artinya di sini                                                                                                   |
+| ---------- | ----------------------------------------------------------------------------------------------------------------- |
+| Tegas      | Garis hitam dua piksel, bayangan keras empat piksel, dan sudut kecil lima piksel menjadi bahasa bentuk utama      |
+| Blok warna | Permukaan putih untuk isi, biru sebagai warna merek, hijau dan merah hanya untuk makna uang                       |
+| Bersih     | Satu gagasan per kartu. Ruang kosong lega. Tidak ada hiasan tanpa alasan                                          |
+| Tanpa ikon | Navigasi dan kepala kartu hanya memakai teks. Ikon hanya boleh ada pada tombol tindakan bila memperjelas perintah |
+| Sederhana  | Satu tindakan utama per layar. Label memakai kata kerja sehari hari. Angka penting dibuat besar                   |
 
 ---
 
@@ -37,19 +31,21 @@ Terjemahannya menjadi aturan yang bisa diperiksa:
 
 1. **Warna hanya dari token.** Tidak ada nilai warna langsung di komponen,
    termasuk nilai inline dan kelas arbitrer.
-2. **Hijau hanya untuk merek dan hal positif.** Pemasukan, laba, dan status
-   terverifikasi. Bukan untuk hiasan.
-3. **Merah hanya untuk hal merugikan.** Pengeluaran, penolakan, dan galat.
-4. **Kuning hanya untuk peringatan.** Terutama stok menipis.
-5. **Angka uang selalu rata kolom.** Pakai `tabular-nums` pada setiap kolom
+2. **Biru untuk merek dan tindakan utama.** Bukan untuk hiasan.
+3. **Hijau hanya untuk hal positif.** Pemasukan dan laba.
+4. **Merah hanya untuk hal merugikan.** Pengeluaran, penolakan, dan galat.
+5. **Kuning hanya untuk peringatan.** Terutama stok menipis.
+6. **Angka uang selalu rata kolom.** Pakai `tabular-nums` pada setiap kolom
    angka dan setiap nilai uang.
-6. **Satu tindakan utama per layar.** Tombol lain tampil sebagai tindakan
+7. **Satu tindakan utama per layar.** Tombol lain tampil sebagai tindakan
    kedua, dengan gaya sekunder atau tanpa isian.
-7. **Status tidak boleh hanya dibedakan warna.** Setiap warna status wajib
-   berpasangan dengan ikon SVG atau teks. Ini untuk pengguna dengan gangguan
-   penglihatan warna.
-8. **Tidak ada teks yang mengarang data.** Kalau belum ada data, tulis kalimat
+8. **Status tidak boleh hanya dibedakan warna.** Setiap warna status wajib
+   berpasangan dengan teks. Ikon tidak dipakai sebagai penanda status di
+   navigasi maupun kepala kartu.
+9. **Tidak ada teks yang mengarang data.** Kalau belum ada data, tulis kalimat
    keadaan kosong yang menjelaskan langkah berikutnya.
+10. **Navigasi dan kartu tanpa ikon.** Label teks sudah cukup dan lebih mudah
+    dibaca pada layar kecil.
 
 ---
 
@@ -58,48 +54,53 @@ Terjemahannya menjadi aturan yang bisa diperiksa:
 Semua nilai di bawah berasal dari `src/styles/tokens/semantic.css`, yang
 menunjuk `src/styles/tokens/primitives.css`.
 
-| Peran           | Token                | Nilai     |
-| --------------- | -------------------- | --------- |
-| Latar halaman   | `--background`       | `#f8fafc` |
-| Teks utama      | `--foreground`       | `#0f172a` |
-| Permukaan kartu | `--card`             | `#ffffff` |
-| Warna merek     | `--primary`          | `#059669` |
-| Teks sekunder   | `--muted-foreground` | `#64748b` |
-| Garis           | `--border`           | `#e2e8f0` |
-| Pemasukan       | `--income`           | `#059669` |
-| Pengeluaran     | `--expense`          | `#dc2626` |
-| Laba            | `--profit`           | `#047857` |
-| Peringatan      | `--warning`          | `#d97706` |
-| Berhasil        | `--success`          | `#059669` |
-| Informasi       | `--info`             | `#2563eb` |
+| Peran           | Token                | Nilai               |
+| --------------- | -------------------- | ------------------- |
+| Latar halaman   | `--background`       | `hsl(214 95% 93%)`  |
+| Teks utama      | `--foreground`       | `#000000`           |
+| Permukaan kartu | `--card`             | `#ffffff`           |
+| Warna merek     | `--primary`          | `hsl(217 100% 66%)` |
+| Teks sekunder   | `--muted-foreground` | `hsl(215 30% 25%)`  |
+| Garis           | `--border`           | `#000000`           |
+| Pemasukan       | `--income`           | `#047a45`           |
+| Pengeluaran     | `--expense`          | `#c81e22`           |
+| Laba            | `--profit`           | `hsl(217 90% 45%)`  |
+| Peringatan      | `--warning`          | `#6b5300`           |
+| Berhasil        | `--success`          | `#047a45`           |
+| Informasi       | `--info`             | `hsl(217 90% 45%)`  |
+
+Blok warna pada ubin ringkasan memakai permukaan pekat, yaitu
+`--income-surface` `#05e17a`, `--expense-surface` `#ff4d50`,
+`--profit-surface` `hsl(217 100% 66%)`, dan `--warning-surface` `#facc00`.
+Teks di atas blok selalu hitam agar kontras tetap tinggi.
 
 Catatan:
 
-- Latar halaman abu sangat muda, bukan putih, supaya kartu putih punya batas
-  yang jelas tanpa perlu bayangan tebal.
+- Latar halaman biru sangat muda, bukan putih, supaya kartu putih dan garis
+  hitam punya batas yang jelas.
 - Warna merek dan warna laba berbeda, supaya laba tetap terbaca sebagai angka
   tersendiri, bukan sebagai merek.
 - Setiap warna status punya tiga bentuk, yaitu warna utama, warna teks di atas
-  permukaan muda, dan warna permukaan muda. Contohnya `--warning`,
-  `--warning-foreground`, dan `--warning-surface`.
-- Warna grafik laporan memakai lima token, `--chart-1` sampai `--chart-5`.
-  Urutannya sengaja dibuat agar mudah dibedakan, dan dua warna pertama sudah
-  bermakna, yaitu penjualan dan pengeluaran.
+  permukaan, dan warna permukaan. Contohnya `--warning`, `--warning-foreground`,
+  dan `--warning-surface`.
+- Warna grafik laporan memakai lima token, `--chart-1` sampai `--chart-5`,
+  mengikuti palet neo-brutalism: biru, merah, kuning, hijau, dan ungu.
 
 ---
 
 ## 4. Huruf
 
 Satu keluarga huruf, yaitu Geist, dimuat lewat `next/font`. Tidak ada huruf
-kedua. Pembedaan dibuat lewat ukuran dan ketebalan.
+kedua. Pembedaan dibuat lewat ukuran dan ketebalan. Isi memakai ketebalan 500,
+sedangkan judul dan angka utama memakai ketebalan 700.
 
 | Peran              | Kelas                | Ukuran    | Ketebalan |
 | ------------------ | -------------------- | --------- | --------- |
-| Angka besar dasbor | `text-metric`        | 2.25rem   | 600       |
-| Judul halaman      | `text-page-title`    | 1.875rem  | 600       |
-| Judul bagian       | `text-section-title` | 1.25rem   | 600       |
-| Isi                | `text-body`          | 0.9375rem | 400       |
-| Keterangan kecil   | `text-caption`       | 0.8125rem | 400       |
+| Angka besar dasbor | `text-metric`        | 2.25rem   | 700       |
+| Judul halaman      | `text-page-title`    | 1.875rem  | 700       |
+| Judul bagian       | `text-section-title` | 1.25rem   | 700       |
+| Isi                | `text-body`          | 0.9375rem | 500       |
+| Keterangan kecil   | `text-caption`       | 0.8125rem | 500       |
 
 Aturan:
 
@@ -115,22 +116,24 @@ Aturan:
 
 ## 5. Bentuk dan ketinggian
 
-| Peran                                | Token              | Nilai                   |
-| ------------------------------------ | ------------------ | ----------------------- |
-| Kendali, misalnya tombol dan masukan | `--radius-control` | 0.375rem                |
-| Permukaan, misalnya kartu dan panel  | `--radius-surface` | 0.875rem                |
-| Lencana dan chip                     | `--radius-pill`    | penuh                   |
-| Kartu diam                           | `shadow-card`      | bayangan paling halus   |
-| Permukaan terangkat                  | `shadow-raised`    | untuk menu dan popover  |
-| Lapisan atas                         | `shadow-overlay`   | untuk dialog dan lembar |
+| Peran                                | Token              | Nilai                         |
+| ------------------------------------ | ------------------ | ----------------------------- |
+| Kendali, misalnya tombol dan masukan | `--radius-control` | 4 piksel                      |
+| Permukaan, misalnya kartu dan panel  | `--radius-surface` | 5 piksel                      |
+| Lencana dan chip                     | `--radius-pill`    | penuh                         |
+| Garis tepi                           | `--border`         | 2 piksel hitam pada permukaan |
+| Kartu diam                           | `shadow-card`      | 4 piksel 4 piksel tanpa blur  |
+| Kendali masukan                      | `shadow-control`   | 2 piksel 2 piksel tanpa blur  |
+| Permukaan terangkat                  | `shadow-raised`    | 4 piksel 4 piksel tanpa blur  |
+| Lapisan atas                         | `shadow-overlay`   | 8 piksel 8 piksel tanpa blur  |
 
 Aturan:
 
-- Garis tepi satu piksel dengan `--border` adalah cara utama memisahkan
-  permukaan. Bayangan hanya tambahan.
+- Garis tepi hitam dua piksel adalah cara utama memisahkan permukaan.
+- Bayangan selalu keras, tanpa blur, dan hanya bergerak ke kanan bawah.
 - Dilarang gradien, dilarang bayangan berwarna, dilarang efek timbul atau
-  bevel. Ini yang dimaksud Flat oleh proposal.
-- Sudut lengkung tidak melebihi `--radius-surface` untuk permukaan besar.
+  bevel.
+- Sudut lengkung tidak melebihi 5 piksel untuk permukaan besar.
 
 ---
 
@@ -165,19 +168,20 @@ Aturan:
 
 ## 7. Komponen inti
 
-| Komponen          | Aturan                                                                                                              |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------- |
-| Tombol utama      | Warna `--primary`, teks `--primary-foreground`, tinggi `--control-height-md`, sudut `--radius-control`              |
-| Tombol sekunder   | Permukaan `--card`, garis `--border-strong`, teks `--foreground`                                                    |
-| Kartu             | Permukaan `--card`, garis `--border`, sudut `--radius-surface`, jarak dalam `--card-padding`                        |
-| Kepala kartu      | Boleh memuat ikon kecil berpermukaan warna untuk menandai jenis data, dengan judul dan satu kalimat keterangan      |
-| Ubin angka        | Satu angka utama berikon, dipakai berkelompok di dasbor; label dan keterangan tetap ada agar tidak bergantung warna |
-| Lencana status    | Bentuk pil, memakai pasangan warna status dan permukaannya, selalu berisi teks                                      |
-| Tabel             | Kepala tabel memakai `text-caption` dan `--muted-foreground`, kolom angka memakai `tabular-nums` dan rata kanan     |
-| Keadaan kosong    | Judul singkat, satu kalimat penjelasan, satu tindakan lanjutan. Tidak ada gambar hiasan                             |
-| Keadaan memuat    | Kerangka abu dengan bentuk menyerupai isi aslinya. Bukan pemutar berputar di tengah halaman                         |
-| Keadaan gagal     | Kalimat sebab yang dapat dimengerti, dan satu tombol coba lagi                                                      |
-| Dialog konfirmasi | Dipakai untuk tindakan yang tidak bisa dibatalkan, misalnya menghapus data pelanggan                                |
+| Komponen          | Aturan                                                                                                             |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------ |
+| Tombol utama      | Biru `--primary`, teks hitam, garis hitam dua piksel, sudut 5 piksel, bayangan keras                               |
+| Tombol sekunder   | Permukaan putih, teks hitam, garis hitam dua piksel, bayangan keras                                                |
+| Kartu             | Permukaan `--card`, garis hitam dua piksel, sudut `--radius-surface`, bayangan keras, jarak dalam `--card-padding` |
+| Kepala kartu      | Hanya judul dan satu kalimat keterangan. Tidak ada ikon                                                            |
+| Ubin angka        | Blok warna pekat dengan teks hitam, garis hitam, bayangan keras, tanpa ikon                                        |
+| Lencana status    | Bentuk pil, garis hitam, teks hitam, latar kuning untuk peringatan                                                 |
+| Navigasi          | Hanya teks. Tujuan aktif memakai blok biru, garis hitam, dan bayangan kecil                                        |
+| Tabel             | Kepala tabel memakai `text-caption` dan `--muted-foreground`, kolom angka memakai `tabular-nums` dan rata kanan    |
+| Keadaan kosong    | Judul tebal, satu kalimat penjelasan, satu tindakan lanjutan. Tidak ada ikon hiasan                                |
+| Keadaan memuat    | Kerangka abu dengan bentuk menyerupai isi aslinya. Bukan pemutar berputar di tengah halaman                        |
+| Keadaan gagal     | Kalimat sebab yang dapat dimengerti, dan satu tombol coba lagi                                                     |
+| Dialog konfirmasi | Dipakai untuk tindakan yang tidak bisa dibatalkan, misalnya menghapus data pelanggan                               |
 
 ---
 
@@ -204,16 +208,18 @@ Aturan:
 1. Emoji dalam bentuk apa pun, termasuk di judul, tombol, dan isi data.
 2. Karakter tanda hubung dan semua variannya. Lihat `docs/CONVENTIONS.md`
    bagian 2 untuk cara penulisan penggantinya.
-3. Gradien, bayangan tebal, dan efek timbul.
+3. Gradien dan bayangan berblur. Bayangan yang dipakai selalu keras.
 4. Nilai desain yang ditulis langsung di komponen, termasuk warna, ukuran,
    dan teks. Ukuran yang dihitung dari data, misalnya lebar batang proporsi,
    tidak termasuk.
 5. Warna di luar token, termasuk warna yang ditulis inline.
 6. Status yang hanya dibedakan lewat warna.
-7. Tombol mati, menu belum berfungsi, dan tulisan "segera hadir".
-8. Mode gelap. Belum ada di `docs/SCOPE.md`, jadi belum dikerjakan.
-9. Menampilkan riwayat percakapan pelanggan sebagai tampilan obrolan di S3.
-   Keputusannya ada di `docs/SCOPE.md` bagian 3.1.
+7. Ikon pada navigasi sisi, navigasi bawah, dan kepala kartu. Ikon hanya boleh
+   muncul pada tombol tindakan bila memperjelas perintah.
+8. Tombol mati, menu belum berfungsi, dan tulisan "segera hadir".
+9. Mode gelap. Belum ada di `docs/SCOPE.md`, jadi belum dikerjakan.
+10. Menampilkan riwayat percakapan pelanggan sebagai tampilan obrolan di S3.
+    Keputusannya ada di `docs/SCOPE.md` bagian 3.1.
 
 ---
 
@@ -247,6 +253,10 @@ token itu akan bernilai kosong.
 
 ## 12. Permukaan tambahan dan status pemeriksaan
 
+Tema neo-brutalism biru ditetapkan pemilik pada 18 Oktober 2026. Seluruh
+permukaan memakai palet, garis, bayangan, dan radius yang sama. Navigasi sisi,
+navigasi bawah, dan kepala kartu tidak memakai ikon.
+
 S7 Kasir ditambahkan atas keputusan pemilik 18 Oktober 2026 dan mengikuti
 arah visual serta token yang sama. Keranjang berada setelah daftar produk
 pada layar sempit. Dialog produk dan arsip memakai Radix melalui komponen
@@ -255,7 +265,7 @@ WhatsApp menyajikan kartu orderan, pesan asal, dan balasan tanpa tampilan
 obrolan pelanggan.
 
 S1 Dasbor disusun untuk dibaca sekilas oleh pemilik warung dan kasir: ubin
-angka berikon untuk penjualan, pengeluaran, dan laba; jumlah orderan hari ini;
+blok warna untuk penjualan, pengeluaran, dan laba; jumlah orderan hari ini;
 produk terlaris dengan batang proporsi; serta stok menipis sebagai kartu
 peringatan. Tindakan memuat ulang ringkasan berada di kepala halaman.
 

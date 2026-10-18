@@ -56,9 +56,9 @@ export function ProductCatalog({
               key={product.id}
               disabled={pending || empty}
               onClick={() => onQuantity(product.id, count + 1)}
-              className="flex min-h-28 flex-col items-start gap-2 rounded-md border border-border p-4 text-left transition-colors hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
+              className="flex min-h-28 flex-col items-start gap-2 rounded-md border-2 border-border bg-card p-4 text-left shadow-control transition-colors hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50"
             >
-              <span className="text-body font-medium">{product.name}</span>
+              <span className="text-body font-bold">{product.name}</span>
               <span className="text-body tabular-nums">
                 {formatRupiah(product.salePrice)}
               </span>

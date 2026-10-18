@@ -1,19 +1,6 @@
-﻿import {
-  ShoppingBasket,
-  Bot,
-  Boxes,
-  ChartColumn,
-  ClipboardCheck,
-  LayoutDashboard,
-  MessageCircle,
-  Settings,
-  type LucideIcon,
-} from "lucide-react";
-
-export type NavItem = {
+﻿export type NavItem = {
   readonly href: string;
   readonly label: string;
-  readonly icon: LucideIcon;
 };
 
 /**
@@ -21,19 +8,18 @@ export type NavItem = {
  * Urutannya sengaja mengikuti alur pemakaian, bukan abjad.
  */
 export const surfaceNavItems: readonly NavItem[] = [
-  { href: "/", label: "Dasbor", icon: LayoutDashboard },
-  { href: "/kasir", label: "Kasir", icon: ShoppingBasket },
-  { href: "/percakapan", label: "Agen AI", icon: Bot },
-  { href: "/whatsapp", label: "WhatsApp", icon: MessageCircle },
-  { href: "/laporan", label: "Laporan", icon: ChartColumn },
-  { href: "/stok", label: "Stok", icon: Boxes },
-  { href: "/persetujuan", label: "Persetujuan", icon: ClipboardCheck },
+  { href: "/", label: "Dasbor" },
+  { href: "/kasir", label: "Kasir" },
+  { href: "/percakapan", label: "Agen AI" },
+  { href: "/whatsapp", label: "WhatsApp" },
+  { href: "/laporan", label: "Laporan" },
+  { href: "/stok", label: "Stok" },
+  { href: "/persetujuan", label: "Persetujuan" },
 ];
 
 export const settingsNavItem: NavItem = {
   href: "/pengaturan",
   label: "Pengaturan",
-  icon: Settings,
 };
 
 /**

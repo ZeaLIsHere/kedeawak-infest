@@ -11,11 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { createSaleAction } from "@/lib/actions/penjualan";
 import type { listProducts } from "@/lib/data/products";
-import {
-  buildCashSuggestions,
-  formatCashInput,
-  parseCashInput,
-} from "@/lib/format/cash";
+import { buildCashSuggestions, formatCashInput, parseCashInput } from "@/lib/format/cash";
 import { formatRupiah } from "@/lib/format/currency";
 
 type Props = { products: Awaited<ReturnType<typeof listProducts>> };
@@ -88,7 +84,7 @@ export function Cashier({ products }: Props) {
       {notice && (
         <p
           role="status"
-          className="rounded-md border border-border bg-success-surface p-3 text-body"
+          className="rounded-md border-2 border-border bg-success-surface p-3 text-body font-medium shadow-control"
         >
           {notice}
         </p>
@@ -154,7 +150,7 @@ export function Cashier({ products }: Props) {
                 {METHODS.map((option) => (
                   <label
                     key={option.value}
-                    className="flex min-h-11 cursor-pointer items-center gap-2 rounded-md border border-border px-3"
+                    className="flex min-h-11 cursor-pointer items-center gap-2 rounded-md border-2 border-border bg-card px-3 font-medium shadow-control has-checked:bg-primary"
                   >
                     <input
                       type="radio"

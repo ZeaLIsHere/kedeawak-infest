@@ -1,7 +1,5 @@
 "use client";
 
-import { TriangleAlert } from "lucide-react";
-
 import { StateBlock } from "@/components/shell/state-block";
 import { Button } from "@/components/ui/button";
 
@@ -15,13 +13,11 @@ type ErrorStateProps = {
  * Keadaan gagal untuk satu bagian data.
  *
  * Berisi sebab yang dapat dimengerti dan satu tombol untuk mencoba lagi, sesuai
- * DESIGN.md bagian 7. Ikon pendamping dipakai karena keadaan gagal tidak boleh
- * hanya dibedakan oleh warna.
+ * DESIGN.md bagian 7.
  */
 export function ErrorState({ title, onRetry }: ErrorStateProps) {
   return (
     <StateBlock
-      icon={TriangleAlert}
       title={`${title} gagal dimuat`}
       description="Terjadi kesalahan saat membaca data warung. Coba lagi sebentar lagi."
       action={
