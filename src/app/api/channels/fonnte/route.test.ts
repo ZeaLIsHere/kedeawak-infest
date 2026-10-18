@@ -259,6 +259,35 @@ describe("webhook Fonnte", () => {
     expect(errorSpy).toHaveBeenCalled();
   });
 
+  it("menerima pesan ketika nomor tersimpan memakai awalan nol", async () => {
+    await updateBusinessChannel(test.db, test.business.id, {
+      status: "terhubung",
+      packageName: "Fonnte",
+      phoneNumber: "081277880527",
+      connectedAt: null,
+      quota: null,
+      checkedAt: new Date(),
+    });
+    const fetcher = stubFetcher();
+    vi.stubGlobal("fetch", fetcher);
+
+    try {
+      const payload = { ...inbound("105"), device: "6281277880527" };
+      await POST(request(payload, SECRET));
+      await flushAfter();
+      expect(sendRequests(fetcher)).toHaveLength(1);
+    } finally {
+      await updateBusinessChannel(test.db, test.business.id, {
+        status: "terhubung",
+        packageName: "Fonnte",
+        phoneNumber: DEVICE,
+        connectedAt: null,
+        quota: null,
+        checkedAt: new Date(),
+      });
+    }
+  });
+
   it("menolak payload yang tidak sesuai dan mengabaikan pesan grup", async () => {
     const fetcher = stubFetcher();
     vi.stubGlobal("fetch", fetcher);

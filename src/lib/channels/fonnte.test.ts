@@ -35,12 +35,13 @@ describe("penerjemah kanal WhatsApp", () => {
       return Response.json({
         status: true,
         device_status: "connect",
-        device: "6281200000001",
+        device: "081277880527",
         package: "Free",
         quota: "50",
       });
     });
     expect(profile.status).toBe("terhubung");
+    expect(profile.phoneNumber).toBe("6281277880527");
     expect(profile.quota).toBe(50);
   });
   it("menolak respons yang tidak sesuai skema", async () => {

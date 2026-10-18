@@ -10,7 +10,7 @@ import {
 } from "../data/channel-intake";
 import { listProducts } from "../data/products";
 import { finalizeChannelReply } from "./finalize-reply";
-import { safeChannelText } from "./fonnte";
+import { normalizeFonnteNumber, safeChannelText } from "./fonnte";
 
 export type FonnteInbound = {
   readonly eventId: string;
@@ -41,11 +41,14 @@ export async function receiveFonnteMessage(
   options: IntakeOptions = {},
 ): Promise<ChannelEventResult> {
   const business = await findBusiness(db, businessId);
+  const storedDevice =
+    business?.channelPhoneNumber === null || business?.channelPhoneNumber === undefined
+      ? null
+      : normalizeFonnteNumber(business.channelPhoneNumber);
   if (
     business?.channelStatus !== "terhubung" ||
     business.channelPackage !== "Fonnte" ||
-    (business.channelPhoneNumber !== null &&
-      business.channelPhoneNumber !== message.deviceNumber)
+    (storedDevice !== null && storedDevice !== message.deviceNumber)
   ) {
     throw new Error("Hubungkan Fonnte sebelum memproses pesan");
   }

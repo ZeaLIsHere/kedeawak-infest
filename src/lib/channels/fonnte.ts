@@ -117,7 +117,7 @@ export async function readFonnteProfile(
     const quota = Number(input.quota);
     return {
       status: input.device_status === "connect" ? "terhubung" : "terputus",
-      phoneNumber: input.device,
+      phoneNumber: normalizeFonnteNumber(input.device),
       connectedAt: input.device_status === "connect" ? new Date() : null,
       packageName: "Fonnte",
       quota: Number.isSafeInteger(quota) && quota >= 0 ? quota : null,
@@ -129,9 +129,15 @@ export async function readFonnteProfile(
 }
 
 function fonnteTarget(value: string): string {
+  const digits = normalizeFonnteNumber(value);
+  if (!/^\d{8,15}$/u.test(digits)) throw new Error("Nomor WhatsApp tujuan belum sesuai");
+  return digits;
+}
+
+/** Menyeragamkan nomor Fonnte ke bentuk 62, sama seperti nomor pada webhook. */
+export function normalizeFonnteNumber(value: string): string {
   const digits = value.trim().replace(/^\+/, "");
-  if (!/^\d{8,15}$/.test(digits)) throw new Error("Nomor WhatsApp tujuan belum sesuai");
-  return digits.startsWith("0") ? "62" + digits.slice(1) : digits;
+  return digits.startsWith("0") ? `62${digits.slice(1)}` : digits;
 }
 
 /** Nilai inbox yang boleh dikirim balik ke Fonnte. Nol dan nilai bukan angka diabaikan. */
