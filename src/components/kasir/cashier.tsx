@@ -11,6 +11,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { createSaleAction } from "@/lib/actions/penjualan";
 import type { listProducts } from "@/lib/data/products";
+import {
+  buildCashSuggestions,
+  formatCashInput,
+  parseCashInput,
+} from "@/lib/format/cash";
 import { formatRupiah } from "@/lib/format/currency";
 
 type Props = { products: Awaited<ReturnType<typeof listProducts>> };
@@ -37,6 +42,7 @@ export function Cashier({ products }: Props) {
         item.quantity,
     0,
   );
+  const suggestions = buildCashSuggestions(total);
   function quantity(id: string, value: number) {
     setNotice("");
     setItems((current) =>
@@ -169,13 +175,32 @@ export function Cashier({ products }: Props) {
               <Input
                 id="cash-received"
                 className="mt-2 tabular-nums"
-                type="number"
-                min={0}
-                step={1}
-                value={cash}
+                type="text"
+                inputMode="numeric"
+                autoComplete="off"
+                value={formatCashInput(cash)}
                 disabled={pending || method !== "tunai"}
-                onChange={(event) => setCash(event.target.value)}
+                onChange={(event) => setCash(parseCashInput(event.target.value))}
               />
+              {method === "tunai" && suggestions.length > 0 && (
+                <div className="mt-3 flex flex-col gap-2">
+                  <span className="text-caption font-medium">Saran nominal</span>
+                  <div className="flex flex-wrap gap-2">
+                    {suggestions.map((value) => (
+                      <Button
+                        key={value}
+                        type="button"
+                        variant={Number(cash) === value ? "secondary" : "outline"}
+                        className="min-h-11 tabular-nums"
+                        disabled={pending}
+                        onClick={() => setCash(String(value))}
+                      >
+                        {value === total ? "Uang pas" : formatRupiah(value)}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              )}
               {method === "tunai" && (
                 <div className="mt-2 flex justify-between text-body">
                   <span>Kembalian</span>

@@ -38,8 +38,16 @@ for (const method of ["Tunai", "Transfer", "QRIS"] as const) {
       )?.replace(/\D/gu, ""),
     );
     await page.getByLabel(method, { exact: true }).check();
-    if (method === "Tunai")
+    if (method === "Tunai") {
       await page.getByLabel("Uang diterima").fill(String(total + 10000));
+      await expect(page.getByLabel("Uang diterima")).toHaveValue(
+        (total + 10000).toLocaleString("id-ID"),
+      );
+      await page.getByRole("button", { name: "Uang pas", exact: true }).click();
+      await expect(page.getByLabel("Uang diterima")).toHaveValue(
+        total.toLocaleString("id-ID"),
+      );
+    }
     await page.getByRole("button", { name: "Catat penjualan", exact: true }).click();
     await expect(
       page.getByRole("status").filter({ hasText: "Penjualan berhasil dicatat" }),
