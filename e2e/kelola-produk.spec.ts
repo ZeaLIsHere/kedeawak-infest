@@ -33,6 +33,10 @@ test("produk dapat dibuat diubah diarsipkan dan diaktifkan kembali", async ({
   const archived = page.getByTestId("archived-product").filter({ hasText: name });
   await archived.getByRole("button", { name: "Aktifkan kembali", exact: true }).click();
   await expect(row).toBeVisible();
+  // Kembalikan produk uji ke arsip agar tidak tampil pada daftar produk aktif.
+  await row.getByRole("button", { name: "Arsipkan", exact: true }).click();
+  await dialog.getByRole("button", { name: "Arsipkan produk", exact: true }).click();
+  await expect(row).toHaveCount(0);
   expect(
     await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
   ).toBe(true);

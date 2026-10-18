@@ -19,7 +19,7 @@ export type WhatsAppOrder = {
   readonly phone: string | null;
   readonly createdAt: Date;
   readonly total: number;
-  readonly status: "baru" | "dikonfirmasi" | "selesai";
+  readonly status: "baru" | "dikonfirmasi" | "selesai" | "dibatalkan";
   readonly items: readonly WhatsAppOrderItem[];
   readonly paymentStatus: "menunggu" | "cocok" | "tidak_cocok" | null;
   readonly origin: string;
@@ -29,6 +29,7 @@ const ORDER_STATUS_LABEL: Record<WhatsAppOrder["status"], string> = {
   baru: "Pesanan baru",
   dikonfirmasi: "Sudah dikonfirmasi",
   selesai: "Sudah selesai",
+  dibatalkan: "Dibatalkan",
 };
 
 const PAYMENT_STATUS_LABEL: Record<"menunggu" | "cocok" | "tidak_cocok", string> = {

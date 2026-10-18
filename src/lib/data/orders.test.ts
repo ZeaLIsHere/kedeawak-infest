@@ -11,6 +11,7 @@ import { summarizeDay } from "./reports";
 import { recordStockMovement } from "./stock";
 import { listTransactions } from "./transactions";
 import {
+  cancelOrder,
   confirmOrder,
   createOrder,
   findOrder,
@@ -257,5 +258,39 @@ describe("data orderan", () => {
     expect((await findProduct(test.db, test.business.id, berasId))?.stock).toBe(
       after?.stock,
     );
+  });
+
+  it("membatalkan orderan baru tanpa mengubah stok dan penjualan", async () => {
+    const created = await createOrder(test.db, test.business.id, {
+      items: [{ productId: berasId, quantity: 2, unitPrice: 15000 }],
+    });
+    const before = await findProduct(test.db, test.business.id, berasId);
+    const salesBefore = await listTransactions(test.db, test.business.id, {
+      kind: "sale",
+    });
+
+    const cancelled = await cancelOrder(test.db, test.business.id, created.order.id);
+
+    expect(cancelled?.status).toBe("dibatalkan");
+    expect((await findProduct(test.db, test.business.id, berasId))?.stock).toBe(
+      before?.stock,
+    );
+    expect(
+      await listTransactions(test.db, test.business.id, { kind: "sale" }),
+    ).toHaveLength(salesBefore.length);
+    expect(
+      await cancelOrder(test.db, test.business.id, created.order.id),
+    ).toBeUndefined();
+  });
+
+  it("menolak pembatalan orderan yang sudah dikonfirmasi", async () => {
+    const created = await createOrder(test.db, test.business.id, {
+      items: [{ productId: gulaId, quantity: 1, unitPrice: 16000 }],
+    });
+    await confirmOrder(test.db, test.business.id, created.order.id, "qris");
+
+    expect(
+      await cancelOrder(test.db, test.business.id, created.order.id),
+    ).toBeUndefined();
   });
 });

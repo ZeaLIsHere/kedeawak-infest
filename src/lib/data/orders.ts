@@ -227,6 +227,45 @@ export async function updateOrderStatus(
 export type OrderPaymentMethod = "tunai" | "transfer" | "qris";
 
 /**
+ * Membatalkan pesanan WhatsApp yang belum dikonfirmasi.
+ *
+ * Hanya status `baru` yang dapat dibatalkan. Pesanan yang sudah dikonfirmasi
+ * sudah menulis penjualan dan mengurangi stok, sehingga tidak diubah di sini.
+ * Pesanan tetap tersimpan dengan status `dibatalkan` agar riwayatnya utuh.
+ */
+export async function cancelOrder(
+  db: Database,
+  businessId: string,
+  orderId: string,
+): Promise<Order | undefined> {
+  if (!isUuid(orderId)) return undefined;
+
+  return db.transaction(async (tx) => {
+    const [order] = await tx
+      .select()
+      .from(orders)
+      .where(and(eq(orders.businessId, businessId), eq(orders.id, orderId)))
+      .for("update");
+
+    if (order === undefined || order.status !== "baru") return undefined;
+
+    const [updated] = await tx
+      .update(orders)
+      .set({ status: "dibatalkan" })
+      .where(
+        and(
+          eq(orders.businessId, businessId),
+          eq(orders.id, order.id),
+          eq(orders.status, "baru"),
+        ),
+      )
+      .returning();
+
+    return updated;
+  });
+}
+
+/**
  * Mengonfirmasi pesanan WhatsApp menjadi penjualan.
  *
  * Hanya pesanan berstatus `baru` yang dapat dikonfirmasi. Penjualan, perubahan

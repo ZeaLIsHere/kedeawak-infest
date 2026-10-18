@@ -33,6 +33,7 @@ const ORDER_STATUS: Record<Order["status"], string> = {
   baru: "Baru",
   dikonfirmasi: "Dikonfirmasi",
   selesai: "Selesai",
+  dibatalkan: "Dibatalkan",
 };
 
 const PAYMENT_STATUS: Record<Payment["status"], string> = {

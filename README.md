@@ -28,7 +28,7 @@ DeepSeek nyata untuk alur baru ini.
 | Laporan Keuangan          | Harian, mingguan, rincian transaksi, jenis pembayaran, dan catat pengeluaran manual                                                            | Audit akhir                                         |
 | Persetujuan               | Antrean, rincian draft, setujui/tolak, riwayat, stok, pencegahan keputusan berulang, pembelian sebagai pengeluaran                             | Penerimaan demo bersama AI nyata                    |
 | Percakapan dengan Agen AI | Teks, riwayat, mode lokal, laporan, parser foto, tinjau bacaan, context lock, kuota                                                            | Uji AI/foto/mikrofon nyata dan unggah voice note S2 |
-| Integrasi WhatsApp        | Kartu koneksi Fonnte tanpa input nomor, daftar pesanan, dan konfirmasi pesanan menjadi penjualan                                               | Uji akun Fonnte nyata dan webhook ngrok             |
+| Integrasi WhatsApp        | Kartu koneksi Fonnte tanpa input nomor, daftar pesanan, konfirmasi pesanan menjadi penjualan, dan pembatalan pesanan baru                      | Uji akun Fonnte nyata dan webhook ngrok             |
 | Pengaturan                | Profil pemilik dan usaha tanpa login, persetujuan pemrosesan pesan, privasi, serta langganan Free dan Gold dengan pembayaran berupa konfirmasi | Penyesuaian penyedia dan audit akhir                |
 
 Sepuluh tool berada di `src/lib/tools/`; setiap pemanggilan meninggalkan audit.
@@ -128,11 +128,18 @@ bukan memigrasikan data lama. `DATABASE_URL` yang terisi memilih Postgres.
 ### Migrasi, server dan Sandbox
 
 Hentikan proses yang mengakses direktori PGlite yang sama sebelum migrasi.
+PGlite hanya mengizinkan satu proses menulis. Menjalankan migrasi atau skrip
+basis data saat server dev hidup dapat merusak WAL. Hentikan server lebih dulu,
+lalu jalankan perintahnya. `db:cleanup-e2e` menghapus produk bernama
+`Biskuit uji ...` yang dibuat uji peramban dan tidak menyentuh produk yang sudah
+punya riwayat orderan atau pesanan pembelian.
 
 ```powershell
 npm run db:migrate
 # Hanya untuk database demo baru yang boleh direset
 npm run db:seed
+# Bersihkan sisa produk uji e2e. Hentikan server dev lebih dulu.
+npm run db:cleanup-e2e
 npm run dev -- --port 3100
 ```
 

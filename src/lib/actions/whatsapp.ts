@@ -6,7 +6,7 @@ import { deleteCustomerData } from "../data/customers";
 import { receiveChannelEvent } from "../channels/intake";
 import { readFonnteProfile } from "../channels/fonnte";
 import { readTwilioProfile } from "../channels/twilio";
-import { confirmOrder, type OrderPaymentMethod } from "../data/orders";
+import { confirmOrder, cancelOrder, type OrderPaymentMethod } from "../data/orders";
 import { formatRupiah } from "../format/currency";
 
 type Result = { ok: true; message: string } | { ok: false; error: string };
@@ -114,6 +114,22 @@ export async function confirmWhatsAppOrderAction(
       ok: false,
       error: "Pesanan belum dapat dikonfirmasi. Periksa stok lalu coba lagi.",
     };
+  }
+}
+
+export async function cancelWhatsAppOrderAction(orderId: string): Promise<Result> {
+  try {
+    const result = await withCurrentBusiness((db, id) => cancelOrder(db, id, orderId));
+    if (!result)
+      return {
+        ok: false,
+        error: "Pesanan tidak ditemukan atau sudah dikonfirmasi",
+      };
+
+    refresh();
+    return { ok: true, message: "Pesanan dibatalkan." };
+  } catch {
+    return { ok: false, error: "Pesanan belum dapat dibatalkan. Coba lagi." };
   }
 }
 

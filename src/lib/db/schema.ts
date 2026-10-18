@@ -60,6 +60,7 @@ export const orderStatusEnum = pgEnum("order_status", [
   "baru",
   "dikonfirmasi",
   "selesai",
+  "dibatalkan",
 ]);
 
 /** Hasil pencocokan bukti pembayaran. */

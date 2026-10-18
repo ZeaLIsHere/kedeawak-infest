@@ -111,7 +111,11 @@ Keputusan user: Fonnte menjadi kanal WhatsApp utama untuk demo.
   pembayaran, dan pesan asal pelanggan. Setiap pesanan berstatus baru memiliki
   tombol Konfirmasi pesanan dengan pilihan tunai, transfer, atau QRIS.
   Konfirmasi mencatat penjualan, mengurangi stok, dan mengubah status menjadi
-  selesai. Balasan agen tidak ditampilkan di S3, dan tidak ada halaman obrolan
+  selesai. Pesanan berstatus baru juga memiliki tombol Batalkan pesanan dengan
+  konfirmasi. Pesanan yang dibatalkan tetap tampil dengan status Dibatalkan,
+  tanpa mengubah stok atau pendapatan. Pesanan yang sudah dikonfirmasi tidak
+  dapat dibatalkan.
+  Balasan agen tidak ditampilkan di S3, dan tidak ada halaman obrolan
   pelanggan. Muat ulang halaman dilakukan manual setelah pemrosesan latar
   selesai.
 - **Webhook:** `POST /api/channels/fonnte?key=SECRET` adalah Route Handler Next

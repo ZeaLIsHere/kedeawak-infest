@@ -15,6 +15,7 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx src/scripts/db-migrate.ts",
     "db:seed": "tsx src/scripts/db-seed.ts",
+    "db:cleanup-e2e": "tsx src/scripts/db-cleanup-e2e.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },

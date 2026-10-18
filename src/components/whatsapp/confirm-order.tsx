@@ -5,7 +5,17 @@ import { useRouter } from "next/navigation";
 import { Check } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { confirmWhatsAppOrderAction } from "@/lib/actions/whatsapp";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  cancelWhatsAppOrderAction,
+  confirmWhatsAppOrderAction,
+} from "@/lib/actions/whatsapp";
 
 const METHODS = [
   { value: "tunai", label: "Tunai" },
@@ -21,6 +31,8 @@ export function ConfirmOrder({ orderId }: { readonly orderId: string }) {
   const [pending, startTransition] = useTransition();
   const [message, setMessage] = useState("");
   const [failed, setFailed] = useState(false);
+  const [cancelOpen, setCancelOpen] = useState(false);
+  const [cancelError, setCancelError] = useState("");
 
   function confirm() {
     setMessage("");
@@ -31,6 +43,20 @@ export function ConfirmOrder({ orderId }: { readonly orderId: string }) {
       setFailed(!result.ok);
       setMessage(result.ok ? result.message : result.error);
       if (result.ok) router.refresh();
+    });
+  }
+
+  function cancel() {
+    setCancelError("");
+
+    startTransition(async () => {
+      const result = await cancelWhatsAppOrderAction(orderId);
+      if (!result.ok) {
+        setCancelError(result.error);
+        return;
+      }
+      setCancelOpen(false);
+      router.refresh();
     });
   }
 
@@ -56,6 +82,44 @@ export function ConfirmOrder({ orderId }: { readonly orderId: string }) {
         <Check aria-hidden="true" />
         {pending ? "Mengonfirmasi" : "Konfirmasi pesanan"}
       </Button>
+
+      <Dialog open={cancelOpen} onOpenChange={setCancelOpen}>
+        <DialogTrigger asChild>
+          <Button variant="destructive" className="min-h-11" disabled={pending}>
+            Batalkan pesanan
+          </Button>
+        </DialogTrigger>
+        <DialogContent>
+          <DialogTitle>Batalkan pesanan</DialogTitle>
+          <DialogDescription>
+            Yakin ingin membatalkan pesanan ini? Pesanan yang dibatalkan tidak dapat
+            dikonfirmasi lagi.
+          </DialogDescription>
+          <div className="mt-5 flex flex-wrap gap-2">
+            <Button
+              variant="destructive"
+              className="min-h-11"
+              disabled={pending}
+              onClick={cancel}
+            >
+              {pending ? "Membatalkan" : "Ya, batalkan pesanan"}
+            </Button>
+            <Button
+              variant="outline"
+              className="min-h-11"
+              disabled={pending}
+              onClick={() => setCancelOpen(false)}
+            >
+              Kembali
+            </Button>
+          </div>
+          {cancelError && (
+            <p role="alert" className="mt-3 text-sm font-medium text-destructive">
+              {cancelError}
+            </p>
+          )}
+        </DialogContent>
+      </Dialog>
 
       {message && (
         <p
