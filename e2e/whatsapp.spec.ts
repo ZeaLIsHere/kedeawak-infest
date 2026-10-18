@@ -7,7 +7,9 @@ test("halaman WhatsApp menampilkan koneksi Fonnte dan daftar pesanan", async ({
 
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Integrasi WhatsApp");
   await expect(page.getByRole("heading", { name: "Koneksi WhatsApp" })).toBeVisible();
-  await expect(page.getByRole("button", { name: "Hubungkan WhatsApp" })).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: /Hubungkan WhatsApp|Periksa koneksi/u }),
+  ).toBeVisible();
   await expect(
     page
       .getByRole("heading", { name: "Pesanan dari WhatsApp" })

@@ -6,6 +6,7 @@ import { NoWarungState } from "@/components/shell/no-warung-state";
 import { PageHeader } from "@/components/shell/page-header";
 import { SectionCard } from "@/components/shell/section-card";
 import { ConnectionPanel } from "@/components/whatsapp/connection-panel";
+import { RefreshOrdersButton } from "@/components/whatsapp/refresh-orders-button";
 import { WhatsAppOrderList, type WhatsAppOrder } from "@/components/whatsapp/order-list";
 import { findBusiness } from "@/lib/data/business";
 import { getChannelOverview } from "@/lib/data/channel-intake";
@@ -61,6 +62,10 @@ async function OrderContent() {
           }}
         />
       </SectionCard>
+
+      <div className="flex justify-end">
+        <RefreshOrdersButton />
+      </div>
 
       <WhatsAppOrderList orders={orders} />
     </div>

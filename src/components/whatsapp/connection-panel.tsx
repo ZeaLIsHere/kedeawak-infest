@@ -157,6 +157,10 @@ export function ConnectionPanel({ state }: { readonly state: ConnectionState }) 
             daftar di bawah.
           </li>
         </ol>
+        <p className="mt-3 text-sm text-muted-foreground">
+          Alamat harus mengarah ke /api/channels/fonnte. Alamat /webhook/... akan
+          menghasilkan 404 dan pesan tidak diproses.
+        </p>
       </details>
     </div>
   );
