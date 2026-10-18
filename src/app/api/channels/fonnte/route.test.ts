@@ -214,6 +214,51 @@ describe("webhook Fonnte", () => {
     expect(sendRequests(fetcher)).toHaveLength(1);
   });
 
+  it("mengirim pesan tanpa inboxid bila pesan tidak punya inboxid", async () => {
+    const fetcher = stubFetcher();
+    vi.stubGlobal("fetch", fetcher);
+
+    await POST(request(inbound("0"), SECRET));
+    await flushAfter();
+
+    const sends = sendRequests(fetcher);
+    expect(sends).toHaveLength(1);
+    expect(new URLSearchParams(String(sends[0]![1]?.body)).has("inboxid")).toBe(false);
+  });
+
+  it("mencoba kirim ulang tanpa inboxid bila Fonnte menolak inboxid", async () => {
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const fetcher = vi.fn<typeof fetch>(async (input, init) => {
+      const url = String(input);
+      if (url.startsWith("https://api.deepseek.com")) {
+        const body = JSON.parse(String(init?.body)) as {
+          messages?: Array<{ content?: unknown }>;
+        };
+        const system = String(body.messages?.[0]?.content ?? "");
+        const prompt = String(body.messages?.[1]?.content ?? "");
+        return deepSeekReply(system, prompt);
+      }
+      if (url === "https://api.fonnte.com/send") {
+        const body = new URLSearchParams(String(init?.body));
+        if (body.has("inboxid")) {
+          return Response.json({ status: false, reason: "inboxid tidak dikenal" });
+        }
+        return Response.json({ status: true, detail: "success" });
+      }
+      throw new Error("URL tidak dikenal: " + url);
+    });
+    vi.stubGlobal("fetch", fetcher);
+
+    await POST(request(inbound("104"), SECRET));
+    await flushAfter();
+
+    const sends = sendRequests(fetcher);
+    expect(sends).toHaveLength(2);
+    expect(new URLSearchParams(String(sends[0]![1]?.body)).get("inboxid")).toBe("104");
+    expect(new URLSearchParams(String(sends[1]![1]?.body)).has("inboxid")).toBe(false);
+    expect(errorSpy).toHaveBeenCalled();
+  });
+
   it("menolak payload yang tidak sesuai dan mengabaikan pesan grup", async () => {
     const fetcher = stubFetcher();
     vi.stubGlobal("fetch", fetcher);

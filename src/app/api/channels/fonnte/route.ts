@@ -3,7 +3,12 @@ import { after } from "next/server";
 import { revalidatePath } from "next/cache";
 
 import { receiveFonnteMessage, type FonnteInbound } from "@/lib/channels/fonnte-intake";
-import { safeChannelText, sendFonnteReply } from "@/lib/channels/fonnte";
+import {
+  FonnteSendError,
+  fonnteInboxId,
+  safeChannelText,
+  sendFonnteReply,
+} from "@/lib/channels/fonnte";
 import { withCurrentBusiness } from "@/lib/data/server";
 
 const PATHS = ["/whatsapp", "/", "/stok", "/laporan"];
@@ -54,11 +59,12 @@ function parsePayload(payload: unknown): FonnteInbound | "ignore" | undefined {
   const kind = url === undefined ? "text" : mediaKind(extension, url);
   const name = text(data.name);
   const inbox = data.inboxid;
-  const inboxId =
-    typeof inbox === "string" || typeof inbox === "number" ? String(inbox) : undefined;
+  const inboxId = fonnteInboxId(
+    typeof inbox === "string" || typeof inbox === "number" ? String(inbox) : undefined,
+  );
   const timestamp = text(String(data.timestamp ?? "")) ?? "";
   const eventId =
-    inboxId !== undefined && inboxId !== "0"
+    inboxId !== undefined
       ? `fonnte:${inboxId}`
       : `fonnte:${createHash("sha256")
           .update([digits(device), digits(sender), timestamp, body, url ?? ""].join("|"))
@@ -76,18 +82,40 @@ function parsePayload(payload: unknown): FonnteInbound | "ignore" | undefined {
   };
 }
 
+function describeFonnteError(error: unknown): string {
+  if (error instanceof FonnteSendError) {
+    return (
+      [error.status === undefined ? undefined : `status ${error.status}`, error.reason]
+        .filter((value): value is string => value !== undefined && value !== "")
+        .join(", ") || error.message
+    );
+  }
+  return error instanceof Error ? error.message : "Kesalahan tidak dikenal";
+}
+
 async function processMessage(message: FonnteInbound, token: string): Promise<void> {
   try {
     const result = await withCurrentBusiness(async (db, businessId) => {
       const outcome = await receiveFonnteMessage(db, businessId, message);
       if (!outcome.duplicate) {
-        await sendFonnteReply(
-          token,
-          message.phoneNumber,
-          safeChannelText(outcome.reply),
-          fetch,
-          message.inboxId,
-        );
+        const reply = safeChannelText(outcome.reply) || "Pesan sudah diterima.";
+        try {
+          await sendFonnteReply(
+            token,
+            message.phoneNumber,
+            reply,
+            fetch,
+            message.inboxId,
+          );
+        } catch (error) {
+          if (message.inboxId === undefined) throw error;
+          console.error(
+            "Balasan Fonnte dengan inboxid gagal, mencoba tanpa inboxid",
+            message.eventId,
+            describeFonnteError(error),
+          );
+          await sendFonnteReply(token, message.phoneNumber, reply, fetch);
+        }
       }
       return outcome;
     });
@@ -97,7 +125,8 @@ async function processMessage(message: FonnteInbound, token: string): Promise<vo
   } catch (error) {
     console.error(
       "Pemrosesan pesan Fonnte belum berhasil",
-      error instanceof Error ? error.message : "Kesalahan tidak dikenal",
+      message.eventId,
+      describeFonnteError(error),
     );
   }
 }
@@ -110,7 +139,10 @@ export async function POST(request: Request): Promise<Response> {
   const token = process.env.FONNTE_TOKEN?.trim();
   const secret = process.env.FONNTE_WEBHOOK_SECRET?.trim();
   if (!token || !secret) {
-    return Response.json({ error: "Penerima pesan Fonnte belum diatur" }, { status: 503 });
+    return Response.json(
+      { error: "Penerima pesan Fonnte belum diatur" },
+      { status: 503 },
+    );
   }
   if (!authorized(request, secret)) {
     return Response.json({ error: "Akses pesan tidak diizinkan" }, { status: 401 });

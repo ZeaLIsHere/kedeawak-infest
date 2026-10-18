@@ -1,4 +1,4 @@
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 
 import {
   createSecondBusiness,
@@ -47,6 +47,22 @@ describe("data pelanggan", () => {
     expect(customer?.phoneNumberHash).toMatch(/^[0-9a-f]{64}$/u);
     expect(readCustomerName(customer ?? ({} as never))).toBe("Bu Sari");
     expect(readCustomerPhone(customer ?? ({} as never))).toBe("081234567890");
+  });
+
+  it("mengembalikan kosong saat kunci enkripsi berbeda", async () => {
+    const customer = await findCustomerByPhone(test.db, test.business.id, "081234567890");
+    if (!customer) throw new Error("Pelanggan uji tidak ditemukan");
+
+    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    vi.stubEnv("FIELD_ENCRYPTION_KEY", "f".repeat(64));
+
+    try {
+      expect(readCustomerName(customer)).toBeNull();
+      expect(readCustomerPhone(customer)).toBeNull();
+    } finally {
+      vi.unstubAllEnvs();
+      spy.mockRestore();
+    }
   });
 
   it("menerima pelanggan tanpa nama", async () => {
