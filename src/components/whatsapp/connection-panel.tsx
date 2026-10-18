@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { CheckCircle2, ExternalLink, RefreshCw, Unplug } from "lucide-react";
+import { CheckCircle2, RefreshCw, Unplug } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { connectChannelAction, disconnectChannelAction } from "@/lib/actions/whatsapp";
@@ -116,52 +116,6 @@ export function ConnectionPanel({ state }: { readonly state: ConnectionState }) 
           {message}
         </p>
       )}
-
-      <details className="rounded-lg border border-border p-4">
-        <summary className="cursor-pointer font-medium">
-          Cara menghubungkan Fonnte
-        </summary>
-        <ol className="mt-3 list-decimal space-y-2 pl-5 text-sm text-muted-foreground">
-          <li>
-            Buka{" "}
-            <a
-              className="font-medium text-primary underline underline-offset-4"
-              href="https://fonnte.com/"
-              target="_blank"
-              rel="noreferrer"
-            >
-              dasbor Fonnte
-              <ExternalLink className="ml-1 inline size-3" aria-hidden="true" />
-            </a>
-            , buat akun, lalu tambahkan perangkat.
-          </li>
-          <li>
-            Pindai kode QR memakai WhatsApp toko sampai perangkat berstatus terhubung di
-            dasbor Fonnte.
-          </li>
-          <li>
-            Salin token perangkat, lalu isi <code>FONNTE_TOKEN</code> pada{" "}
-            <code>.env.local</code>.
-          </li>
-          <li>
-            Isi <code>FONNTE_WEBHOOK_SECRET</code> pada <code>.env.local</code> dengan
-            teks acak yang kuat.
-          </li>
-          <li>Restart server, lalu tekan Hubungkan WhatsApp.</li>
-          <li>
-            Pasang alamat <code>https://DOMAIN_ANDA/api/channels/fonnte?key=SECRET</code>{" "}
-            pada halaman webhook Fonnte.
-          </li>
-          <li>
-            Kirim pesan uji dari nomor lain ke WhatsApp toko. Pesanan akan muncul di
-            daftar di bawah.
-          </li>
-        </ol>
-        <p className="mt-3 text-sm text-muted-foreground">
-          Alamat harus mengarah ke /api/channels/fonnte. Alamat /webhook/... akan
-          menghasilkan 404 dan pesan tidak diproses.
-        </p>
-      </details>
     </div>
   );
 }
