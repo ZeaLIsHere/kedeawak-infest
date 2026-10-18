@@ -20,18 +20,22 @@ DeepSeek nyata untuk alur baru ini.
 
 ## Fitur yang tersedia dan pekerjaan terbuka
 
-| Halaman                   | Sudah diimplementasikan pada checkpoint                                                                 | Masih terbuka                                                                  |
-| ------------------------- | ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| Dasbor                    | Ringkasan penjualan, pengeluaran, laba, jumlah order, produk terlaris, alert stok dari basis data                 | Audit akhir dan penerimaan demo lengkap                                        |
-| Kasir                     | Produk, keranjang, stok, tunai/transfer/QRIS, kembalian, simpan penjualan, usulan pesanan teks/mikrofon | Uji DeepSeek dan mikrofon nyata                                                |
-| Stok dan Produk           | Tambah, ubah, stok awal, ambang, penyesuaian, arsip, alert, draft pembelian, tinjau produk dari asisten | Uji asisten nyata dan kartu prediksi restok                                    |
-| Laporan Keuangan          | Harian, mingguan, rincian transaksi, jenis pembayaran, dan catat pengeluaran manual                      | Audit akhir                                                                    |
-| Persetujuan               | Antrean, rincian draft, setujui/tolak, riwayat, stok, pencegahan keputusan berulang, pembelian sebagai pengeluaran                     | Penerimaan demo bersama AI nyata                                               |
-| Percakapan dengan Agen AI | Teks, riwayat, mode lokal, laporan, parser foto, tinjau bacaan, context lock, kuota                     | Uji AI/foto/mikrofon nyata dan unggah voice note S2                            |
-| Integrasi WhatsApp        | Kartu koneksi Fonnte tanpa input nomor, daftar pesanan, dan konfirmasi pesanan menjadi penjualan | Uji akun Fonnte nyata dan webhook ngrok |
-| Pengaturan                | Profil pemilik dan usaha tanpa login, persetujuan pemrosesan pesan, dan privasi | Penyesuaian penyedia dan audit akhir                                           |
+| Halaman                   | Sudah diimplementasikan pada checkpoint                                                                                                        | Masih terbuka                                       |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| Dasbor                    | Ringkasan penjualan, pengeluaran, laba, jumlah order, produk terlaris, alert stok dari basis data                                              | Audit akhir dan penerimaan demo lengkap             |
+| Kasir                     | Produk, keranjang, stok, tunai/transfer/QRIS, kembalian, simpan penjualan, usulan pesanan teks/mikrofon                                        | Uji DeepSeek dan mikrofon nyata                     |
+| Stok dan Produk           | Tambah, ubah, stok awal, ambang, penyesuaian, arsip, alert, draft pembelian, tinjau produk dari asisten                                        | Uji asisten nyata dan kartu prediksi restok         |
+| Laporan Keuangan          | Harian, mingguan, rincian transaksi, jenis pembayaran, dan catat pengeluaran manual                                                            | Audit akhir                                         |
+| Persetujuan               | Antrean, rincian draft, setujui/tolak, riwayat, stok, pencegahan keputusan berulang, pembelian sebagai pengeluaran                             | Penerimaan demo bersama AI nyata                    |
+| Percakapan dengan Agen AI | Teks, riwayat, mode lokal, laporan, parser foto, tinjau bacaan, context lock, kuota                                                            | Uji AI/foto/mikrofon nyata dan unggah voice note S2 |
+| Integrasi WhatsApp        | Kartu koneksi Fonnte tanpa input nomor, daftar pesanan, dan konfirmasi pesanan menjadi penjualan                                               | Uji akun Fonnte nyata dan webhook ngrok             |
+| Pengaturan                | Profil pemilik dan usaha tanpa login, persetujuan pemrosesan pesan, privasi, serta langganan Free dan Gold dengan pembayaran berupa konfirmasi | Penyesuaian penyedia dan audit akhir                |
 
 Sepuluh tool berada di `src/lib/tools/`; setiap pemanggilan meninggalkan audit.
+Paket Free membatasi pesanan WhatsApp menjadi 10 per hari dan menutup fitur suara
+serta foto struk di Agen AI. Paket Gold Rp19.900 berlaku 30 hari, membuka kedua
+fitur itu dan pesanan tanpa batas. Pembelian pada demo hanya meminta konfirmasi,
+dan tombol Hapus langganan di Pengaturan mengembalikan warung ke paket Free.
 Keberadaan tool prediksi belum berarti kartu prediksi tersedia pada Stok.
 Kasir menyimpan orderan, item, transaksi, dan stok secara atomik dengan harga
 yang diperiksa ulang di server serta deduplikasi. Orderan WhatsApp baru belum

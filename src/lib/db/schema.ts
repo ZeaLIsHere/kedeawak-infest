@@ -69,6 +69,9 @@ export const paymentStatusEnum = pgEnum("payment_status", [
   "tidak_cocok",
 ]);
 
+/** Tingkat langganan sebuah warung. */
+export const subscriptionTierEnum = pgEnum("subscription_tier", ["free", "gold"]);
+
 export const paymentMethodEnum = pgEnum("payment_method", ["tunai", "transfer", "qris"]);
 
 /** Jenis transaksi keuangan. */
@@ -148,6 +151,9 @@ export const businesses = pgTable("businesses", {
   channelPackage: text("channel_package"),
   channelQuota: integer("channel_quota"),
   channelCheckedAt: timestamp("channel_checked_at", { withTimezone: true }),
+  subscriptionTier: subscriptionTierEnum("subscription_tier").notNull().default("free"),
+  subscriptionStartedAt: timestamp("subscription_started_at", { withTimezone: true }),
+  subscriptionExpiresAt: timestamp("subscription_expires_at", { withTimezone: true }),
   createdAt,
   updatedAt,
 });

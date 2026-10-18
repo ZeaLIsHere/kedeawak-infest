@@ -24,7 +24,11 @@ export async function finalizeChannelReply(
   }
 
   let reply = result.reply;
-  if (result.orderId === undefined && result.paymentStatus === undefined) {
+  if (
+    !result.replyFinal &&
+    result.orderId === undefined &&
+    result.paymentStatus === undefined
+  ) {
     const aiReply = await composeCustomerReply(
       db,
       businessId,

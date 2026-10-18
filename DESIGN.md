@@ -269,6 +269,12 @@ blok warna untuk penjualan, pengeluaran, dan laba; jumlah orderan hari ini;
 produk terlaris dengan batang proporsi; serta stok menipis sebagai kartu
 peringatan. Tindakan memuat ulang ringkasan berada di kepala halaman.
 
+Halaman Pengaturan memuat kartu Langganan berisi perbandingan Free dan Gold,
+status paket aktif, pemakaian pesanan WhatsApp hari ini, dan tombol pembelian
+yang meminta konfirmasi. Tombol hapus langganan berada pada kartu terpisah
+di bawahnya. Ubin paket memakai garis hitam, bayangan keras, dan blok biru
+untuk Gold tanpa ikon.
+
 Pengembangan dihentikan pada titik yang diminta pemilik. Uji peramban dua
 ukuran layar tersedia, tetapi audit akhir aksesibilitas dan kualitas desain
 T6.2 serta T6.3 belum selesai; dokumen ini tidak mengklaim audit tersebut lulus.

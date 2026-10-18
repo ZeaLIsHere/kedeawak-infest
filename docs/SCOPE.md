@@ -25,15 +25,15 @@ Aturan induk dari user:
 Tujuh permukaan. Enam di antaranya mengacu ke bagian mockup dan fitur utama
 proposal. Yang ketujuh, Kasir, ditambahkan atas permintaan pemilik proyek.
 
-| ID  | Permukaan                 | Isi                                                                                                                                                   | Status |
-| --- | ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ------ |
-| S1  | Dasbor                    | Statistik penjualan, pengeluaran, laba, jumlah order, produk terlaris, alert stok terbaru                                                             | MASUK  |
-| S2  | Percakapan dengan Agen AI | Obrolan dengan AI untuk mencatat transaksi lewat teks, voice note, dan foto struk, termasuk konfirmasi dan persetujuan aksi                           | MASUK  |
-| S3  | Integrasi WhatsApp        | Daftar pesanan WhatsApp dan kartu koneksi Fonnte tanpa input nomor. Pesanan baru dapat dikonfirmasi untuk mencatat penjualan dan mengurangi stok     | MASUK  |
-| S4  | Laporan Keuangan          | Laporan harian dan mingguan: penjualan, pengeluaran, laba, rincian transaksi, dan catat pengeluaran manual                                          | MASUK  |
-| S5  | Stok dan Produk           | Daftar, tambah, ubah, dan arsip produk, stok, ambang minimum, alert, penyesuaian beralasan, asisten dengan dialog tinjau                              | MASUK  |
-| S6  | Persetujuan               | Antrean aksi yang menunggu persetujuan pemilik, contohnya draft PO ke supplier, dengan aksi setujui atau tolak                                        | MASUK  |
-| S7  | Kasir                     | Daftar produk yang dapat ditekan, keranjang, jenis pembayaran tunai atau transfer atau QRIS, pesanan lewat suara                                      | MASUK  |
+| ID  | Permukaan                 | Isi                                                                                                                                              | Status |
+| --- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ------ |
+| S1  | Dasbor                    | Statistik penjualan, pengeluaran, laba, jumlah order, produk terlaris, alert stok terbaru                                                        | MASUK  |
+| S2  | Percakapan dengan Agen AI | Obrolan dengan AI untuk mencatat transaksi lewat teks, voice note, dan foto struk, termasuk konfirmasi dan persetujuan aksi                      | MASUK  |
+| S3  | Integrasi WhatsApp        | Daftar pesanan WhatsApp dan kartu koneksi Fonnte tanpa input nomor. Pesanan baru dapat dikonfirmasi untuk mencatat penjualan dan mengurangi stok | MASUK  |
+| S4  | Laporan Keuangan          | Laporan harian dan mingguan: penjualan, pengeluaran, laba, rincian transaksi, dan catat pengeluaran manual                                       | MASUK  |
+| S5  | Stok dan Produk           | Daftar, tambah, ubah, dan arsip produk, stok, ambang minimum, alert, penyesuaian beralasan, asisten dengan dialog tinjau                         | MASUK  |
+| S6  | Persetujuan               | Antrean aksi yang menunggu persetujuan pemilik, contohnya draft PO ke supplier, dengan aksi setujui atau tolak                                   | MASUK  |
+| S7  | Kasir                     | Daftar produk yang dapat ditekan, keranjang, jenis pembayaran tunai atau transfer atau QRIS, pesanan lewat suara                                 | MASUK  |
 
 Catatan S7. Kasir tidak diambil dari proposal, melainkan permintaan langsung
 pemilik proyek pada 18 Oktober 2026, supaya penjualan di warung dapat dicatat
@@ -59,6 +59,23 @@ Token perangkat dan secret webhook berasal dari `.env.local`. Aplikasi tidak
 meminta nomor WhatsApp, karena nomor perangkat dibaca langsung dari Fonnte
 setelah token diverifikasi. Verifikasi akun Fonnte nyata belum diklaim sampai
 ada bukti pengujian pada akun yang dipakai demo. `docs/PRODUCT.md` tidak diubah.
+
+## 2.2 Langganan
+
+Langganan diatur di halaman Pengaturan dan terdiri dari dua tier.
+
+| Tier | Harga              | Isi                                                                                  |
+| ---- | ------------------ | ------------------------------------------------------------------------------------ |
+| Free | Rp0                | 10 pesanan WhatsApp per hari, tanpa fitur suara dan foto struk di Agen AI            |
+| Gold | Rp19.900 per bulan | Pesanan WhatsApp tanpa batas, fitur suara dan foto struk di Agen AI, berlaku 30 hari |
+
+Pembelian hanya berupa konfirmasi pada demo ini, belum memproses uang.
+Tombol hapus langganan berada pada kartu terpisah di halaman Pengaturan dan
+mengembalikan warung ke paket Free. Batas harian memakai Waktu Indonesia Barat
+dan hanya menghitung pesanan WhatsApp yang tercatat pada hari berjalan.
+Pesanan ke-11 dan seterusnya ditolak tanpa dicatat, lalu pelanggan menerima
+balasan bahwa kuota hari ini habis. Fitur suara dan foto struk dibatasi hanya
+pada halaman Agen AI, bukan pada media masuk WhatsApp.
 
 ## 3. Fitur utama proposal dan statusnya
 
@@ -174,6 +191,19 @@ AI membuat draft PO, mengirim setelah disetujui pemilik, lalu memperbarui stok.
 - **Batas:** pengiriman PO ke supplier tidak dilakukan. PO disimpan sebagai
   dokumen di dalam aplikasi.
 
+### 3.7 Langganan — MASUK (pembayaran disimulasikan)
+
+Pembatasan fitur menurut paket, diminta pemilik pada 18 Oktober 2026.
+
+- **Free:** pesanan WhatsApp dibatasi 10 per hari. Pesanan berikutnya ditolak
+  dan tidak dicatat. Fitur suara serta foto struk di Agen AI tidak tersedia.
+- **Gold:** Rp19.900 per bulan, berlaku 30 hari, membuka pesanan WhatsApp tanpa
+  batas serta fitur suara dan foto struk di Agen AI.
+- **Pembelian:** hanya konfirmasi, belum memproses pembayaran. Status dan tanggal
+  berakhir tampil di Pengaturan. Hapus langganan tersedia pada kartu terpisah.
+- **Batas:** tidak ada penagihan berulang, faktur, atau integrasi pembayaran.
+  Media masuk WhatsApp tetap diproses seperti sebelumnya tanpa dibatasi paket.
+
 ## 4. Tool layer
 
 Sepuluh tool dari proposal. Ini daftar kerja yang harus ada dan berfungsi.
@@ -230,7 +260,8 @@ Tidak dikerjakan. Tidak ada kode, halaman, endpoint, maupun tabel untuk ini.
 3. Credit scoring dan penyaluran data keuangan ke bank, koperasi, atau
    lembaga pembiayaan.
 4. Skema komisi B2B pemasok dan integrasi ke distributor.
-5. Billing, langganan, koin pintar, dan seluruh alur pembayaran.
+5. Billing produksi, penagihan otomatis, dan pembayaran uang nyata. Langganan
+   demo dengan konfirmasi dijelaskan pada bagian 2.2 dan tetap tanpa alur uang.
 6. Marketplace, rekonsiliasi bank, dan integrasi pihak ketiga lainnya.
 7. Kampanye marketing, akuisisi pengguna, dan halaman promosi.
 8. Penyusunan dokumen bisnis seperti BMC dan unit economics di dalam aplikasi.

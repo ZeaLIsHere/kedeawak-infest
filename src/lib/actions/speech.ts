@@ -1,5 +1,7 @@
 "use server";
 import { transcribeAudio } from "@/lib/ai/speech";
+import { readSubscription } from "@/lib/data/subscription";
+import { withCurrentBusiness } from "@/lib/data/server";
 
 type Result = { ok: true; text: string } | { ok: false; error: string };
 
@@ -14,6 +16,17 @@ const MAX_BYTES = 16 * 1024 * 1024;
  */
 export async function transcribeSpeechAction(form: FormData): Promise<Result> {
   try {
+    const allowed = await withCurrentBusiness(async (db, businessId) =>
+      Boolean((await readSubscription(db, businessId))?.active),
+    );
+    if (!allowed) {
+      return {
+        ok: false,
+        error:
+          "Fitur suara tersedia pada paket Gold. Buka halaman Pengaturan untuk mengaktifkannya.",
+      };
+    }
+
     const file = form.get("audio");
     if (
       typeof file !== "object" ||

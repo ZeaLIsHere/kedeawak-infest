@@ -15,6 +15,7 @@ import { createOrder, findOrderWithItems, listOrders } from "./orders";
 import { findProduct, listProducts } from "./products";
 import { createPayment, listPaymentsForOrder, recordPaymentReading } from "./payments";
 import { recordStockMovement } from "./stock";
+import { FREE_WHATSAPP_ORDER_LIMIT, readSubscription } from "./subscription";
 
 export type ChannelEvent = {
   readonly eventId: string;
@@ -38,6 +39,8 @@ export type ChannelEventResult = {
   orderId?: string;
   paymentStatus?: "menunggu" | "cocok" | "tidak_cocok";
   reply: string;
+  /** Balasan ini sudah final dan tidak boleh ditimpa balasan AI. */
+  replyFinal?: boolean;
 };
 async function prior(db: Database, businessId: string, eventId: string) {
   const [row] = await db
@@ -116,24 +119,40 @@ export async function processChannelEvent(
         reply: "Pesan pelanggan sudah tercatat",
       };
       if (itemInputs.length) {
-        const made = await createOrder(tx, businessId, {
-          customerId: incoming.customer.id,
-          conversationId: incoming.conversation.id,
-          items: itemInputs,
-        });
-        const daftarItem = itemInputs
-          .map((item) => formatNumber(item.quantity) + " " + item.name)
-          .join(", ");
-        result = {
-          ...result,
-          orderId: made.order.id,
-          reply:
-            "Pesanan diterima: " +
-            daftarItem +
-            ". Total " +
-            formatRupiah(made.order.total) +
-            ". Silakan kirim bukti pembayaran bila membayar transfer. Terima kasih.",
-        };
+        const subscription = await readSubscription(tx, businessId);
+        if (
+          subscription !== undefined &&
+          subscription.whatsappOrdersRemaining !== null &&
+          subscription.whatsappOrdersRemaining <= 0
+        ) {
+          result = {
+            ...result,
+            reply:
+              "Kuota " +
+              formatNumber(FREE_WHATSAPP_ORDER_LIMIT) +
+              " pesanan WhatsApp hari ini sudah habis. Pesanan ini tidak dicatat. Coba lagi besok atau aktifkan paket Gold di halaman Pengaturan.",
+            replyFinal: true,
+          };
+        } else {
+          const made = await createOrder(tx, businessId, {
+            customerId: incoming.customer.id,
+            conversationId: incoming.conversation.id,
+            items: itemInputs,
+          });
+          const daftarItem = itemInputs
+            .map((item) => formatNumber(item.quantity) + " " + item.name)
+            .join(", ");
+          result = {
+            ...result,
+            orderId: made.order.id,
+            reply:
+              "Pesanan diterima: " +
+              daftarItem +
+              ". Total " +
+              formatRupiah(made.order.total) +
+              ". Silakan kirim bukti pembayaran bila membayar transfer. Terima kasih.",
+          };
+        }
       } else if (event.payment) {
         const { payment } = event;
         const found = await findOrderWithItems(tx, businessId, payment.orderId);

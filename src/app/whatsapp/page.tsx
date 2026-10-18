@@ -1,30 +1,37 @@
 import { Suspense } from "react";
+import Link from "next/link";
 import { connection } from "next/server";
 
 import { CardError } from "@/components/shell/card-error";
 import { NoWarungState } from "@/components/shell/no-warung-state";
 import { PageHeader } from "@/components/shell/page-header";
 import { SectionCard } from "@/components/shell/section-card";
+import { Button } from "@/components/ui/button";
 import { ConnectionPanel } from "@/components/whatsapp/connection-panel";
 import { RefreshOrdersButton } from "@/components/whatsapp/refresh-orders-button";
 import { WhatsAppOrderList, type WhatsAppOrder } from "@/components/whatsapp/order-list";
 import { findBusiness } from "@/lib/data/business";
 import { getChannelOverview } from "@/lib/data/channel-intake";
 import { withCurrentBusiness } from "@/lib/data/server";
+import { readSubscription } from "@/lib/data/subscription";
+import { formatDate } from "@/lib/format/date";
+import { formatNumber } from "@/lib/format/number";
 
 async function OrderContent() {
   await connection();
 
   const data = await withCurrentBusiness(async (db, businessId) => {
-    const [business, overview] = await Promise.all([
+    const [business, overview, subscription] = await Promise.all([
       findBusiness(db, businessId),
       getChannelOverview(db, businessId),
+      readSubscription(db, businessId),
     ]);
 
-    return { business, overview };
+    return { business, overview, subscription };
   });
 
-  if (!data?.business) return <NoWarungState />;
+  if (!data?.business || !data.subscription) return <NoWarungState />;
+  const subscription = data.subscription;
 
   const orders: WhatsAppOrder[] = data.overview.orders.map((order) => ({
     id: order.id,
@@ -62,6 +69,36 @@ async function OrderContent() {
           }}
         />
       </SectionCard>
+
+      <div className="rounded-md border-2 border-border bg-card p-4 shadow-control">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-body font-bold">
+              {subscription.active ? "Paket Gold aktif" : "Paket Free"}
+            </p>
+            <p className="text-body font-medium text-muted-foreground">
+              {subscription.active
+                ? `Pesanan WhatsApp tanpa batas. Berlaku sampai ${
+                    subscription.expiresAt
+                      ? formatDate(subscription.expiresAt)
+                      : "30 hari"
+                  }.`
+                : `Pesanan WhatsApp hari ini ${formatNumber(
+                    subscription.whatsappOrdersToday,
+                  )} dari ${formatNumber(
+                    subscription.whatsappOrderLimit ?? 0,
+                  )}. Sisa ${formatNumber(
+                    subscription.whatsappOrdersRemaining ?? 0,
+                  )} pesanan.`}
+            </p>
+          </div>
+          {subscription.active ? null : (
+            <Button asChild variant="outline" className="min-h-11">
+              <Link href="/pengaturan">Aktifkan Gold</Link>
+            </Button>
+          )}
+        </div>
+      </div>
 
       <div className="flex justify-end">
         <RefreshOrdersButton />

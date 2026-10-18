@@ -2,6 +2,8 @@ import { Suspense } from "react";
 import { connection } from "next/server";
 
 import { ProfileForm } from "@/components/settings/profile-form";
+import { SubscriptionPanel } from "@/components/settings/subscription-panel";
+import { RemoveSubscriptionButton } from "@/components/settings/subscription-actions";
 import { CardError } from "@/components/shell/card-error";
 import { NoWarungState } from "@/components/shell/no-warung-state";
 import { PageHeader } from "@/components/shell/page-header";
@@ -9,13 +11,22 @@ import { SectionCard } from "@/components/shell/section-card";
 import { Skeleton } from "@/components/shell/skeleton";
 import { findBusiness } from "@/lib/data/business";
 import { withCurrentBusiness } from "@/lib/data/server";
+import { readSubscription } from "@/lib/data/subscription";
 
 async function PengaturanContent() {
   await connection();
 
-  const business = await withCurrentBusiness((db, id) => findBusiness(db, id));
+  const data = await withCurrentBusiness(async (db, id) => {
+    const [business, subscription] = await Promise.all([
+      findBusiness(db, id),
+      readSubscription(db, id),
+    ]);
 
-  if (!business) return <NoWarungState />;
+    return { business, subscription };
+  });
+
+  if (!data?.business || !data.subscription) return <NoWarungState />;
+  const { business, subscription } = data;
 
   return (
     <div className="mx-auto flex w-full max-w-content flex-col gap-section p-page">
@@ -36,6 +47,28 @@ async function PengaturanContent() {
           }}
         />
       </SectionCard>
+
+      <SectionCard
+        title="Langganan"
+        description="Bandingkan paket Free dan Gold untuk warung Anda."
+      >
+        <SubscriptionPanel status={subscription} />
+      </SectionCard>
+
+      {subscription.active && (
+        <SectionCard
+          title="Hapus langganan"
+          description="Kembalikan warung ke paket Free kapan saja."
+        >
+          <div className="flex flex-col gap-3">
+            <p className="text-body font-medium text-muted-foreground">
+              Setelah dihapus, pesanan WhatsApp dibatasi 10 per hari dan fitur suara serta
+              foto struk ditutup.
+            </p>
+            <RemoveSubscriptionButton />
+          </div>
+        </SectionCard>
+      )}
 
       <SectionCard title="Persetujuan pemrosesan pesan">
         <div className="space-y-3 text-sm text-muted-foreground">

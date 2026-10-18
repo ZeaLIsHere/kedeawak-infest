@@ -17,10 +17,12 @@ export type ConversationMessage = {
 export function ConversationPanel({
   initialMessages,
   available,
+  goldFeatures,
   initialReceipt,
 }: {
   initialMessages: ConversationMessage[];
   available: boolean;
+  goldFeatures: boolean;
   initialReceipt?: Receipt;
 }) {
   const [messages, setMessages] = useState(initialMessages);
@@ -205,8 +207,9 @@ export function ConversationPanel({
           aria-describedby="agentHint"
         />
         <p id="agentHint" className="text-xs font-medium text-muted-foreground">
-          Contoh: laporan hari ini atau cek stok beras. Foto struk disimpan sebagai
-          pengeluaran setelah Anda menyetujuinya.
+          {goldFeatures
+            ? "Contoh: laporan hari ini atau cek stok beras. Foto struk disimpan sebagai pengeluaran setelah Anda menyetujuinya."
+            : "Contoh: laporan hari ini atau cek stok beras."}
         </p>
         {image && (
           <div className="flex items-center justify-between gap-2 rounded-md border-2 border-border bg-muted p-3 text-sm">
@@ -227,30 +230,40 @@ export function ConversationPanel({
           </div>
         )}
         <div className="flex flex-wrap items-start justify-between gap-3">
-          <div className="flex flex-wrap gap-2">
-            <SpeechInput onTranscript={setText} disabled={pending || !!receipt} />
-            <div>
-              <input
-                ref={file}
-                id="receipt-photo"
-                type="file"
-                accept="image/png,image/jpeg,image/webp,image/gif"
-                className="sr-only"
-                disabled={pending || !!receipt}
-                onChange={(e) => void selectFile(e.target.files?.[0])}
-              />
-              <Button
-                type="button"
-                variant="outline"
-                className="min-h-11"
-                disabled={pending || !!receipt}
-                onClick={() => file.current?.click()}
-              >
-                <ImagePlus aria-hidden="true" />
-                Pilih foto struk
-              </Button>
+          {goldFeatures ? (
+            <div className="flex flex-wrap gap-2">
+              <SpeechInput onTranscript={setText} disabled={pending || !!receipt} />
+              <div>
+                <input
+                  ref={file}
+                  id="receipt-photo"
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp,image/gif"
+                  className="sr-only"
+                  disabled={pending || !!receipt}
+                  onChange={(e) => void selectFile(e.target.files?.[0])}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="min-h-11"
+                  disabled={pending || !!receipt}
+                  onClick={() => file.current?.click()}
+                >
+                  <ImagePlus aria-hidden="true" />
+                  Pilih foto struk
+                </Button>
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="max-w-md rounded-md border-2 border-border bg-warning-surface p-3 text-sm font-medium">
+              Fitur suara dan foto struk tersedia pada paket Gold.{" "}
+              <Link className="font-bold underline underline-offset-4" href="/pengaturan">
+                Buka Pengaturan
+              </Link>
+              .
+            </div>
+          )}
           <Button
             type="submit"
             className="min-h-11"

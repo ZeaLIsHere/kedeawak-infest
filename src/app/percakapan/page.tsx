@@ -8,15 +8,17 @@ import { getOwnerConversation } from "@/lib/data/agent-context";
 import { findLatestSession } from "@/lib/data/agent-sessions";
 import { listMessages } from "@/lib/data/conversations";
 import { withCurrentBusiness } from "@/lib/data/server";
+import { readSubscription } from "@/lib/data/subscription";
 
 async function Conversation() {
   await connection();
 
   const data = await withCurrentBusiness(async (db, id) => {
     const conversation = await getOwnerConversation(db, id);
-    const [messages, session] = await Promise.all([
+    const [messages, session, subscription] = await Promise.all([
       listMessages(db, id, conversation.id),
       findLatestSession(db, id, conversation.id),
+      readSubscription(db, id),
     ]);
 
     return {
@@ -27,6 +29,7 @@ async function Conversation() {
         createdAt: message.createdAt.toISOString(),
       })),
       context: session?.context,
+      goldFeatures: subscription?.active ?? false,
     };
   });
 
@@ -47,6 +50,7 @@ async function Conversation() {
     <ConversationPanel
       initialMessages={data.messages}
       available={Boolean(process.env.DEEPSEEK_API_KEY?.trim())}
+      goldFeatures={data.goldFeatures}
       initialReceipt={context.pendingReceipt}
     />
   );

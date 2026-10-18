@@ -41,9 +41,9 @@ diperbarui 18 Oktober 2026.
 | 2    | Basis data dan lapisan data         | 8       | 8     |
 | 3    | Tool layer                          | 12      | 12    |
 | 4    | Lapisan AI dan context lock         | 5       | 10    |
-| 5    | Permukaan aplikasi                  | 40      | 53    |
+| 5    | Permukaan aplikasi                  | 45      | 58    |
 | 6    | Pematangan dan bukti                | 2       | 7     |
-|      | Jumlah                              | 87      | 110   |
+|      | Jumlah                              | 92      | 115   |
 
 Checkpoint penghentian sebelumnya dipertahankan sebagai riwayat di bawah.
 Pekerjaan kanal dibuka kembali sesuai persetujuan Twilio Sandbox. T5.13 dan
@@ -398,6 +398,19 @@ Tambah, ubah, arsip, dan asisten produk dilacak pada T5.41 sampai T5.44.
 | T5.39 | Ringkasan uang masuk per jenis pembayaran dan rincian transaksi         | `[x]`  |
 | T5.40 | Uji Kasir sampai stok dan laporan berubah pada dua lebar layar          | `[x]`  |
 
+### S8 Langganan
+
+Langganan berada di halaman Pengaturan, bukan tujuan navigasi baru. Pembayaran
+disimulasikan dengan konfirmasi. Permintaan pemilik 18 Oktober 2026.
+
+| ID    | Tugas                                                                                                          | Status |
+| ----- | -------------------------------------------------------------------------------------------------------------- | ------ |
+| T5.52 | Skema kolom langganan pada warung beserta migrasi                                                              | `[x]`  |
+| T5.53 | Lapisan data langganan, masa berlaku 30 hari, dan batas 10 pesanan harian                                      | `[x]`  |
+| T5.54 | Perbandingan Free dan Gold di Pengaturan, pembelian dengan konfirmasi, dan hapus langganan pada kartu terpisah | `[x]`  |
+| T5.55 | Penolakan pesanan ke-11 dan pembatasan suara serta foto struk pada paket Free di Agen AI                       | `[x]`  |
+| T5.56 | Uji lapisan data, kuota pesanan, dan alur beli serta hapus langganan                                           | `[x]`  |
+
 ### Kelengkapan kelola produk dan alur persetujuan
 
 | ID    | Tugas                                                                    | Status |
@@ -457,7 +470,9 @@ bagian 7 lulus otomatis, dan semua dokumen sesuai kenyataan.
 | Human in the loop                               | T3.6, T4.7, T5.29                       |
 | Sepuluh tool                                    | T3.1 sampai T3.12                       |
 | Tiga butir privasi                              | T2.4, T5.11, T5.12, T5.17, T5.31, T5.32 |
-| Dashboard clean, minimalis, rata                | T1.3, T1.4, T6.3                        |
+| Langganan Free dan Gold dengan pembayaran demo  | T5.52 sampai T5.56                      |
+| Tema neo-brutalism biru                         | T1.3, T1.4, T6.3                        |
+| Langganan Free dan Gold dengan pembayaran demo  | T5.52 sampai T5.56                      |
 | Aturan user: tanpa emoji dan tanpa tanda hubung | T1.6, T6.3                              |
 
 ---
