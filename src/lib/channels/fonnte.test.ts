@@ -69,6 +69,9 @@ describe("pengiriman balasan Fonnte", () => {
           expect(url).toBe("https://api.fonnte.com/send");
           expect(init?.method).toBe("POST");
           expect(new Headers(init?.headers).get("Authorization")).toBe("rahasia");
+          expect(new Headers(init?.headers).get("Content-Type")).toBe(
+            "application/x-www-form-urlencoded",
+          );
           expect(init?.redirect).toBe("error");
           expect([...new URLSearchParams(String(init?.body)).entries()]).toEqual([
             ["target", "6281200000001"],

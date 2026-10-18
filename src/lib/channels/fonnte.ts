@@ -180,8 +180,11 @@ export async function sendFonnteReply(
     }
     const response = await fetcher("https://api.fonnte.com/send", {
       method: "POST",
-      headers: { Authorization: token },
-      body: body.toString(),
+      headers: {
+        Authorization: token,
+        "Content-Type": "application/x-www-form-urlencoded", // lint-ui-ignore: nama MIME resmi, bukan teks antarmuka
+      },
+      body,
       redirect: "error",
       signal: AbortSignal.timeout(20_000),
     });
