@@ -93,11 +93,24 @@ function describeFonnteError(error: unknown): string {
   return error instanceof Error ? error.message : "Kesalahan tidak dikenal";
 }
 
+function logInfo(...values: unknown[]): void {
+  if (process.env.NODE_ENV !== "test") console.info(...values);
+}
+
 async function processMessage(message: FonnteInbound, token: string): Promise<void> {
+  logInfo("Pesan Fonnte diterima", message.eventId, message.kind ?? "text");
+
   try {
     const result = await withCurrentBusiness(async (db, businessId) => {
       const outcome = await receiveFonnteMessage(db, businessId, message);
-      if (!outcome.duplicate) {
+      if (outcome.duplicate) {
+        logInfo("Pesan Fonnte duplikat", message.eventId);
+      } else {
+        logInfo(
+          "Pesan Fonnte diproses",
+          message.eventId,
+          outcome.orderId ?? "tanpa order",
+        );
         const reply = safeChannelText(outcome.reply) || "Pesan sudah diterima.";
         try {
           await sendFonnteReply(
@@ -116,6 +129,7 @@ async function processMessage(message: FonnteInbound, token: string): Promise<vo
           );
           await sendFonnteReply(token, message.phoneNumber, reply, fetch);
         }
+        logInfo("Balasan Fonnte terkirim", message.eventId);
       }
       return outcome;
     });
@@ -154,7 +168,10 @@ export async function POST(request: Request): Promise<Response> {
   } catch {
     message = undefined;
   }
-  if (message === "ignore") return Response.json({ ok: true, ignored: true });
+  if (message === "ignore") {
+    logInfo("Pesan grup Fonnte diabaikan");
+    return Response.json({ ok: true, ignored: true });
+  }
   if (message === undefined) {
     return Response.json({ error: "Pesan belum sesuai" }, { status: 400 });
   }
