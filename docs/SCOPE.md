@@ -114,7 +114,10 @@ Keputusan user: Fonnte menjadi kanal WhatsApp utama untuk demo.
   selesai. Pesanan berstatus baru juga memiliki tombol Batalkan pesanan dengan
   konfirmasi. Pesanan yang dibatalkan tetap tampil dengan status Dibatalkan,
   tanpa mengubah stok atau pendapatan. Pesanan yang sudah dikonfirmasi tidak
-  dapat dibatalkan.
+  dapat dibatalkan. Pesan yang diketik ulang persis sama dalam sepuluh menit
+  dengan item yang sama tidak dicatat sebagai pesanan kedua. Pelanggan diberi
+  tahu bahwa pesanan sudah tercatat dan diminta menulis kata tambah bila memang
+  ingin menambah jumlah.
   Balasan agen tidak ditampilkan di S3, dan tidak ada halaman obrolan
   pelanggan. Muat ulang halaman dilakukan manual setelah pemrosesan latar
   selesai.

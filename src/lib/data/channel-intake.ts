@@ -11,7 +11,12 @@ import {
   findCustomer,
   findCustomerByPhone,
 } from "./customers";
-import { createOrder, findOrderWithItems, listOrders } from "./orders";
+import {
+  createOrder,
+  findOrderWithItems,
+  findRecentMatchingOrder,
+  listOrders,
+} from "./orders";
 import { findProduct, listProducts } from "./products";
 import { createPayment, listPaymentsForOrder, recordPaymentReading } from "./payments";
 import { recordStockMovement } from "./stock";
@@ -42,6 +47,22 @@ export type ChannelEventResult = {
   /** Balasan ini sudah final dan tidak boleh ditimpa balasan AI. */
   replyFinal?: boolean;
 };
+
+/* Pesan dengan kata ini dianggap permintaan menambah, bukan kiriman ulang. */
+const ADD_TO_ORDER_PATTERN = /\b(tambah|tambahkan|tambahan|lagi)\b/iu;
+
+/** Menyeragamkan isi pesan sebelum dibandingkan. */
+function normalizeOrderMessage(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, " ")
+    .trim();
+}
+
+/** Daftar item untuk balasan singkat. */
+function describeItems(items: readonly { name: string; quantity: number }[]): string {
+  return items.map((item) => formatNumber(item.quantity) + " " + item.name).join(", ");
+}
 async function prior(db: Database, businessId: string, eventId: string) {
   const [row] = await db
     .select()
@@ -119,39 +140,76 @@ export async function processChannelEvent(
         reply: "Pesan pelanggan sudah tercatat",
       };
       if (itemInputs.length) {
-        const subscription = await readSubscription(tx, businessId);
-        if (
-          subscription !== undefined &&
-          subscription.whatsappOrdersRemaining !== null &&
-          subscription.whatsappOrdersRemaining <= 0
-        ) {
+        const daftarItem = describeItems(itemInputs);
+        const history = await listMessages(tx, businessId, incoming.conversation.id);
+        const previous = history
+          .filter(
+            (message) =>
+              message.sender === "customer" && message.id !== incoming.message.id,
+          )
+          .at(-1);
+        /*
+         * Pesan yang diketik ulang persis sama dalam waktu dekat dianggap
+         * kiriman ulang, bukan pesanan kedua. Kata tambah tetap dicatat sebagai
+         * pesanan baru supaya pelanggan dapat memesan jumlah tambahan.
+         */
+        const repeated =
+          previous?.body !== null &&
+          previous?.body !== undefined &&
+          normalizeOrderMessage(previous.body) === normalizeOrderMessage(event.body) &&
+          !ADD_TO_ORDER_PATTERN.test(event.body)
+            ? await findRecentMatchingOrder(
+                tx,
+                businessId,
+                incoming.customer.id,
+                itemInputs,
+              )
+            : undefined;
+
+        if (repeated !== undefined) {
           result = {
             ...result,
+            orderId: repeated.id,
             reply:
-              "Kuota " +
-              formatNumber(FREE_WHATSAPP_ORDER_LIMIT) +
-              " pesanan WhatsApp hari ini sudah habis. Pesanan ini tidak dicatat. Coba lagi besok atau aktifkan paket Gold di halaman Pengaturan.",
+              "Pesanan " +
+              daftarItem +
+              " sudah tercatat sebelumnya. Jika memang ingin menambah jumlah, balas dengan kata tambah, misalnya: tambah " +
+              daftarItem +
+              ".",
             replyFinal: true,
           };
         } else {
-          const made = await createOrder(tx, businessId, {
-            customerId: incoming.customer.id,
-            conversationId: incoming.conversation.id,
-            items: itemInputs,
-          });
-          const daftarItem = itemInputs
-            .map((item) => formatNumber(item.quantity) + " " + item.name)
-            .join(", ");
-          result = {
-            ...result,
-            orderId: made.order.id,
-            reply:
-              "Pesanan diterima: " +
-              daftarItem +
-              ". Total " +
-              formatRupiah(made.order.total) +
-              ". Silakan kirim bukti pembayaran bila membayar transfer. Terima kasih.",
-          };
+          const subscription = await readSubscription(tx, businessId);
+          if (
+            subscription !== undefined &&
+            subscription.whatsappOrdersRemaining !== null &&
+            subscription.whatsappOrdersRemaining <= 0
+          ) {
+            result = {
+              ...result,
+              reply:
+                "Kuota " +
+                formatNumber(FREE_WHATSAPP_ORDER_LIMIT) +
+                " pesanan WhatsApp hari ini sudah habis. Pesanan ini tidak dicatat. Coba lagi besok atau aktifkan paket Gold di halaman Pengaturan.",
+              replyFinal: true,
+            };
+          } else {
+            const made = await createOrder(tx, businessId, {
+              customerId: incoming.customer.id,
+              conversationId: incoming.conversation.id,
+              items: itemInputs,
+            });
+            result = {
+              ...result,
+              orderId: made.order.id,
+              reply:
+                "Pesanan diterima: " +
+                daftarItem +
+                ". Total " +
+                formatRupiah(made.order.total) +
+                ". Silakan kirim bukti pembayaran bila membayar transfer. Terima kasih.",
+            };
+          }
         }
       } else if (event.payment) {
         const { payment } = event;

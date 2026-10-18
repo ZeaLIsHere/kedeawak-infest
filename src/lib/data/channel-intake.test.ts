@@ -1,10 +1,12 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { eq } from "drizzle-orm";
 import { createTestDatabase, createSecondBusiness, type TestDatabase } from "../db/testing";
+import { orders } from "../db/schema";
 import { createProduct, findProduct } from "./products";
 import { recordStockMovement } from "./stock";
 import { listOrders, findOrder } from "./orders";
 import { listTransactions } from "./transactions";
-import { listCustomers } from "./customers";
+import { findCustomerByPhone, listCustomers } from "./customers";
 import { processChannelEvent, getChannelOverview } from "./channel-intake";
 
 describe("alur pesan pelanggan", () => {
@@ -52,5 +54,31 @@ describe("alur pesan pelanggan", () => {
  it("menolak bukti milik pelanggan lain",async()=>{
   const order=(await listOrders(test.db,test.business.id))[0]!;
   await expect(processChannelEvent(test.db,test.business.id,{eventId:"payasing",phoneNumber:"081200000009",body:"Bukti asing",payment:{orderId:order.id,readAmount:15000,confidence:1}})).rejects.toThrow();
+ });
+ it("tidak mencatat pesanan kedua saat pesan yang sama dikirim ulang",async()=>{
+  const phone="081200000021";
+  const first=await processChannelEvent(test.db,test.business.id,{eventId:"ulang1",phoneNumber:phone,body:"Pesan satu beras",items:[{productId,quantity:1}]});
+  const repeat=await processChannelEvent(test.db,test.business.id,{eventId:"ulang2",phoneNumber:phone,body:"Pesan satu beras",items:[{productId,quantity:1}]});
+  expect(repeat.orderId).toBe(first.orderId);
+  expect(repeat.reply).toContain("sudah tercatat");
+  expect(repeat.replyFinal).toBe(true);
+  const customer=await findCustomerByPhone(test.db,test.business.id,phone);
+  const own=(await listOrders(test.db,test.business.id)).filter((order)=>order.customerId===customer?.id);
+  expect(own).toHaveLength(1);
+ });
+ it("mencatat pesanan baru saat pelanggan meminta tambah",async()=>{
+  const phone="081200000022";
+  const first=await processChannelEvent(test.db,test.business.id,{eventId:"tambah1",phoneNumber:phone,body:"Pesan satu beras",items:[{productId,quantity:1}]});
+  const second=await processChannelEvent(test.db,test.business.id,{eventId:"tambah2",phoneNumber:phone,body:"Tambah satu beras",items:[{productId,quantity:1}]});
+  expect(second.orderId).toBeDefined();
+  expect(second.orderId).not.toBe(first.orderId);
+ });
+ it("mencatat pesanan baru setelah jeda lebih dari sepuluh menit",async()=>{
+  const phone="081200000023";
+  const first=await processChannelEvent(test.db,test.business.id,{eventId:"jeda1",phoneNumber:phone,body:"Pesan satu beras",items:[{productId,quantity:1}]});
+  await test.db.update(orders).set({createdAt:new Date(Date.now()-11*60*1000)}).where(eq(orders.id,first.orderId!));
+  const second=await processChannelEvent(test.db,test.business.id,{eventId:"jeda2",phoneNumber:phone,body:"Pesan satu beras",items:[{productId,quantity:1}]});
+  expect(second.orderId).toBeDefined();
+  expect(second.orderId).not.toBe(first.orderId);
  });
 });

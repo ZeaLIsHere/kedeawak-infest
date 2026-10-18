@@ -41,9 +41,9 @@ diperbarui 18 Oktober 2026.
 | 2    | Basis data dan lapisan data         | 8       | 8     |
 | 3    | Tool layer                          | 12      | 12    |
 | 4    | Lapisan AI dan context lock         | 5       | 10    |
-| 5    | Permukaan aplikasi                  | 46      | 59    |
+| 5    | Permukaan aplikasi                  | 47      | 60    |
 | 6    | Pematangan dan bukti                | 2       | 7     |
-|      | Jumlah                              | 93      | 116   |
+|      | Jumlah                              | 94      | 117   |
 
 Checkpoint penghentian sebelumnya dipertahankan sebagai riwayat di bawah.
 Pekerjaan kanal dibuka kembali sesuai persetujuan Twilio Sandbox. T5.13 dan
@@ -344,6 +344,7 @@ diuji.
 | T5.50 | Pengeluaran agen dan pembelian stok masuk ke ringkasan dashboard                                     | `[x]`  |
 | T5.51 | Uji konfirmasi pesanan dan konsistensi ringkasan dashboard                                           | `[x]`  |
 | T5.57 | Batalkan pesanan baru tanpa mengubah stok dan pendapatan                                             | `[x]`  |
+| T5.58 | Deteksi pesan pesanan yang dikirim ulang agar tidak menjadi pesanan ganda                            | `[x]`  |
 
 Catatan terkini: Fonnte menggantikan Twilio Sandbox berdasarkan keputusan
 user. Permukaan WhatsApp menampilkan daftar pesanan dari pesan masuk di atas

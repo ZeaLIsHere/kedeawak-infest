@@ -186,6 +186,78 @@ export async function findOrderWithItems(
   return { order, items };
 }
 
+/**
+ * Jarak waktu pesanan dengan isi yang sama dianggap kiriman ulang.
+ *
+ * Pesan pelanggan yang persis sama dalam rentang ini tidak dicatat sebagai
+ * pesanan kedua, karena kemungkinan besar hanya terkirim dua kali. Setelah
+ * rentang lewat, pesanan baru dicatat seperti biasa.
+ */
+export const REPEAT_ORDER_WINDOW_MS = 10 * 60 * 1000;
+
+/** Barang yang dibandingkan saat mencari pesanan yang mungkin terkirim ulang. */
+export type RepeatedOrderItem = {
+  readonly productId: string;
+  readonly quantity: number;
+};
+
+/**
+ * Mencari pesanan berstatus baru yang itemnya sama dalam rentang waktu tertentu.
+ *
+ * Pencarian dibatasi pada pelanggan yang sama dan status `baru`, supaya pesanan
+ * yang sudah dikonfirmasi tidak menghalangi pesanan berikutnya.
+ */
+export async function findRecentMatchingOrder(
+  db: Database,
+  businessId: string,
+  customerId: string,
+  items: readonly RepeatedOrderItem[],
+  options: { readonly now?: Date; readonly windowMs?: number } = {},
+): Promise<Order | undefined> {
+  if (items.length === 0) {
+    return undefined;
+  }
+
+  const now = options.now ?? new Date();
+  const windowMs = options.windowMs ?? REPEAT_ORDER_WINDOW_MS;
+  const [candidate] = await db
+    .select()
+    .from(orders)
+    .where(
+      and(
+        eq(orders.businessId, businessId),
+        eq(orders.customerId, customerId),
+        eq(orders.status, "baru"),
+        gte(orders.createdAt, new Date(now.getTime() - windowMs)),
+      ),
+    )
+    .orderBy(desc(orders.createdAt))
+    .limit(1);
+
+  if (candidate === undefined) {
+    return undefined;
+  }
+
+  const existing = await db
+    .select()
+    .from(orderItems)
+    .where(
+      and(eq(orderItems.businessId, businessId), eq(orderItems.orderId, candidate.id)),
+    );
+
+  if (existing.length !== items.length) {
+    return undefined;
+  }
+
+  const quantities = new Map(
+    existing.map((item) => [item.productId, item.quantity] as const),
+  );
+
+  return items.every((item) => quantities.get(item.productId) === item.quantity)
+    ? candidate
+    : undefined;
+}
+
 /** Mengambil rincian item beberapa orderan sekaligus. */
 export async function listItemsForOrders(
   db: Database,
