@@ -41,9 +41,9 @@ diperbarui 18 Oktober 2026.
 | 2    | Basis data dan lapisan data         | 8       | 8     |
 | 3    | Tool layer                          | 12      | 12    |
 | 4    | Lapisan AI dan context lock         | 5       | 10    |
-| 5    | Permukaan aplikasi                  | 48      | 61    |
+| 5    | Permukaan aplikasi                  | 49      | 62    |
 | 6    | Pematangan dan bukti                | 2       | 7     |
-|      | Jumlah                              | 95      | 118   |
+|      | Jumlah                              | 96      | 119   |
 
 Checkpoint penghentian sebelumnya dipertahankan sebagai riwayat di bawah.
 Pekerjaan kanal dibuka kembali sesuai persetujuan Twilio Sandbox. T5.13 dan
@@ -356,14 +356,15 @@ bagian 11.
 
 ### S4 Laporan Keuangan
 
-| ID    | Tugas                                      | Status |
-| ----- | ------------------------------------------ | ------ |
-| T5.18 | Laporan harian                             | `[x]`  |
-| T5.19 | Laporan mingguan                           | `[x]`  |
-| T5.20 | Rincian transaksi per periode              | `[x]`  |
-| T5.21 | Pemisahan penjualan, pengeluaran, dan laba | `[x]`  |
-| T5.47 | Form catat pengeluaran manual di Laporan   | `[x]`  |
-| T5.48 | Uji pengeluaran manual tampil di laporan   | `[x]`  |
+| ID    | Tugas                                        | Status |
+| ----- | -------------------------------------------- | ------ |
+| T5.18 | Laporan harian                               | `[x]`  |
+| T5.19 | Laporan mingguan                             | `[x]`  |
+| T5.20 | Rincian transaksi per periode                | `[x]`  |
+| T5.60 | Buka rincian item dan total setiap transaksi | `[x]`  |
+| T5.21 | Pemisahan penjualan, pengeluaran, dan laba   | `[x]`  |
+| T5.47 | Form catat pengeluaran manual di Laporan     | `[x]`  |
+| T5.48 | Uji pengeluaran manual tampil di laporan     | `[x]`  |
 
 ### S5 Stok dan Produk
 

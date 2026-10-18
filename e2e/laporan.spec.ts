@@ -12,4 +12,10 @@ test("pengeluaran manual tersimpan dan tampil di laporan", async ({ page }) => {
 
   await page.reload();
   await expect(page.getByText(description)).toBeVisible();
+
+  await page.getByRole("button").filter({ hasText: description }).click();
+  const dialog = page.getByRole("dialog");
+  await expect(dialog.getByRole("heading", { name: "Rincian transaksi" })).toBeVisible();
+  await expect(dialog.getByText(/tidak memiliki rincian item/u)).toBeVisible();
+  await expect(dialog.getByText("Total transaksi")).toBeVisible();
 });

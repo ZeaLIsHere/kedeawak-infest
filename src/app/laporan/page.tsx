@@ -30,7 +30,7 @@ import {
 } from "@/lib/data/period";
 import { summarizePayments, summarizeDay, summarizeWeek } from "@/lib/data/reports";
 import { withCurrentBusiness } from "@/lib/data/server";
-import { listTransactions } from "@/lib/data/transactions";
+import { listTransactionsWithItems } from "@/lib/data/transactions";
 import { formatDateRange, formatDateWithDay } from "@/lib/format/date";
 
 const JUDUL_RINGKASAN = "Ringkasan periode";
@@ -114,7 +114,7 @@ async function LaporanContent({
       mode === "harian"
         ? await summarizeDay(db, businessId, anchor)
         : await summarizeWeek(db, businessId, anchor);
-    const transactions = await listTransactions(db, businessId, period);
+    const transactions = await listTransactionsWithItems(db, businessId, period);
 
     const payments = await summarizePayments(db, businessId, period);
     return { summary, transactions, payments };

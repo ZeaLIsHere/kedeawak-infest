@@ -1,7 +1,7 @@
-import { and, desc, eq, gte, lt } from "drizzle-orm";
+import { and, desc, eq, gte, inArray, lt } from "drizzle-orm";
 
 import type { Database } from "../db/client";
-import { transactions, type Transaction } from "../db/schema";
+import { orderItems, products, transactions, type Transaction } from "../db/schema";
 import { isUuid } from "./ids";
 import { assertCustomerOwned } from "./ownership";
 
@@ -92,6 +92,83 @@ export async function listTransactions(
     .from(transactions)
     .where(and(...conditions))
     .orderBy(desc(transactions.occurredAt));
+}
+
+/** Satu item yang tersimpan pada orderan asal transaksi penjualan. */
+export type TransactionItemDetail = {
+  readonly productId: string;
+  readonly name: string;
+  readonly unit: string;
+  readonly quantity: number;
+  readonly unitPrice: number;
+};
+
+/** Transaksi beserta item yang dapat ditampilkan pada rincian. */
+export type TransactionWithItems = Transaction & {
+  readonly items: readonly TransactionItemDetail[];
+};
+
+/**
+ * Daftar transaksi beserta rincian itemnya.
+ *
+ * Hanya penjualan yang berasal dari orderan yang memiliki item. Pengeluaran,
+ * hutang, dan transaksi lama tanpa orderan tetap dikembalikan dengan daftar
+ * item kosong supaya semua transaksi dapat dibuka tanpa mengarang isi.
+ */
+export async function listTransactionsWithItems(
+  db: Database,
+  businessId: string,
+  filter: TransactionFilter = {},
+): Promise<TransactionWithItems[]> {
+  const rows = await listTransactions(db, businessId, filter);
+  const orderIds = [
+    ...new Set(
+      rows.flatMap((transaction) =>
+        transaction.orderId === null ? [] : [transaction.orderId],
+      ),
+    ),
+  ];
+
+  const itemsByOrder = new Map<string, TransactionItemDetail[]>();
+
+  if (orderIds.length > 0) {
+    const itemRows = await db
+      .select({
+        orderId: orderItems.orderId,
+        productId: orderItems.productId,
+        name: products.name,
+        unit: products.unit,
+        quantity: orderItems.quantity,
+        unitPrice: orderItems.unitPrice,
+      })
+      .from(orderItems)
+      .innerJoin(
+        products,
+        and(eq(products.id, orderItems.productId), eq(products.businessId, businessId)),
+      )
+      .where(
+        and(eq(orderItems.businessId, businessId), inArray(orderItems.orderId, orderIds)),
+      )
+      .orderBy(products.name);
+
+    for (const item of itemRows) {
+      const items = itemsByOrder.get(item.orderId) ?? [];
+      items.push({
+        productId: item.productId,
+        name: item.name,
+        unit: item.unit,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+      });
+      itemsByOrder.set(item.orderId, items);
+    }
+  }
+
+  return rows.map((transaction) => ({
+    ...transaction,
+    items:
+      transaction.orderId === null ? [] : (itemsByOrder.get(transaction.orderId) ?? []),
+  }));
 }
 
 /** Mengambil satu transaksi. */

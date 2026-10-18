@@ -7,8 +7,16 @@ import {
 } from "../db/testing";
 import { createCustomer } from "./customers";
 import { endOfDay, startOfDay } from "./period";
+import { createProduct } from "./products";
 import { summarizePeriod } from "./reports";
-import { createTransaction, findTransaction, listTransactions } from "./transactions";
+import { createSale } from "./sales";
+import { recordStockMovement } from "./stock";
+import {
+  createTransaction,
+  findTransaction,
+  listTransactions,
+  listTransactionsWithItems,
+} from "./transactions";
 
 let test: TestDatabase;
 let otherBusinessId: string;
@@ -192,5 +200,43 @@ describe("data transaksi", () => {
 
     expect(sales).toBe(summary.sales);
     expect(list).toHaveLength(summary.transactionCount);
+  });
+
+  it("menyertakan rincian item pada transaksi penjualan", async () => {
+    const product = await createProduct(test.db, test.business.id, {
+      name: "Kopi Uji",
+      unit: "sachet",
+      salePrice: 2500,
+      purchasePrice: 2000,
+      minimumStock: 0,
+    });
+    await recordStockMovement(test.db, test.business.id, {
+      productId: product.id,
+      kind: "masuk",
+      quantityChange: 10,
+      reason: "Stok awal uji",
+    });
+    await createSale(test.db, test.business.id, {
+      items: [{ productId: product.id, quantity: 3 }],
+      method: "tunai",
+      cashReceived: 10000,
+    });
+
+    const list = await listTransactionsWithItems(test.db, test.business.id);
+    const sale = list.find((transaction) => transaction.orderId !== null);
+
+    expect(sale?.amount).toBe(7500);
+    expect(sale?.items).toEqual([
+      {
+        productId: product.id,
+        name: "Kopi Uji",
+        unit: "sachet",
+        quantity: 3,
+        unitPrice: 2500,
+      },
+    ]);
+
+    const expense = list.find((transaction) => transaction.kind === "expense");
+    expect(expense?.items).toEqual([]);
   });
 });

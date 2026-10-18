@@ -1,10 +1,10 @@
 ﻿import { Skeleton } from "@/components/shell/skeleton";
 import { StateBlock } from "@/components/shell/state-block";
-import { Badge } from "@/components/ui/badge";
-import type { listTransactions } from "@/lib/data/transactions";
-import { formatRupiah } from "@/lib/format/currency";
+import type { listTransactionsWithItems } from "@/lib/data/transactions";
 import { formatDate, formatTime } from "@/lib/format/date";
-import { transactionKindLabel } from "@/lib/ui-copy/labels";
+import { transactionKindLabel, transactionSourceLabel } from "@/lib/ui-copy/labels";
+
+import { TransactionDetail } from "./transaction-detail";
 
 /**
  * Satu baris transaksi sebagaimana dikembalikan lapisan data.
@@ -12,7 +12,7 @@ import { transactionKindLabel } from "@/lib/ui-copy/labels";
  * Tipenya diturunkan dari fungsi lapisan data, bukan diambil dari `src/lib/db`,
  * karena komponen tidak boleh menyentuh lapisan basis data.
  */
-type TransactionRow = Awaited<ReturnType<typeof listTransactions>>[number];
+type TransactionRow = Awaited<ReturnType<typeof listTransactionsWithItems>>[number];
 
 /** Kerangka muat untuk rincian transaksi. */
 export function TransactionListSkeleton() {
@@ -28,9 +28,16 @@ export function TransactionListSkeleton() {
   );
 }
 
+function paymentMethodLabel(method: TransactionRow["method"]): string | null {
+  if (method === "tunai") return "Tunai";
+  if (method === "transfer") return "Transfer";
+  if (method === "qris") return "QRIS";
+  return null;
+}
+
 /**
  * Rincian setiap transaksi pada periode yang dipilih, yang paling baru lebih
- * dulu. Nilainya selalu positif dan arahnya dibaca dari label jenis transaksi.
+ * dulu. Setiap baris dapat ditekan untuk membuka rincian item dan totalnya.
  */
 export function TransactionList({
   transactions,
@@ -48,37 +55,32 @@ export function TransactionList({
 
   return (
     <ul className="flex flex-col gap-section">
-      {transactions.map((transaction) => (
-        <li
-          key={transaction.id}
-          className="flex flex-col gap-1 border-b border-border pb-3 last:border-b-0 last:pb-0"
-        >
-          <div className="flex flex-wrap items-baseline justify-between gap-x-gutter gap-y-1">
-            <span className="text-body font-bold">{transaction.description}</span>
-            <span className="text-body font-bold tabular-nums">
-              {formatRupiah(transaction.amount)}
-            </span>
-          </div>
+      {transactions.map((transaction) => {
+        const methodLabel =
+          transaction.kind === "sale"
+            ? (paymentMethodLabel(transaction.method) ?? "Pembayaran belum diketahui")
+            : null;
 
-          <div className="flex flex-wrap items-center gap-x-gutter gap-y-1">
-            <span className="text-caption text-muted-foreground tabular-nums">
-              {formatDate(transaction.occurredAt)}, {formatTime(transaction.occurredAt)}
-            </span>
-            <Badge variant="outline">{transactionKindLabel(transaction.kind)}</Badge>
-            {transaction.kind === "sale" && (
-              <span className="text-caption text-muted-foreground">
-                {transaction.method === "tunai"
-                  ? "Tunai"
-                  : transaction.method === "transfer"
-                    ? "Transfer"
-                    : transaction.method === "qris"
-                      ? "QRIS"
-                      : "Pembayaran belum diketahui"}
-              </span>
-            )}
-          </div>
-        </li>
-      ))}
+        return (
+          <li
+            key={transaction.id}
+            className="border-b border-border pb-3 last:border-b-0 last:pb-0"
+          >
+            <TransactionDetail
+              transaction={{
+                description: transaction.description,
+                amount: transaction.amount,
+                dateLabel: formatDate(transaction.occurredAt),
+                timeLabel: formatTime(transaction.occurredAt),
+                kindLabel: transactionKindLabel(transaction.kind),
+                methodLabel,
+                sourceLabel: transactionSourceLabel(transaction.source),
+                items: transaction.items,
+              }}
+            />
+          </li>
+        );
+      })}
     </ul>
   );
 }

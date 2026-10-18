@@ -181,6 +181,10 @@ Pemilik mengirim pesan seperti "Laporan hari ini", AI menyajikan rangkuman.
 - **Pengeluaran manual:** S4 menyediakan formulir keterangan, nominal, dan
   tanggal. Data ditulis ke tabel `transactions` dan langsung dipakai laporan
   serta ringkasan hari ini.
+- **Rincian transaksi:** setiap baris pada S4 dapat ditekan untuk membuka
+  jenis, sumber, metode, dan waktu transaksi. Penjualan yang berasal dari
+  orderan juga menampilkan harga satuan, jumlah, subtotal setiap item, dan
+  total transaksi.
 - **Batas:** periode yang didukung hanya harian dan mingguan, sesuai proposal.
 
 ### 3.6 Agentic Action — MASUK
