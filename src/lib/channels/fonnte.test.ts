@@ -1,5 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
-import { parseChannelEvent, readFonnteProfile, sendFonnteReply } from "./fonnte";
+import {
+  parseChannelEvent,
+  readFonnteProfile,
+  safeChannelText,
+  sendFonnteReply,
+} from "./fonnte";
 
 describe("penerjemah kanal WhatsApp", () => {
   it("memeriksa payload dan menormalkan nomor", () => {
@@ -55,6 +60,14 @@ describe("penerjemah kanal WhatsApp", () => {
         Response.json({ status: true, device_status: "connect", device: 42 }),
       ),
     ).rejects.toThrow();
+  });
+  it("membersihkan teks kanal tanpa menghapus baris baru", () => {
+    expect(safeChannelText("Contoh yang tersedia:\n1. Beras\n2. Gula 👋")).toBe(
+      "Contoh yang tersedia:\n1. Beras\n2. Gula",
+    );
+    expect(safeChannelText("Baris   pertama\n\n\nBaris kedua")).toBe(
+      "Baris pertama\n\nBaris kedua",
+    );
   });
 });
 

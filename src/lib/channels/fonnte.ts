@@ -91,7 +91,9 @@ export function safeChannelText(value: string): string {
   return value
     .replace(/[\p{Extended_Pictographic}\p{Emoji_Presentation}\u200d\ufe0f]/gu, "")
     .replace(/[\u002d\u2010-\u2015\u2212]/g, " ")
-    .replace(/\s+/g, " ")
+    .replace(/\r\n?/g, "\n")
+    .replace(/[^\S\n]+/g, " ")
+    .replace(/\n{3,}/g, "\n\n")
     .trim();
 }
 export async function readFonnteProfile(

@@ -46,9 +46,7 @@ describe("balasan AI untuk pelanggan WhatsApp", () => {
       provider,
     );
 
-    expect(reply).toBe(
-      "Beras Pandan Wangi tersedia, harganya Rp15.000 per kilogram.",
-    );
+    expect(reply).toBe("Beras Pandan Wangi tersedia, harganya Rp15.000 per kilogram.");
     const prompt = String(complete.mock.calls[0]?.[0].prompt);
     expect(prompt).toContain("Beras Pandan Wangi");
     expect(prompt).toContain("15000");
@@ -70,6 +68,24 @@ describe("balasan AI untuk pelanggan WhatsApp", () => {
         provider,
       ),
     ).resolves.toBe("Halo stok 10 kilogram masih ada");
+  });
+
+  it("menata daftar produk menjadi daftar bernomor per baris", async () => {
+    const provider: AIProvider = {
+      complete: async () => ({
+        reply: "Contoh yang tersedia: 1. Beras 2. Gula 3. Kopi",
+      }),
+    };
+
+    await expect(
+      composeCustomerReply(
+        test.db,
+        test.business.id,
+        conversationId,
+        "Produk apa saja yang tersedia?",
+        provider,
+      ),
+    ).resolves.toBe("Contoh yang tersedia:\n1. Beras\n2. Gula\n3. Kopi");
   });
 
   it("mengembalikan kosong saat penyedia gagal", async () => {
