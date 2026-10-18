@@ -7,6 +7,7 @@ import {
 } from "../db/testing";
 import { createProduct, findProduct } from "./products";
 import { listStockAlerts, listStockMovements } from "./stock";
+import { listTransactions } from "./transactions";
 import {
   createPurchaseOrder,
   decidePurchaseOrder,
@@ -213,5 +214,31 @@ describe("draft pesanan pembelian", () => {
     expect(await listPurchaseOrders(test.db, otherBusinessId)).toHaveLength(1);
     expect((await findProduct(test.db, otherBusinessId, otherBerasId))?.stock).toBe(0);
     expect(await listStockMovements(test.db, otherBusinessId)).toEqual([]);
+  });
+
+  it("mencatat pembelian sebagai pengeluaran saat draft disetujui", async () => {
+    const draft = await createPurchaseOrder(test.db, test.business.id, {
+      supplierName: "Pasar Induk",
+      items: [{ productId: berasId, quantity: 4, estimatedPrice: 12000 }],
+    });
+    const before = await listTransactions(test.db, test.business.id, { kind: "expense" });
+
+    const decided = await decidePurchaseOrder(
+      test.db,
+      test.business.id,
+      draft.order.id,
+      "disetujui",
+    );
+
+    expect(decided?.status).toBe("disetujui");
+
+    const after = await listTransactions(test.db, test.business.id, { kind: "expense" });
+    expect(after.length).toBe(before.length + 1);
+    expect(
+      after.some(
+        (row) =>
+          row.amount === draft.order.total && row.description.includes("Pasar Induk"),
+      ),
+    ).toBe(true);
   });
 });

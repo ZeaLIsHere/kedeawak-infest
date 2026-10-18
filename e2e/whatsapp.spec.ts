@@ -10,6 +10,13 @@ test("halaman WhatsApp menampilkan koneksi Fonnte dan daftar pesanan", async ({
   await expect(
     page.getByRole("button", { name: /Hubungkan WhatsApp|Periksa koneksi/u }),
   ).toBeVisible();
+
+  const newOrder = page.getByText("Pesanan baru", { exact: true }).first();
+  if (await newOrder.isVisible().catch(() => false)) {
+    await expect(
+      page.getByRole("button", { name: "Konfirmasi pesanan" }).first(),
+    ).toBeVisible();
+  }
   await expect(
     page
       .getByRole("heading", { name: "Pesanan dari WhatsApp" })

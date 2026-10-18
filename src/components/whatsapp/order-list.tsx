@@ -2,6 +2,7 @@ import { ShoppingBag } from "lucide-react";
 
 import { SectionCard } from "@/components/shell/section-card";
 import { StateBlock } from "@/components/shell/state-block";
+import { ConfirmOrder } from "@/components/whatsapp/confirm-order";
 import { safeChannelText } from "@/lib/channels/fonnte";
 import { formatRupiah } from "@/lib/format/currency";
 import { formatDateTime } from "@/lib/format/date";
@@ -123,6 +124,8 @@ export function WhatsAppOrderList({
                   </span>
                 )}
               </div>
+
+              {order.status === "baru" ? <ConfirmOrder orderId={order.id} /> : null}
 
               <p className="mt-3 text-sm text-muted-foreground">
                 Pesan pelanggan: {safeChannelText(order.origin)}

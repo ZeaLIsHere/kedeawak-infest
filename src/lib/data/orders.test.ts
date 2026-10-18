@@ -5,9 +5,13 @@ import {
   createTestDatabase,
   type TestDatabase,
 } from "../db/testing";
-import { createProduct, listProducts } from "./products";
+import { createProduct, findProduct, listProducts } from "./products";
 import { endOfDay, startOfDay } from "./period";
+import { summarizeDay } from "./reports";
+import { recordStockMovement } from "./stock";
+import { listTransactions } from "./transactions";
 import {
+  confirmOrder,
   createOrder,
   findOrder,
   findOrderWithItems,
@@ -52,6 +56,19 @@ beforeAll(async () => {
   berasId = beras.id;
   gulaId = gula.id;
   otherBerasId = otherBeras.id;
+
+  await recordStockMovement(test.db, test.business.id, {
+    productId: berasId,
+    kind: "masuk",
+    quantityChange: 20,
+    reason: "Stok awal",
+  });
+  await recordStockMovement(test.db, test.business.id, {
+    productId: gulaId,
+    kind: "masuk",
+    quantityChange: 10,
+    reason: "Stok awal",
+  });
 }, 60_000);
 
 afterAll(async () => {
@@ -200,5 +217,45 @@ describe("data orderan", () => {
       to: at,
     });
     expect(memuat(sebelumWaktuItu)).toBe(false);
+  });
+
+  it("mengonfirmasi orderan baru menjadi penjualan dan mengurangi stok", async () => {
+    const created = await createOrder(test.db, test.business.id, {
+      items: [{ productId: berasId, quantity: 3, unitPrice: 15000 }],
+    });
+    const before = await findProduct(test.db, test.business.id, berasId);
+
+    const confirmed = await confirmOrder(
+      test.db,
+      test.business.id,
+      created.order.id,
+      "tunai",
+    );
+
+    expect(confirmed?.order.status).toBe("selesai");
+    expect(confirmed?.total).toBe(45000);
+
+    const after = await findProduct(test.db, test.business.id, berasId);
+    expect(after?.stock).toBe((before?.stock ?? 0) - 3);
+
+    const sales = await listTransactions(test.db, test.business.id, { kind: "sale" });
+    expect(
+      sales.some(
+        (row) =>
+          row.orderId === created.order.id &&
+          row.amount === 45000 &&
+          row.method === "tunai",
+      ),
+    ).toBe(true);
+
+    const summary = await summarizeDay(test.db, test.business.id, new Date());
+    expect(summary.sales).toBeGreaterThanOrEqual(45000);
+
+    expect(
+      await confirmOrder(test.db, test.business.id, created.order.id, "tunai"),
+    ).toBeUndefined();
+    expect((await findProduct(test.db, test.business.id, berasId))?.stock).toBe(
+      after?.stock,
+    );
   });
 });

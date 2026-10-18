@@ -6,6 +6,8 @@ import { deleteCustomerData } from "../data/customers";
 import { receiveChannelEvent } from "../channels/intake";
 import { readFonnteProfile } from "../channels/fonnte";
 import { readTwilioProfile } from "../channels/twilio";
+import { confirmOrder, type OrderPaymentMethod } from "../data/orders";
+import { formatRupiah } from "../format/currency";
 
 type Result = { ok: true; message: string } | { ok: false; error: string };
 function refresh() {
@@ -87,6 +89,34 @@ export async function disconnectChannelAction(): Promise<Result> {
     return { ok: false, error: "Koneksi aplikasi belum dapat diputus. Coba lagi." };
   }
 }
+export async function confirmWhatsAppOrderAction(
+  orderId: string,
+  method: OrderPaymentMethod,
+): Promise<Result> {
+  if (!["tunai", "transfer", "qris"].includes(method))
+    return { ok: false, error: "Jenis pembayaran belum sesuai" };
+
+  try {
+    const result = await withCurrentBusiness((db, id) =>
+      confirmOrder(db, id, orderId, method),
+    );
+    if (!result)
+      return { ok: false, error: "Pesanan tidak ditemukan atau sudah dikonfirmasi" };
+
+    refresh();
+    return {
+      ok: true,
+      message:
+        "Pesanan dikonfirmasi. Pendapatan " + formatRupiah(result.total) + " tercatat.",
+    };
+  } catch {
+    return {
+      ok: false,
+      error: "Pesanan belum dapat dikonfirmasi. Periksa stok lalu coba lagi.",
+    };
+  }
+}
+
 export async function receiveSimulatedMessage(form: FormData): Promise<Result> {
   try {
     const mode = form.get("mode");

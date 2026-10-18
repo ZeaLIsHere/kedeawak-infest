@@ -29,7 +29,7 @@ proposal. Yang ketujuh, Kasir, ditambahkan atas permintaan pemilik proyek.
 | --- | ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ------ |
 | S1  | Dasbor                    | Statistik penjualan, pengeluaran, laba, jumlah order, produk terlaris, alert stok terbaru                                                             | MASUK  |
 | S2  | Percakapan dengan Agen AI | Obrolan dengan AI untuk mencatat transaksi lewat teks, voice note, dan foto struk, termasuk konfirmasi dan persetujuan aksi                           | MASUK  |
-| S3  | Integrasi WhatsApp        | Daftar pesanan WhatsApp dan kartu koneksi Fonnte tanpa input nomor. Nomor perangkat dibaca dari Fonnte setelah token diverifikasi                    | MASUK  |
+| S3  | Integrasi WhatsApp        | Daftar pesanan WhatsApp dan kartu koneksi Fonnte tanpa input nomor. Pesanan baru dapat dikonfirmasi untuk mencatat penjualan dan mengurangi stok     | MASUK  |
 | S4  | Laporan Keuangan          | Laporan harian dan mingguan: penjualan, pengeluaran, laba, rincian transaksi, dan catat pengeluaran manual                                          | MASUK  |
 | S5  | Stok dan Produk           | Daftar, tambah, ubah, dan arsip produk, stok, ambang minimum, alert, penyesuaian beralasan, asisten dengan dialog tinjau                              | MASUK  |
 | S6  | Persetujuan               | Antrean aksi yang menunggu persetujuan pemilik, contohnya draft PO ke supplier, dengan aksi setujui atau tolak                                        | MASUK  |
@@ -91,9 +91,12 @@ Keputusan user: Fonnte menjadi kanal WhatsApp utama untuk demo.
   tinggi mencatat penjualan serta stok sekali. Confidence rendah tetap
   menunggu.
 - **Tampilan:** daftar pesanan beserta rincian item, status pesanan, keadaan
-  pembayaran, dan pesan asal pelanggan. Balasan agen tidak ditampilkan di S3,
-  dan tidak ada halaman obrolan pelanggan. Muat ulang halaman dilakukan manual
-  setelah pemrosesan latar selesai.
+  pembayaran, dan pesan asal pelanggan. Setiap pesanan berstatus baru memiliki
+  tombol Konfirmasi pesanan dengan pilihan tunai, transfer, atau QRIS.
+  Konfirmasi mencatat penjualan, mengurangi stok, dan mengubah status menjadi
+  selesai. Balasan agen tidak ditampilkan di S3, dan tidak ada halaman obrolan
+  pelanggan. Muat ulang halaman dilakukan manual setelah pemrosesan latar
+  selesai.
 - **Webhook:** `POST /api/channels/fonnte?key=SECRET` adalah Route Handler Next
   pada server UI yang sama. Secret dibaca dari `FONNTE_WEBHOOK_SECRET`.
   `/whatsapp` hanya UI, bukan webhook.
@@ -162,7 +165,8 @@ AI membuat draft PO, mengirim setelah disetujui pemilik, lalu memperbarui stok.
 
 - **Yang dikerjakan:** AI menyusun draft PO berisi produk dan jumlah, draft
   masuk ke antrean S6, pemilik menyetujui atau menolak, setelah disetujui PO
-  tercatat dan stok diperbarui.
+  tercatat dan stok diperbarui. Persetujuan juga mencatat pengeluaran sebesar
+  total draft, sehingga ringkasan dashboard ikut berubah.
 - **Human in the loop wajib.** Tidak ada aksi yang mengubah data stok atau
   membuat PO tanpa persetujuan eksplisit pemilik.
 - **Context lock:** saat sebuah aksi menunggu persetujuan, konteks sesi

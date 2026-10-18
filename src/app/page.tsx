@@ -9,6 +9,7 @@ import {
   StockAlertPreviewSkeleton,
 } from "@/components/dashboard/stock-alert-preview";
 import { TodaySummary, TodaySummarySkeleton } from "@/components/dashboard/today-summary";
+import { RefreshDashboardButton } from "@/components/dashboard/refresh-dashboard-button";
 import { CardError } from "@/components/shell/card-error";
 import { PageHeader } from "@/components/shell/page-header";
 import { SectionCard } from "@/components/shell/section-card";
@@ -30,6 +31,10 @@ export default function DasborPage() {
       <PageHeader title="Dasbor" description="Ringkasan keadaan warung hari ini." />
 
       <div className="mx-auto flex w-full max-w-content flex-col gap-section p-page">
+        <div className="flex justify-end">
+          <RefreshDashboardButton />
+        </div>
+
         <SectionCard title={JUDUL_RINGKASAN}>
           <CardError title={JUDUL_RINGKASAN}>
             <Suspense fallback={<TodaySummarySkeleton />}>

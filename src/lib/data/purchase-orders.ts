@@ -4,6 +4,7 @@ import type { Database } from "../db/client";
 import {
   purchaseOrderItems,
   purchaseOrders,
+  transactions,
   type PurchaseOrder,
   type PurchaseOrderItem,
 } from "../db/schema";
@@ -221,6 +222,17 @@ export async function applyPurchaseOrderDecision(
       kind: "masuk",
       quantityChange: item.quantity,
       reason: `Pesanan pembelian dari ${order.supplierName}`,
+    });
+  }
+
+  if (order.total > 0) {
+    await db.insert(transactions).values({
+      businessId,
+      kind: "expense",
+      description: `Pembelian stok dari ${order.supplierName}`,
+      amount: order.total,
+      source: "app",
+      occurredAt: new Date(),
     });
   }
 

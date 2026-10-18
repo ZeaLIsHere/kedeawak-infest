@@ -1,13 +1,20 @@
 import { and, desc, eq, gte, inArray, lt } from "drizzle-orm";
 
 import type { Database } from "../db/client";
-import { orderItems, orders, type Order, type OrderItem } from "../db/schema";
+import {
+  orderItems,
+  orders,
+  transactions,
+  type Order,
+  type OrderItem,
+} from "../db/schema";
 import { isUuid } from "./ids";
 import {
   assertConversationOwned,
   assertCustomerOwned,
   assertProductsOwned,
 } from "./ownership";
+import { applyStockMovement } from "./stock";
 
 /** Satu barang di dalam orderan. Harga satuan disimpan apa adanya saat orderan dibuat. */
 export type OrderItemInput = {
@@ -214,4 +221,95 @@ export async function updateOrderStatus(
     .returning();
 
   return order;
+}
+
+/** Jenis pembayaran yang dapat dipilih saat pesanan dikonfirmasi. */
+export type OrderPaymentMethod = "tunai" | "transfer" | "qris";
+
+/**
+ * Mengonfirmasi pesanan WhatsApp menjadi penjualan.
+ *
+ * Hanya pesanan berstatus `baru` yang dapat dikonfirmasi. Penjualan, perubahan
+ * stok, dan status pesanan ditulis dalam satu transaksi. Pesanan yang sudah
+ * selesai atau sudah memiliki transaksi penjualan tidak diproses ulang.
+ */
+export async function confirmOrder(
+  db: Database,
+  businessId: string,
+  orderId: string,
+  method: OrderPaymentMethod,
+): Promise<{ order: Order; total: number } | undefined> {
+  if (!isUuid(orderId)) return undefined;
+  if (!["tunai", "transfer", "qris"].includes(method)) {
+    throw new Error("Jenis pembayaran tidak valid");
+  }
+
+  return db.transaction(async (tx) => {
+    const [order] = await tx
+      .select()
+      .from(orders)
+      .where(and(eq(orders.businessId, businessId), eq(orders.id, orderId)))
+      .for("update");
+
+    if (order === undefined || order.status !== "baru") return undefined;
+
+    const items = await tx
+      .select()
+      .from(orderItems)
+      .where(
+        and(eq(orderItems.businessId, businessId), eq(orderItems.orderId, order.id)),
+      );
+
+    if (items.length === 0) throw new Error("Pesanan tidak memiliki item");
+
+    const [existing] = await tx
+      .select({ id: transactions.id })
+      .from(transactions)
+      .where(
+        and(
+          eq(transactions.businessId, businessId),
+          eq(transactions.orderId, order.id),
+          eq(transactions.kind, "sale"),
+        ),
+      )
+      .limit(1);
+
+    if (existing !== undefined) return undefined;
+
+    for (const item of items) {
+      await applyStockMovement(tx, businessId, {
+        productId: item.productId,
+        kind: "keluar",
+        quantityChange: -item.quantity,
+        reason: "Penjualan dari konfirmasi pesanan WhatsApp",
+      });
+    }
+
+    await tx.insert(transactions).values({
+      businessId,
+      orderId: order.id,
+      customerId: order.customerId,
+      kind: "sale",
+      amount: order.total,
+      source: "whatsapp",
+      method,
+      description: "Penjualan dari pesanan WhatsApp",
+    });
+
+    const [updated] = await tx
+      .update(orders)
+      .set({ status: "selesai" })
+      .where(
+        and(
+          eq(orders.businessId, businessId),
+          eq(orders.id, order.id),
+          eq(orders.status, "baru"),
+        ),
+      )
+      .returning();
+
+    if (updated === undefined) throw new Error("Pesanan sudah diproses");
+
+    return { order: updated, total: order.total };
+  });
 }
