@@ -4,20 +4,28 @@ import { connection } from "next/server";
 import { CardError } from "@/components/shell/card-error";
 import { NoWarungState } from "@/components/shell/no-warung-state";
 import { PageHeader } from "@/components/shell/page-header";
+import { SectionCard } from "@/components/shell/section-card";
+import { ConnectionPanel } from "@/components/whatsapp/connection-panel";
 import { WhatsAppOrderList, type WhatsAppOrder } from "@/components/whatsapp/order-list";
+import { findBusiness } from "@/lib/data/business";
 import { getChannelOverview } from "@/lib/data/channel-intake";
 import { withCurrentBusiness } from "@/lib/data/server";
 
 async function OrderContent() {
   await connection();
 
-  const overview = await withCurrentBusiness((db, businessId) =>
-    getChannelOverview(db, businessId),
-  );
+  const data = await withCurrentBusiness(async (db, businessId) => {
+    const [business, overview] = await Promise.all([
+      findBusiness(db, businessId),
+      getChannelOverview(db, businessId),
+    ]);
 
-  if (overview === undefined) return <NoWarungState />;
+    return { business, overview };
+  });
 
-  const orders: WhatsAppOrder[] = overview.orders.map((order) => ({
+  if (!data?.business) return <NoWarungState />;
+
+  const orders: WhatsAppOrder[] = data.overview.orders.map((order) => ({
     id: order.id,
     customerName: order.customerName,
     phone: order.phone,
@@ -34,7 +42,29 @@ async function OrderContent() {
     origin: order.origin,
   }));
 
-  return <WhatsAppOrderList orders={orders} />;
+  return (
+    <div className="flex flex-col gap-section">
+      <SectionCard
+        title="Koneksi WhatsApp"
+        description="Hubungkan perangkat Fonnte agar pesanan pelanggan masuk ke aplikasi."
+      >
+        <ConnectionPanel
+          state={{
+            connected:
+              data.business.channelStatus === "terhubung" &&
+              data.business.channelPackage === "Fonnte",
+            phone: data.business.channelPhoneNumber,
+            packageName: data.business.channelPackage,
+            quota: data.business.channelQuota,
+            tokenConfigured: Boolean(process.env.FONNTE_TOKEN?.trim()),
+            webhookConfigured: Boolean(process.env.FONNTE_WEBHOOK_SECRET?.trim()),
+          }}
+        />
+      </SectionCard>
+
+      <WhatsAppOrderList orders={orders} />
+    </div>
+  );
 }
 
 export default function WhatsappPage() {
@@ -42,7 +72,7 @@ export default function WhatsappPage() {
     <>
       <PageHeader
         title="Integrasi WhatsApp"
-        description="Daftar pesanan yang masuk lewat WhatsApp."
+        description="Pesanan yang masuk lewat WhatsApp toko."
       />
       <div className="mx-auto w-full max-w-content p-page">
         <CardError title="Integrasi WhatsApp">

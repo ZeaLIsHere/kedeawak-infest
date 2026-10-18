@@ -29,7 +29,7 @@ proposal. Yang ketujuh, Kasir, ditambahkan atas permintaan pemilik proyek.
 | --- | ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ------ |
 | S1  | Dasbor                    | Statistik penjualan, pengeluaran, laba, jumlah order, produk terlaris, alert stok terbaru                                                             | MASUK  |
 | S2  | Percakapan dengan Agen AI | Obrolan dengan AI untuk mencatat transaksi lewat teks, voice note, dan foto struk, termasuk konfirmasi dan persetujuan aksi                           | MASUK  |
-| S3  | Integrasi WhatsApp        | Daftar pesanan WhatsApp. Kontrol koneksi, kotak masuk, panel simulasi, dan pengaturan pelanggan ditunda sampai rancangan baru disepakati | MASUK  |
+| S3  | Integrasi WhatsApp        | Daftar pesanan WhatsApp dan kartu koneksi Fonnte tanpa input nomor. Nomor perangkat dibaca dari Fonnte setelah token diverifikasi                    | MASUK  |
 | S4  | Laporan Keuangan          | Laporan harian dan mingguan: penjualan, pengeluaran, laba, rincian transaksi, dan catat pengeluaran manual                                          | MASUK  |
 | S5  | Stok dan Produk           | Daftar, tambah, ubah, dan arsip produk, stok, ambang minimum, alert, penyesuaian beralasan, asisten dengan dialog tinjau                              | MASUK  |
 | S6  | Persetujuan               | Antrean aksi yang menunggu persetujuan pemilik, contohnya draft PO ke supplier, dengan aksi setujui atau tolak                                        | MASUK  |
@@ -51,66 +51,58 @@ dan menyesuaikan jawaban dengan usahanya, bukan untuk membuat akun atau login.
 
 Checkpoint sebelum migrasi: S1 dan S4 membaca data; S7 menyimpan penjualan;
 S5 mengelola produk/stok; S6 memutus draft. S2 mempunyai percakapan, mode lokal
-dan tinjau struk. S3 mempunyai simulasi pelanggan dan pemeriksaan Fonnte.
-Pengaturan memuat profil pemilik, persetujuan, serta privasi. Ini riwayat,
-bukan bukti Twilio.
+dan tinjau struk. S3 memakai Fonnte untuk kanal WhatsApp. Pengaturan memuat
+profil pemilik, persetujuan, serta privasi. Ini riwayat, bukan bukti Twilio.
 
-Pada 18 Oktober 2026 user menyetujui Twilio Sandbox menggantikan Fonnte,
-balasan nyata ke peserta opt in, dan voice note otomatis menjadi teks lalu
-orderan. Groq Whisper dipilih tim implementasi untuk transkripsi; bukan
-permintaan penyedia spesifik dari user. Implementasi/verifikasi kanal baru
-masih parsial. Uji AI/mikrofon/provider nyata belum lengkap; unggah voice note
-S2 dan kartu prediksi stok tetap pekerjaan terpisah. Status MASUK/SIMULASI
-adalah keputusan cakupan, bukan bukti selesai. Ikuti `PLAN.md` dan
-`docs/plans/2026-10-18-twilio.md`. `docs/PRODUCT.md` tidak diubah.
+Pada 18 Oktober 2026 user menetapkan Fonnte sebagai kanal WhatsApp utama.
+Token perangkat dan secret webhook berasal dari `.env.local`. Aplikasi tidak
+meminta nomor WhatsApp, karena nomor perangkat dibaca langsung dari Fonnte
+setelah token diverifikasi. Verifikasi akun Fonnte nyata belum diklaim sampai
+ada bukti pengujian pada akun yang dipakai demo. `docs/PRODUCT.md` tidak diubah.
 
 ## 3. Fitur utama proposal dan statusnya
 
 Enam fitur dari bagian "Fitur Utama" proposal.
 
-### 3.1 Integrasi WhatsApp ke Aplikasi — MASUK (demo Sandbox)
+### 3.1 Integrasi WhatsApp ke Aplikasi — MASUK (Fonnte)
 
-Keputusan terbaru user menggantikan keputusan Fonnte/simulasi saja.
+Keputusan user: Fonnte menjadi kanal WhatsApp utama untuk demo.
 
-- **Tampilan saat ini:** permukaan S3 hanya menampilkan daftar pesanan.
-  Kontrol koneksi, kotak masuk, panel simulasi, dan pengaturan data pelanggan
-  tidak ditampilkan sampai rancangan baru disepakati. Endpoint webhook dan
-  pemrosesan pesan tetap tersedia di balik layar.
-- **Koneksi:** backend menyediakan konfigurasi Twilio Sandbox, tata cara join,
-  Hubungkan dan Putuskan aplikasi. Kontrol ini belum ditampilkan di S3 sampai
-  rancangan baru disepakati. Pemilik mengaktifkan pemrosesan secara eksplisit;
-  peserta mengirim kode join Sandbox untuk opt in. Nomor Sandbox bukan klaim
-  bahwa nomor pribadi pemilik sudah dimigrasi. Putuskan hanya menghentikan
-  pemrosesan lokal, bukan keluar dari Sandbox Twilio.
-- **Pesan nyata:** teks dan voice note peserta membentuk orderan; audio
-  ditranskripsi Groq Whisper lalu DeepSeek menafsirkan transkrip. Transkrip
-  disimpan sebagai pesan asal orderan. Gagal transkripsi/interpretasi meminta
-  kirim ulang atau ketik, tidak membuat orderan rekaan.
-- **Media:** maksimal satu gambar JPEG/PNG/WebP <= 3 MiB atau satu audio
-  OGG/MP3/MP4/WAV/WebM/FLAC <= 16 MiB. MP4/WebM hanya audio. `Body` kosong
-  dengan media tetap diterima. Unduhan awal HTTPS api.twilio.com memakai
-  Basic Auth; redirect hanya host allowlist, tanpa meneruskan Authorization.
-- **Bukti:** foto hanya terkait bila tepat satu orderan menunggu milik
-  pengirim pada warung yang sama. Ambigu/tidak ada orderan meminta klarifikasi;
-  confidence rendah tetap menunggu. Perilaku lama tidak diubah: nominal cocok
-  dan confidence >= 0.7 otomatis menyelesaikan orderan, mencatat penjualan dan
-  stok sekali. Ini pencocokan nominal, **bukan verifikasi bank** atau saldo.
+- **Tampilan saat ini:** S3 menampilkan kartu koneksi Fonnte dan daftar
+  pesanan. Kartu koneksi tidak meminta nomor WhatsApp. Nomor perangkat dibaca
+  dari Fonnte setelah token diverifikasi. Kotak masuk, panel simulasi, dan
+  pengaturan data pelanggan belum ditampilkan.
+- **Koneksi:** pemilik menyiapkan perangkat di dasbor Fonnte, mengisi
+  `FONNTE_TOKEN` dan `FONNTE_WEBHOOK_SECRET` pada `.env.local`, lalu menekan
+  Hubungkan WhatsApp. Aplikasi memeriksa token dengan
+  `POST https://api.fonnte.com/device`, memastikan perangkat berstatus
+  terhubung, lalu menyimpan nomor, paket, kuota, dan waktu pemeriksaan pada
+  baris `businesses`. Putuskan koneksi hanya menghentikan pemrosesan lokal.
+- **Pesan nyata:** pesan teks pelanggan menjadi orderan dan balasan agen.
+  Pesan yang tidak dapat dipahami tetap dicatat sebagai pesan pelanggan dan
+  meminta pelanggan menulis nama produk serta jumlah dengan jelas. Tidak ada
+  orderan rekaan saat pemrosesan gagal.
+- **Media:** pada paket gratis Fonnte, lampiran masuk tidak diteruskan ke
+  webhook. Voice note WhatsApp berformat OGG juga tidak diteruskan karena
+  Fonnte hanya menerima MP3. Karena itu foto bukti dan voice note pelanggan
+  tidak diandalkan pada demo ini. Pesan teks tetap diproses.
+- **Bukti:** pencocokan bukti pembayaran tetap tersedia lewat jalur aplikasi
+  dan simulasi, bukan klaim verifikasi bank. Nominal cocok dan confidence
+  tinggi mencatat penjualan serta stok sekali. Confidence rendah tetap
+  menunggu.
 - **Tampilan:** daftar pesanan beserta rincian item, status pesanan, keadaan
   pembayaran, dan pesan asal pelanggan. Balasan agen tidak ditampilkan di S3,
   dan tidak ada halaman obrolan pelanggan. Muat ulang halaman dilakukan manual
   setelah pemrosesan latar selesai.
-- **Webhook:** `POST /api/channels/whatsapp` adalah Route Handler Next pada
-  server UI yang sama port 3100. Parse semua parameter form dan validasi SDK
-  resmi `X-Twilio-Signature` terhadap `WEBHOOK_URL` HTTPS ngrok lengkap persis.
-  Tidak ada port 3101 atau webhook `/whatsapp`; `/whatsapp` hanya UI.
-- **Batas demo:** segera balas TwiML kosong, proses lewat Next `after()` dan
-  kirim balasan REST Twilio ke peserta opt in. Bukan durable worker: stop
-  server/redeploy sebelum selesai dapat menghilangkan proses meski webhook
-  sukses. Biarkan server hidup; jika tidak ada balasan, kirim ulang pesan baru.
+- **Webhook:** `POST /api/channels/fonnte?key=SECRET` adalah Route Handler Next
+  pada server UI yang sama. Secret dibaca dari `FONNTE_WEBHOOK_SECRET`.
+  `/whatsapp` hanya UI, bukan webhook.
+- **Batas demo:** webhook langsung menjawab lalu memproses pesan lewat Next
+  `after()`. Ini bukan durable worker. Biarkan server hidup selama demo. Kanal
+  luar tetap bergantung pada koneksi perangkat Fonnte dan jaringan.
 - **Simulasi tetap ada:** panel pelanggan tiruan memakai jalur domain yang
-  sama tanpa mengirim pesan provider nyata. Ini jalur lokal, bukan pengganti
-  bukti penerimaan Sandbox. Kredensial tidak disimpan di repo. Panel ini belum
-  ditampilkan di S3 sampai pembahasan berikutnya.
+  sama tanpa mengirim pesan provider nyata. Panel ini belum ditampilkan di S3
+  sampai pembahasan berikutnya. Kredensial tidak disimpan di repo.
 
 ### 3.2 Ekstraksi Data Multimodal — MASUK
 

@@ -1,109 +1,162 @@
 "use client";
+
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { CheckCircle2, ExternalLink, RefreshCw, Unplug } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { connectChannelAction, disconnectChannelAction } from "@/lib/actions/whatsapp";
 
-export function ConnectionPanel({
-  connected,
-  simulation,
-  fonnte,
-  phone,
-}: {
-  connected: boolean;
-  simulation: boolean;
-  fonnte: boolean;
-  phone: string | null;
-}) {
-  const [pending, start] = useTransition();
-  const [message, setMessage] = useState("");
+export type ConnectionState = {
+  readonly connected: boolean;
+  readonly phone: string | null;
+  readonly packageName: string | null;
+  readonly quota: number | null;
+  readonly tokenConfigured: boolean;
+  readonly webhookConfigured: boolean;
+};
+
+export function ConnectionPanel({ state }: { readonly state: ConnectionState }) {
   const router = useRouter();
-  function run(mode: "simulasi" | "fonnte" | "disconnect") {
-    start(async () => {
+  const [pending, startTransition] = useTransition();
+  const [message, setMessage] = useState("");
+  const [failed, setFailed] = useState(false);
+
+  function run(action: "connect" | "disconnect") {
+    setMessage("");
+    setFailed(false);
+
+    startTransition(async () => {
       const result =
-        mode === "disconnect"
-          ? await disconnectChannelAction()
-          : await connectChannelAction(mode);
+        action === "connect"
+          ? await connectChannelAction("fonnte")
+          : await disconnectChannelAction();
+
+      setFailed(!result.ok);
       setMessage(result.ok ? result.message : result.error);
       router.refresh();
     });
   }
+
   return (
     <div className="flex flex-col gap-4">
-      <p className="font-medium">
-        {connected
-          ? simulation
-            ? "Simulasi web terhubung"
-            : fonnte
-              ? "WhatsApp Fonnte terhubung"
-              : "Kanal terhubung"
-          : "Kanal belum terhubung"}
-      </p>
-      {phone && <p className="tabular-nums">Nomor perangkat {phone}</p>}
-      <p className="text-sm text-muted-foreground">
-        Hubungkan perangkat Fonnte agar pesan pelanggan masuk ke aplikasi dan dibalas
-        otomatis. Simulasi memakai alur data yang sama dan tidak mengirim pesan ke
-        pelanggan asli.
-      </p>
+      <div className="flex flex-wrap items-center gap-3">
+        <p className="flex items-center gap-2 font-medium">
+          {state.connected ? (
+            <CheckCircle2 className="size-4 text-success" aria-hidden="true" />
+          ) : (
+            <Unplug className="size-4 text-muted-foreground" aria-hidden="true" />
+          )}
+          {state.connected ? "WhatsApp Fonnte terhubung" : "WhatsApp belum terhubung"}
+        </p>
+        {state.phone && (
+          <span className="text-sm tabular-nums text-muted-foreground">
+            Nomor perangkat {state.phone}
+          </span>
+        )}
+      </div>
+
+      {state.connected && (
+        <p className="text-sm text-muted-foreground">
+          Paket {state.packageName ?? "tidak diketahui"}
+          {state.quota === null ? "" : `, sisa kuota ${state.quota}`}.
+        </p>
+      )}
+
+      {!state.tokenConfigured && (
+        <p role="alert" className="text-sm text-destructive">
+          FONNTE_TOKEN belum diisi pada .env.local. Isi token perangkat dari dasbor
+          Fonnte, lalu restart server.
+        </p>
+      )}
+
+      {!state.webhookConfigured && (
+        <p role="alert" className="text-sm text-destructive">
+          FONNTE_WEBHOOK_SECRET belum diisi pada .env.local. Isi secret webhook agar pesan
+          pelanggan dapat diterima.
+        </p>
+      )}
+
       <div className="flex flex-wrap gap-3">
-        <Button className="min-h-12" disabled={pending} onClick={() => run("fonnte")}>
-          Hubungkan WhatsApp
-        </Button>
         <Button
-          variant="outline"
           className="min-h-12"
-          disabled={pending}
-          onClick={() => run("simulasi")}
+          disabled={pending || !state.tokenConfigured}
+          onClick={() => run("connect")}
         >
-          Hubungkan simulasi
+          {pending ? (
+            <RefreshCw className="animate-spin" aria-hidden="true" />
+          ) : (
+            <CheckCircle2 aria-hidden="true" />
+          )}
+          {pending
+            ? "Memeriksa koneksi"
+            : state.connected
+              ? "Periksa koneksi"
+              : "Hubungkan WhatsApp"}
         </Button>
-        {connected && (
+
+        {state.connected && (
           <Button
             variant="outline"
             className="min-h-12"
             disabled={pending}
             onClick={() => run("disconnect")}
           >
+            <Unplug aria-hidden="true" />
             Putuskan koneksi aplikasi
           </Button>
         )}
       </div>
+
       {message && (
-        <p role="status" className="text-sm">
+        <p
+          role={failed ? "alert" : "status"}
+          className={`text-sm ${failed ? "text-destructive" : "text-muted-foreground"}`}
+        >
           {message}
         </p>
       )}
+
       <details className="rounded-lg border border-border p-4">
         <summary className="cursor-pointer font-medium">
           Cara menghubungkan Fonnte
         </summary>
         <ol className="mt-3 list-decimal space-y-2 pl-5 text-sm text-muted-foreground">
           <li>
-            Buka dasbor Fonnte, tambahkan perangkat, lalu sambungkan dengan memindai kode
-            QR memakai WhatsApp warung.
+            Buka{" "}
+            <a
+              className="font-medium text-primary underline underline-offset-4"
+              href="https://fonnte.com/"
+              target="_blank"
+              rel="noreferrer"
+            >
+              dasbor Fonnte
+              <ExternalLink className="ml-1 inline size-3" aria-hidden="true" />
+            </a>
+            , buat akun, lalu tambahkan perangkat.
           </li>
           <li>
-            Salin Token perangkat dari menu perangkat Fonnte, lalu isi FONNTE_TOKEN pada
-            konfigurasi server.
+            Pindai kode QR memakai WhatsApp toko sampai perangkat berstatus terhubung di
+            dasbor Fonnte.
           </li>
           <li>
-            Isi alamat webhook perangkat Fonnte ke alamat publik aplikasi ini, arah POST
-            /api/channels/fonnte, beserta kunci FONNTE_WEBHOOK_SECRET sebagai parameter
-            key.
+            Salin token perangkat, lalu isi <code>FONNTE_TOKEN</code> pada{" "}
+            <code>.env.local</code>.
           </li>
           <li>
-            Aktifkan Autoread pada perangkat Fonnte, lalu biarkan Personal dan Group mati
-            agar balasan hanya dikirim melalui aplikasi ini.
+            Isi <code>FONNTE_WEBHOOK_SECRET</code> pada <code>.env.local</code> dengan
+            teks acak yang kuat.
+          </li>
+          <li>Restart server, lalu tekan Hubungkan WhatsApp.</li>
+          <li>
+            Pasang alamat <code>https://DOMAIN_ANDA/api/channels/fonnte?key=SECRET</code>{" "}
+            pada halaman webhook Fonnte.
           </li>
           <li>
-            Tekan Hubungkan WhatsApp. Perangkat harus berstatus terhubung di dasbor
-            Fonnte.
+            Kirim pesan uji dari nomor lain ke WhatsApp toko. Pesanan akan muncul di
+            daftar di bawah.
           </li>
         </ol>
-        <p className="mt-3 text-sm text-muted-foreground">
-          Balasan pelanggan dibuat oleh model DeepSeek dari data warung dan dikirim
-          kembali melalui perangkat Fonnte.
-        </p>
       </details>
     </div>
   );

@@ -325,9 +325,11 @@ Tujuan: tujuh permukaan berfungsi penuh, sesuai `docs/SCOPE.md` bagian 2.
 
 ### S3 Integrasi WhatsApp
 
-Catatan 18 Oktober 2026: permukaan S3 sementara hanya menampilkan daftar
-pesanan. Kontrol koneksi, kotak masuk, panel simulasi, dan pengaturan data
-pelanggan tidak ditampilkan sampai rancangan baru disepakati.
+Catatan 18 Oktober 2026: permukaan S3 menampilkan kartu koneksi Fonnte tanpa
+input nomor dan daftar pesanan. Nomor perangkat dibaca dari Fonnte setelah
+token diverifikasi. Kotak masuk, panel simulasi, dan pengaturan data pelanggan
+belum ditampilkan. T5.11 dan T5.12 tetap parsial sampai akun Fonnte nyata
+diuji.
 
 | ID    | Tugas                                                                                                | Status |
 | ----- | ---------------------------------------------------------------------------------------------------- | ------ |
