@@ -194,7 +194,9 @@ describe("webhook Fonnte", () => {
     const body = new URLSearchParams(String(sends[0]![1]?.body));
     expect(body.get("target")).toBe(SENDER);
     expect(body.get("inboxid")).toBe("101");
-    expect(body.get("message")).toContain("Pesanan tercatat");
+    expect(body.get("message")).toContain("Pesanan diterima");
+    expect(body.get("message")).toContain("Rp30.000");
+    expect(body.get("message")).toContain("Beras Uji");
   });
 
   it("membalas pertanyaan biasa dengan balasan model dan tidak menggandakan pesan ulang", async () => {
