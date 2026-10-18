@@ -1,3 +1,4 @@
+import { ShoppingBag, TriangleAlert, Wallet } from "lucide-react";
 import { Suspense } from "react";
 
 import {
@@ -28,14 +29,18 @@ const JUDUL_STOK = "Stok menipis";
 export default function DasborPage() {
   return (
     <>
-      <PageHeader title="Dasbor" description="Ringkasan keadaan warung hari ini." />
+      <PageHeader
+        title="Dasbor"
+        description="Ringkasan keadaan warung hari ini."
+        action={<RefreshDashboardButton />}
+      />
 
       <div className="mx-auto flex w-full max-w-content flex-col gap-section p-page">
-        <div className="flex justify-end">
-          <RefreshDashboardButton />
-        </div>
-
-        <SectionCard title={JUDUL_RINGKASAN}>
+        <SectionCard
+          title={JUDUL_RINGKASAN}
+          description="Uang masuk, uang keluar, dan laba bersih hari ini."
+          icon={Wallet}
+        >
           <CardError title={JUDUL_RINGKASAN}>
             <Suspense fallback={<TodaySummarySkeleton />}>
               <TodaySummary />
@@ -43,21 +48,34 @@ export default function DasborPage() {
           </CardError>
         </SectionCard>
 
-        <SectionCard title={JUDUL_ORDERAN}>
-          <CardError title={JUDUL_ORDERAN}>
-            <Suspense fallback={<OrderHighlightsSkeleton />}>
-              <OrderHighlights />
-            </Suspense>
-          </CardError>
-        </SectionCard>
+        <div className="grid items-start gap-section xl:grid-cols-3">
+          <div className="min-w-0 xl:col-span-2">
+            <SectionCard
+              title={JUDUL_ORDERAN}
+              description="Orderan hari ini dan produk yang paling banyak terjual minggu ini."
+              icon={ShoppingBag}
+            >
+              <CardError title={JUDUL_ORDERAN}>
+                <Suspense fallback={<OrderHighlightsSkeleton />}>
+                  <OrderHighlights />
+                </Suspense>
+              </CardError>
+            </SectionCard>
+          </div>
 
-        <SectionCard title={JUDUL_STOK}>
-          <CardError title={JUDUL_STOK}>
-            <Suspense fallback={<StockAlertPreviewSkeleton />}>
-              <StockAlertPreview />
-            </Suspense>
-          </CardError>
-        </SectionCard>
+          <SectionCard
+            title={JUDUL_STOK}
+            description="Produk yang sudah menyentuh atau melewati ambang minimum."
+            icon={TriangleAlert}
+            tone="warning"
+          >
+            <CardError title={JUDUL_STOK}>
+              <Suspense fallback={<StockAlertPreviewSkeleton />}>
+                <StockAlertPreview />
+              </Suspense>
+            </CardError>
+          </SectionCard>
+        </div>
       </div>
     </>
   );

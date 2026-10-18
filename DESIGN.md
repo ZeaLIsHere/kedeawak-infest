@@ -95,18 +95,21 @@ kedua. Pembedaan dibuat lewat ukuran dan ketebalan.
 
 | Peran              | Kelas                | Ukuran    | Ketebalan |
 | ------------------ | -------------------- | --------- | --------- |
-| Angka besar dasbor | `text-metric`        | 1.875rem  | 600       |
-| Judul halaman      | `text-page-title`    | 1.5rem    | 600       |
-| Judul bagian       | `text-section-title` | 1.0625rem | 600       |
+| Angka besar dasbor | `text-metric`        | 2.25rem   | 600       |
+| Judul halaman      | `text-page-title`    | 1.875rem  | 600       |
+| Judul bagian       | `text-section-title` | 1.25rem   | 600       |
 | Isi                | `text-body`          | 0.9375rem | 400       |
-| Keterangan kecil   | `text-caption`       | 0.75rem   | 400       |
+| Keterangan kecil   | `text-caption`       | 0.8125rem | 400       |
 
 Aturan:
 
-- Maksimal dua tingkat ukuran huruf dalam satu kartu.
+- Hierarki dalam satu kartu dibatasi pada empat tingkat: judul bagian, label,
+  angka utama, dan keterangan. Tidak ada tingkat tambahan di bawahnya.
 - Judul bagian tidak memakai huruf besar semua, karena lebih sulit dibaca.
 - Panjang baris isi dijaga di bawah 75 karakter.
 - Nilai uang memakai `tabular-nums`, dan tidak pernah dipotong dengan elipsis.
+- Angka utama dibuat besar karena pemilik warung membaca dasbor sekilas, sering
+  dari layar telepon genggam di tengah kesibukan.
 
 ---
 
@@ -162,17 +165,19 @@ Aturan:
 
 ## 7. Komponen inti
 
-| Komponen          | Aturan                                                                                                          |
-| ----------------- | --------------------------------------------------------------------------------------------------------------- |
-| Tombol utama      | Warna `--primary`, teks `--primary-foreground`, tinggi `--control-height-md`, sudut `--radius-control`          |
-| Tombol sekunder   | Permukaan `--card`, garis `--border-strong`, teks `--foreground`                                                |
-| Kartu             | Permukaan `--card`, garis `--border`, sudut `--radius-surface`, jarak dalam `--card-padding`                    |
-| Lencana status    | Bentuk pil, memakai pasangan warna status dan permukaannya, selalu berisi teks                                  |
-| Tabel             | Kepala tabel memakai `text-caption` dan `--muted-foreground`, kolom angka memakai `tabular-nums` dan rata kanan |
-| Keadaan kosong    | Judul singkat, satu kalimat penjelasan, satu tindakan lanjutan. Tidak ada gambar hiasan                         |
-| Keadaan memuat    | Kerangka abu dengan bentuk menyerupai isi aslinya. Bukan pemutar berputar di tengah halaman                     |
-| Keadaan gagal     | Kalimat sebab yang dapat dimengerti, dan satu tombol coba lagi                                                  |
-| Dialog konfirmasi | Dipakai untuk tindakan yang tidak bisa dibatalkan, misalnya menghapus data pelanggan                            |
+| Komponen          | Aturan                                                                                                              |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------- |
+| Tombol utama      | Warna `--primary`, teks `--primary-foreground`, tinggi `--control-height-md`, sudut `--radius-control`              |
+| Tombol sekunder   | Permukaan `--card`, garis `--border-strong`, teks `--foreground`                                                    |
+| Kartu             | Permukaan `--card`, garis `--border`, sudut `--radius-surface`, jarak dalam `--card-padding`                        |
+| Kepala kartu      | Boleh memuat ikon kecil berpermukaan warna untuk menandai jenis data, dengan judul dan satu kalimat keterangan      |
+| Ubin angka        | Satu angka utama berikon, dipakai berkelompok di dasbor; label dan keterangan tetap ada agar tidak bergantung warna |
+| Lencana status    | Bentuk pil, memakai pasangan warna status dan permukaannya, selalu berisi teks                                      |
+| Tabel             | Kepala tabel memakai `text-caption` dan `--muted-foreground`, kolom angka memakai `tabular-nums` dan rata kanan     |
+| Keadaan kosong    | Judul singkat, satu kalimat penjelasan, satu tindakan lanjutan. Tidak ada gambar hiasan                             |
+| Keadaan memuat    | Kerangka abu dengan bentuk menyerupai isi aslinya. Bukan pemutar berputar di tengah halaman                         |
+| Keadaan gagal     | Kalimat sebab yang dapat dimengerti, dan satu tombol coba lagi                                                      |
+| Dialog konfirmasi | Dipakai untuk tindakan yang tidak bisa dibatalkan, misalnya menghapus data pelanggan                                |
 
 ---
 
@@ -200,7 +205,9 @@ Aturan:
 2. Karakter tanda hubung dan semua variannya. Lihat `docs/CONVENTIONS.md`
    bagian 2 untuk cara penulisan penggantinya.
 3. Gradien, bayangan tebal, dan efek timbul.
-4. Nilai warna, ukuran, atau teks yang ditulis langsung di komponen.
+4. Nilai desain yang ditulis langsung di komponen, termasuk warna, ukuran,
+   dan teks. Ukuran yang dihitung dari data, misalnya lebar batang proporsi,
+   tidak termasuk.
 5. Warna di luar token, termasuk warna yang ditulis inline.
 6. Status yang hanya dibedakan lewat warna.
 7. Tombol mati, menu belum berfungsi, dan tulisan "segera hadir".
@@ -246,6 +253,11 @@ pada layar sempit. Dialog produk dan arsip memakai Radix melalui komponen
 UI bersama. Antrean Persetujuan memisahkan aksi menunggu dari riwayat.
 WhatsApp menyajikan kartu orderan, pesan asal, dan balasan tanpa tampilan
 obrolan pelanggan.
+
+S1 Dasbor disusun untuk dibaca sekilas oleh pemilik warung dan kasir: ubin
+angka berikon untuk penjualan, pengeluaran, dan laba; jumlah orderan hari ini;
+produk terlaris dengan batang proporsi; serta stok menipis sebagai kartu
+peringatan. Tindakan memuat ulang ringkasan berada di kepala halaman.
 
 Pengembangan dihentikan pada titik yang diminta pemilik. Uji peramban dua
 ukuran layar tersedia, tetapi audit akhir aksesibilitas dan kualitas desain

@@ -91,10 +91,10 @@
   --space-gutter: var(--primitive-space-4);
 
   /* Ukuran huruf menurut peran */
-  --type-page-title: var(--primitive-font-size-2xl);
-  --type-section-title: var(--primitive-font-size-lg);
-  --type-metric: var(--primitive-font-size-3xl);
-  --type-metric-label: var(--primitive-font-size-sm);
+  --type-page-title: var(--primitive-font-size-3xl);
+  --type-section-title: var(--primitive-font-size-xl);
+  --type-metric: var(--primitive-font-size-4xl);
+  --type-metric-label: var(--primitive-font-size-base);
   --type-body: var(--primitive-font-size-base);
-  --type-caption: var(--primitive-font-size-xs);
+  --type-caption: var(--primitive-font-size-2xs);
 }

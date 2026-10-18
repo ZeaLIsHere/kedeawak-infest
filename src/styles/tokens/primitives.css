@@ -72,6 +72,7 @@
   --primitive-space-12: 3rem;
 
   /* Ukuran huruf. */
+  --primitive-font-size-2xs: 0.8125rem;
   --primitive-font-size-xs: 0.75rem;
   --primitive-font-size-sm: 0.875rem;
   --primitive-font-size-base: 0.9375rem;
@@ -79,6 +80,7 @@
   --primitive-font-size-xl: 1.25rem;
   --primitive-font-size-2xl: 1.5rem;
   --primitive-font-size-3xl: 1.875rem;
+  --primitive-font-size-4xl: 2.25rem;
 
   /* Ketebalan huruf. */
   --primitive-font-weight-normal: 400;

@@ -38,7 +38,7 @@
   --touch-target-min: var(--primitive-space-12);
 
   /* Jarak dalam dan luar komponen */
-  --card-padding: var(--primitive-space-5);
+  --card-padding: var(--primitive-space-6);
   --button-padding-x: var(--primitive-space-4);
   --button-padding-y: var(--primitive-space-2);
   --field-gap: var(--primitive-space-2);

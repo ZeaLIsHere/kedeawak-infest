@@ -9,7 +9,7 @@ import { formatNumber } from "@/lib/format/number";
 /** Kerangka muat untuk ringkasan periode. */
 export function PeriodSummarySkeleton() {
   return (
-    <div className="grid gap-section sm:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-section sm:grid-cols-2 2xl:grid-cols-4">
       {[0, 1, 2, 3].map((column) => (
         <div key={column} className="flex flex-col gap-2">
           <Skeleton className="h-4 w-24" />
@@ -31,7 +31,7 @@ export function PeriodSummary({ summary }: { readonly summary: FinancialSummary 
   const rugi = summary.profit < 0;
 
   return (
-    <div className="grid gap-section sm:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-section sm:grid-cols-2 2xl:grid-cols-4">
       <MetricBlock label="Penjualan" value={formatRupiah(summary.sales)} tone="income" />
       <MetricBlock
         label="Pengeluaran"

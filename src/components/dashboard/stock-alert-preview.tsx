@@ -1,4 +1,4 @@
-import { CircleCheck } from "lucide-react";
+import { CircleCheck, Package } from "lucide-react";
 import Link from "next/link";
 import { connection } from "next/server";
 
@@ -22,10 +22,13 @@ export function StockAlertPreviewSkeleton() {
       {[0, 1].map((index) => (
         <div
           key={index}
-          className="flex flex-col gap-2 border-b border-border pb-2 last:border-b-0"
+          className="flex items-start gap-3 rounded-lg border border-border p-4"
         >
-          <Skeleton className="h-5 w-40" />
-          <Skeleton className="h-4 w-56" />
+          <Skeleton className="size-10 shrink-0" />
+          <div className="flex w-full flex-col gap-2">
+            <Skeleton className="h-5 w-40" />
+            <Skeleton className="h-4 w-56" />
+          </div>
         </div>
       ))}
     </div>
@@ -79,27 +82,35 @@ export async function StockAlertPreview() {
   }
 
   return (
-    <div className="flex flex-col gap-section">
+    <div className="flex flex-col gap-gutter">
       <ul className="flex flex-col gap-gutter">
         {alerts.slice(0, PREVIEW_LIMIT).map(({ alert, product }) => (
           <li
             key={alert.id}
-            className="flex flex-col gap-1 border-b border-border pb-2 last:border-b-0 last:pb-0"
+            className="flex items-start gap-3 rounded-lg border border-border bg-background p-4"
           >
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-body font-medium">{product.name}</span>
-              <LowStockBadge />
-            </div>
-            <span className="text-caption text-muted-foreground">
-              Stok sekarang {formatNumber(product.stock)} {product.unit}, ambang minimum{" "}
-              {formatNumber(product.minimumStock)} {product.unit}
+            <span
+              aria-hidden="true"
+              className="flex size-10 shrink-0 items-center justify-center rounded-md bg-warning-surface text-warning-foreground"
+            >
+              <Package className="size-5" />
             </span>
+            <div className="flex min-w-0 flex-col gap-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-body font-semibold">{product.name}</span>
+                <LowStockBadge />
+              </div>
+              <span className="text-caption text-muted-foreground">
+                Stok sekarang {formatNumber(product.stock)} {product.unit}, ambang minimum{" "}
+                {formatNumber(product.minimumStock)} {product.unit}
+              </span>
+            </div>
           </li>
         ))}
       </ul>
 
       {alerts.length > PREVIEW_LIMIT ? (
-        <p className="text-caption text-muted-foreground">
+        <p className="text-body text-muted-foreground">
           {formatNumber(alerts.length - PREVIEW_LIMIT)} produk lain juga menipis.
         </p>
       ) : null}
